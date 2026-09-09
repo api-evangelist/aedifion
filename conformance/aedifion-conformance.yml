@@ -1,0 +1,173 @@
+generated: '2026-09-09'
+method: searched
+source: openapi/_original/aedifion-openapi.json
+docs:
+- https://docs.aedifion.io/en/products/io/data/semantic-data-model/
+- https://docs.aedifion.io/en/products/general/security/overview/
+- https://www.aedifion.com/sicherheit
+note: >-
+  Two classes of assertion are recorded separately below. `standards` are cross-cutting web/API
+  standards, judged from the contract. `domain_standards` are the standards of aedifion's own
+  market - building automation and building data semantics - and each entry says whether the
+  evidence is IN THE CONTRACT or only in the documentation, because those are different facts
+  for an integrator.
+standards:
+- id: oauth2
+  conforms: true
+  evidence: >-
+    openapi components.securitySchemes.openIDConnect is type oauth2; the aedifion Keycloak
+    realm serves a complete RFC 8414 authorization-server metadata document at
+    https://auth.aedifion.io/realms/aedifion/.well-known/oauth-authorization-server
+- id: oidc
+  conforms: true
+  evidence: >-
+    OpenID Provider Configuration served at
+    https://auth.aedifion.io/realms/aedifion/.well-known/openid-configuration with issuer,
+    jwks_uri, 13 scopes and 8 response types. Saved to
+    well-known/aedifion-openid-configuration.json
+- id: rfc7636-pkce
+  conforms: true
+  evidence: code_challenge_methods_supported includes S256 in the OIDC discovery document
+- id: rfc8705-mtls-client-auth
+  conforms: true
+  evidence: token_endpoint_auth_methods_supported includes tls_client_auth
+- id: rfc7617-http-basic
+  conforms: true
+  evidence: openapi securityScheme basicAuth, type http scheme basic (documented as legacy)
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: >-
+    All 269 error responses use application/json with a bespoke Error schema
+    (error/success/operation/details). No application/problem+json anywhere in the spec.
+- id: json-api
+  conforms: false
+  evidence: Bespoke response envelope; no JSON:API media type or document structure.
+- id: openapi-3
+  conforms: true
+  evidence: openapi/_original/aedifion-openapi.json declares openapi 3.0.1, 147 paths, 208
+    operations, 239 component schemas
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: No Sunset or Deprecation header declared on any operation; no deprecation policy
+    published.
+- id: pagination
+  conforms: true
+  partial: true
+  evidence: page/per_page query parameters with a PaginationMeta response envelope
+    (current_page, items_per_page, total_items, total_pages) on 20 of 208 operations
+- id: idempotency
+  conforms: true
+  partial: true
+  evidence: >-
+    Two operations documented as idempotent (post_project_in_project_group,
+    delete_project_in_project_group). No Idempotency-Key header exists. See
+    conventions/aedifion-conventions.yml idempotency.coverage = partial.
+- id: mqtt-3.1.1
+  conforms: true
+  evidence: >-
+    Broker at mqtt.aedifion.io, TLS-only on 8883 (native) and 9001 (WebSockets), MQTT 3.1.1
+    client identifier rules cited verbatim in the docs, QoS 0/1/2 supported.
+    https://docs.aedifion.io/en/developers/mqtt-api/
+- id: sasl-scram-sha-512
+  conforms: true
+  evidence: Kafka interface authenticates with SASL_SCRAM_SHA512 over SSL.
+    https://docs.aedifion.io/en/developers/kafka/
+domain_standards:
+- id: project-haystack
+  conforms: true
+  evidence_class: documentation
+  evidence: >-
+    The semantic data model documentation states aedifion uses Project Haystack's predefined
+    markers and tags to map entities to its semantic data model, while noting structural
+    differences between Haystack's flexible tagging and aedifion's predefined component model.
+    https://docs.aedifion.io/en/products/io/data/semantic-data-model/
+  note: >-
+    This is the load-bearing domain standard for building data. It is asserted in the docs and
+    reflected in the API's first-class tag surface (datapoint tags, tag associations with a
+    confirmed/unconfirmed state), but no Haystack marker vocabulary or version is declared in
+    the OpenAPI itself, so a consumer cannot verify the alignment from the contract alone.
+- id: bacnet
+  conforms: true
+  evidence_class: contract
+  evidence: >-
+    The Node units schema in the OpenAPI carries a BACnet alias alongside pint and
+    units-conversion aliases - e.g. {"bacnet":"degreesCelsius","pint":"degrees-celsius",
+    "units-conversion":"deg-C"} - so engineering units are mapped to BACnet unit enumerations
+    in the contract. Datapoint identifiers are BACnet-shaped, with the spec's own example being
+    "bacnet100-4120-CO2". The edge device documents BACnet logger, publisher, subscriber and
+    writer roles.
+  source: openapi/_original/aedifion-openapi.json#/components/schemas/Node
+- id: influxdb-line-protocol
+  conforms: true
+  evidence_class: contract
+  evidence: >-
+    The timeseries import operation declares format as an enum of ["csv",
+    "influx_line_protocol"] with a time_precision parameter documented as used only for
+    influx_line_protocol. The same wire format is mandatory for MQTT timeseries payloads and
+    is the Kafka message format.
+  source: openapi/_original/aedifion-openapi.json
+- id: modbus
+  conforms: true
+  evidence_class: documentation
+  evidence: Edge device documents Modbus logger and writer capability.
+    https://docs.aedifion.io/en/products/edge-device/overview/
+- id: knx
+  conforms: true
+  evidence_class: documentation
+  evidence: Edge device documents KNX logger and writer capability.
+- id: opc-ua
+  conforms: true
+  evidence_class: documentation
+  evidence: Edge device documents OPC UA and OPC DA logger capability.
+- id: brick-schema
+  conforms: false
+  evidence: No Brick Schema reference in the contract or the documentation.
+- id: ashrae-223p
+  conforms: false
+  evidence: Not named in the contract or the documentation.
+- id: saref
+  conforms: false
+  evidence: Not named in the contract or the documentation.
+- id: ifc
+  conforms: false
+  evidence: Not named in the contract or the documentation.
+compliance:
+- id: iso-27001
+  name: DIN EN ISO/IEC 27001
+  conforms: true
+  certified_since: '2023-12'
+  certifier: INFAZ Institut fuer Auditierung und Zertifizierung
+  certificate: https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/696e525b02ad6e609db2751c_2025_aedifion_certificate_iso-iec-27001_de.pdf
+  evidence: >-
+    "our processes and systems in all business areas have been certified according to DIN EN
+    ISO 27001 since December 2023" - https://www.aedifion.com/sicherheit. The 2025 certificate
+    PDF is published and was fetched (HTTP 200, application/pdf, 302 KB).
+- id: gdpr
+  name: GDPR / DSGVO
+  conforms: true
+  evidence: >-
+    Data is stored and processed exclusively in Germany (Hetzner data centres in Nuremberg and
+    Falkenstein); privacy policy published at https://www.aedifion.com/datenschutz
+- id: iso-50001
+  name: ISO 50001 energy management
+  conforms: enabling
+  evidence: >-
+    The Energy Bundle is marketed as delivering ISO 50001 conformity for the CUSTOMER's energy
+    management system. This is a capability aedifion provides to its customers, not a
+    certification aedifion holds.
+- id: geg
+  name: Gebaeudeenergiegesetz (German Buildings Energy Act) sections 60b and 71a
+  conforms: enabling
+  evidence: >-
+    TUEV Rheinland certified support for GEG conformity via aedifion.smartkit.
+    https://www.aedifion.com/geg
+- id: dgnb
+  name: DGNB building certification
+  conforms: enabling
+  evidence: Sustainability Bundle supports DGNB certification of the customer's buildings.
+- id: soc2
+  conforms: false
+  evidence: No SOC 2 report or claim found.
+- id: fedramp
+  conforms: false
+  evidence: Not applicable - German provider, no US federal offering found.

@@ -64,5 +64,68 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Aedifion is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://equityzen.com/company/aedifion
+aedifion GmbH is a Cologne-based PropTech founded in 2017 that operates a vendor-neutral,
+patented cloud platform for the optimized operation of non-residential buildings. It ingests
+real-time operating data from all building trades via plug-and-play edge devices, applies
+analytics and AI to detect faults, and autonomously controls HVAC plant based on weather
+forecasts, occupancy and electricity prices.
+
+- Website: https://www.aedifion.com/
+- Developer documentation: https://docs.aedifion.io/en/developers/
+- API console: https://api.aedifion.io/ui/
+
+## API surface
+
+| Surface | Where | Notes |
+|---|---|---|
+| HTTP API | `https://api.aedifion.io` | OpenAPI 3.0.1, 147 paths, **208 operations**, 239 schemas. Live at `/openapi.json` and `/openapi.yaml`. |
+| MQTT API | `mqtt.aedifion.io:8883` / `:9001` | TLS-only broker, MQTT 3.1.1, InfluxDB line protocol. |
+| Kafka | not published | SASL/SCRAM-SHA-512, topics `mtw.aed.{project_handle}.*`. Bootstrap servers are not published. |
+| Alert notifications | via HTTP API | Outbound push to Microsoft Teams webhook URLs, Telegram, email, dashboard. |
+
+Authentication is HTTP Basic (documented as legacy) or OpenID Connect bearer tokens from the
+aedifion Keycloak realm at `https://auth.aedifion.io/realms/aedifion`.
+
+## What this profile found
+
+**Strengths.** The contract is unusually complete for this sector: every one of the 208
+operations carries an `operationId`, a summary, a description and tags. The platform is ISO
+27001 certified (since December 2023, certificate published) and hosted entirely in Germany.
+The semantic component/pin data model aligns with Project Haystack, and BACnet unit
+enumerations are mapped in the schema itself. A dated changelog is maintained and was updated
+five days before this profile was written. aedifion also publishes a genuine, hand-written
+`llms.txt`.
+
+**Notable gaps.**
+
+- The spec declares `servers: [{"url": ""}]` — an **empty string**. The Swagger UI works because
+  the browser resolves it relative to the page, but any client generated from the downloaded
+  document has no host to call. `info.title` is the generic "API Docs" and `info.version` is
+  empty. See `overlays/aedifion-http-api-overlay.yaml`.
+- **No client SDK exists in any package registry.** The only npm package, `aedifion-api`, was
+  unpublished six minutes after it was published in 2021. The GitHub organisation's five repos
+  were all last touched between 2018 and 2020, and the "open source Excel plugin" repository is
+  empty.
+- **No sandbox.** The interactive console calls production, where a setpoint write actuates real
+  building equipment and 43 DELETE operations have no undo.
+- No RFC 9457 problem details, no `Idempotency-Key`, no rate-limit headers, no ETags, no
+  request-id header. Throttling is signalled inconsistently as 423 on one operation and 429 on
+  another.
+- No published vulnerability disclosure policy, `security.txt` or bug bounty.
+- No MCP server. `mcp/aedifion-mcp.yml` holds a **candidate** tool set derived from real
+  operationIds — it is a proposal, not a live agent surface.
+
+**Where aedifion does better than most.** The highest-consequence operation on the API,
+`post_datapoint_setpoint`, ships a real `dryrun` parameter, returns the prior value in
+`SetpointAck.state_before`, and defines `value='null'` as a reset that hands the point back to
+the local building automation system. That is a rehearsal path, an audit trail and a reversal
+path on the one operation that moves physical plant.
+
+## Artifacts
+
+`openapi/` `asyncapi/` `authentication/` `scopes/` `conventions/` `errors/` `data-model/`
+`conformance/` `lifecycle/` `changelog/` `rate-limits/` `plans/` `packages/` `components/`
+`sandbox/` `security/` `well-known/` `llms/` `mcp/` `skills/` `overlays/`
+
+Six packaged Agent Skills are in `skills/`; every `operationId` they reference was verified
+against the live spec.

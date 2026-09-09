@@ -1,18 +1,130 @@
 aid: aedifion
 name: Aedifion
-description: 'Aedifion is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  aedifion GmbH is a Cologne-based PropTech founded in 2017 that operates a vendor-neutral,
+  patented cloud platform for the optimized operation of non-residential buildings. The
+  platform ingests real-time operating data from all building trades via plug-and-play edge
+  devices, applies analytics and AI to detect faults and inefficiencies, and autonomously
+  controls HVAC and building services based on weather forecasts, occupancy and electricity
+  prices - cutting energy use, CO2 emissions and operating costs by up to 40% without
+  structural retrofits. Products span aedifion.io (connectivity and monitoring),
+  aedifion.analytics, aedifion.controls, aedifion.dynamics (demand-side management) and
+  aedifion.smartkit. Developers get a documented HTTP API (OpenAPI 3.0, 208 operations
+  across projects, datapoints, timeseries, analytics, controls, alerts and tasks), an MQTT
+  broker and a Kafka interface for streaming building telemetry. The company serves owners,
+  operators and asset managers of commercial real estate and supports decarbonization, ESG
+  reporting and DGNB, ISO 50001 and GEG certification.
+image: https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/6942a43e5bcce46ebe9f7529_65f998eafa61f2995943d60d_favicon-32x32.png
 url: https://raw.githubusercontent.com/api-evangelist/aedifion/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-09-09'
 modified: '2026-09-09'
 tags:
-- Company
-apis: []
+- Building Automation
+- Smart Buildings
+- Energy Management
+- Internet of Things
+- Real Estate
+- HVAC
+- Sustainability
+- Time Series
+- Analytics
+- MQTT
+- Building Operations
+- ESG
+- PropTech
+- Germany
+tags_raw:
+- building-automation
+- smart-buildings
+- energy-management
+- internet-of-things
+- real-estate
+- hvac
+- sustainability
+- time-series
+- analytics
+- mqtt
+- building-operations
+- esg
+- proptech
+- germany
+apis:
+- name: aedifion HTTP API
+  description: >-
+    Versioned REST API (v2) for the aedifion.io building operations platform. Covers
+    company, realm, project and user administration; datapoint and timeseries read/write;
+    virtual datapoints; the semantic component/pin data model; analytics runs and results;
+    cloud-based controls apps, setpoints and schedules; alerts and tasks; a document
+    database; and an AI assistant. 208 operations across 147 paths, every one carrying an
+    operationId, summary, description and tag. Authentication is HTTP Basic (legacy) or
+    OpenID Connect bearer tokens issued by the aedifion Keycloak realm.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  image: https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/6942a43e5bcce46ebe9f7529_65f998eafa61f2995943d60d_favicon-32x32.png
+  baseURL: https://api.aedifion.io
+  tags:
+  - Building Automation
+  - Smart Buildings
+  - Energy Management
+  - Time Series
+  - Analytics
+  - Internet of Things
+  - HVAC
+  tags_raw:
+  - building-automation
+  - smart-buildings
+  - energy-management
+  - time-series
+  - analytics
+  - internet-of-things
+  - hvac
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+  - type: Overlay
+    url: overlays/aedifion-http-api-overlay.yaml
+- name: aedifion MQTT API
+  description: >-
+    MQTT 3.1.1 broker interface at mqtt.aedifion.io for streaming building telemetry into
+    and out of the aedifion.io platform. TLS-only (ports 8883 for native MQTT, 9001 for
+    MQTT over WebSockets), username/password authentication with per-topic read/write
+    authorization. Three topic families - timeseries, META and CONTROLS - are namespaced by
+    load-balancing group and project handle. Timeseries payloads use InfluxDB Line
+    Protocol; metadata and controls payloads are JSON.
+  humanURL: https://docs.aedifion.io/en/developers/mqtt-api/
+  image: https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/6942a43e5bcce46ebe9f7529_65f998eafa61f2995943d60d_favicon-32x32.png
+  baseURL: mqtts://mqtt.aedifion.io:8883
+  tags:
+  - MQTT
+  - Internet of Things
+  - Time Series
+  - Streaming
+  - Building Automation
+  tags_raw:
+  - mqtt
+  - internet-of-things
+  - time-series
+  - streaming
+  - building-automation
+  properties:
+  - type: AsyncAPI
+    url: asyncapi/aedifion-mqtt-asyncapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/mqtt-api/
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -20,4 +132,85 @@ maintainers:
   email: info@apis.io
 common:
 - type: Website
-  url: https://equityzen.com/company/aedifion
+  url: https://www.aedifion.com/
+- type: DeveloperPortal
+  url: https://docs.aedifion.io/en/developers/
+- type: Documentation
+  url: https://docs.aedifion.io/en/
+- type: APIReference
+  url: https://api.aedifion.io/ui/
+- type: GettingStarted
+  url: https://docs.aedifion.io/en/developers/http-api/
+- type: Support
+  url: https://www.aedifion.com/kontakt
+- type: HelpCenter
+  url: https://www.aedifion.com/faq
+- type: Blog
+  url: https://www.aedifion.com/blog
+- type: GitHubOrganization
+  url: https://github.com/aedifion
+- type: SignUp
+  url: https://www.aedifion.io/login
+- type: Login
+  url: https://www.aedifion.io/login
+- type: TermsOfService
+  url: https://www.aedifion.com/agb
+- type: PrivacyPolicy
+  url: https://www.aedifion.com/datenschutz
+- type: StatusPage
+  url: https://status.aedifion.io/
+- type: ChangeLog
+  url: https://docs.aedifion.io/en/changelog/
+- type: Compliance
+  url: https://www.aedifion.com/sicherheit
+- type: OpenAPI
+  url: openapi/aedifion-openapi.yml
+- type: AsyncAPI
+  url: asyncapi/aedifion-mqtt-asyncapi.yml
+- type: LLMsTxt
+  url: llms/aedifion-llms.txt
+- type: WellKnown
+  url: well-known/aedifion-well-known.yml
+- type: Authentication
+  url: authentication/aedifion-authentication.yml
+- type: OAuthScopes
+  url: scopes/aedifion-scopes.yml
+- type: Conventions
+  url: conventions/aedifion-conventions.yml
+- type: Idempotency
+  url: conventions/aedifion-conventions.yml
+- type: ErrorCatalog
+  url: errors/aedifion-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/aedifion-lifecycle.yml
+- type: Conformance
+  url: conformance/aedifion-conformance.yml
+- type: DomainSecurity
+  url: security/aedifion-domain-security.yml
+- type: DataModel
+  url: data-model/aedifion-data-model.yml
+- type: ChangeLog
+  url: changelog/aedifion-changelog.yml
+- type: RateLimits
+  url: rate-limits/aedifion-rate-limits.yml
+- type: Plans
+  url: plans/aedifion-plans-pricing.yml
+- type: Packages
+  url: packages/aedifion-packages.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Overlay
+  url: overlays/aedifion-http-api-overlay.yaml
+- type: TrustCenter
+  url: security/aedifion-trust-center.yml
+- type: Console
+  url: https://api.aedifion.io/ui/
+- type: Webhooks
+  url: asyncapi/aedifion-event-surface.yml
+- type: Components
+  url: components/aedifion-components.yml
+x-enrichment:
+  date: '2026-09-09'
+  status: enriched
+  artifacts_added: 31
+  pass: local-v3

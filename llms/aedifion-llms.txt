@@ -1,0 +1,68 @@
+
+# aedifion
+
+<!-- last-updated: 2026-07 · language: de · canonical: https://www.aedifion.com/llms.txt -->
+
+> aedifion ist ein 2017 gegründetes Kölner PropTech mit über 100 Mitarbeitenden, spezialisiert auf Software für den optimierten Betrieb von Nichtwohnimmobilien. Die patentierte, herstellerunabhängige KI-Cloud-Plattform senkt Energieverbrauch, CO₂-Emissionen und Betriebskosten von Gebäuden um bis zu 40 % – ohne bauliche Eingriffe.
+
+Die Plug-and-Play-Lösung sammelt Echtzeit-Betriebsdaten, identifiziert Fehlfunktionen, gibt priorisierte Handlungsempfehlungen und regelt den Gebäudebetrieb autonom auf Basis von Wetterprognosen, Nutzerverhalten und Strompreisen. aedifion richtet sich an Eigentümer, Betreiber und Asset Manager von Nichtwohnimmobilien und unterstützt Dekarbonisierung, ESG-Reporting sowie Zertifizierungen (DGNB, ISO 50001, GEG).
+
+Das Unternehmen betreut mehr als 600 Projekte und hat rund 29 Mio. € Wagniskapital eingeworben (u. a. Eurazeo, World Fund). Zum Kundenportfolio zählen unter anderem BNP Paribas REIM, ECE, Drees & Sommer, AEW Invest, Art-Invest Real Estate, Strabag Property and Facility Services, Phoenix Contact, MOMENI und Henkel. Der Anspruch des Unternehmens: „Buildings Simply Made Better".
+
+Die Website gibt es auch auf Englisch und Französisch; die Pfade sind je Sprache lokalisiert (nicht einfach `/en`- oder `/fr`-Präfix). Einstiegspunkte: [English](https://www.aedifion.com/en) · [Français](https://www.aedifion.com/fr).
+
+> Hinweis: Lösungen sind vorkonfigurierte Produktbundles; Use Cases beschreiben Anwendungsziele. 
+> Produkte → Bausteine | Lösungen → Bundles | Use Cases → Ziele
+
+## Produkte
+
+- [Produktübersicht](https://www.aedifion.com/produkte): Patentierte, herstellerunabhängige Cloud-Plattform aus aufeinander abgestimmten Software-Bausteinen für die ganzheitliche technische und wirtschaftliche Optimierung von Immobilienportfolios.
+- [aedifion.io](https://www.aedifion.com/produkte/io): Ganzheitliches Datenbild des Gebäudebetriebs mit Konnektivität aller Gewerke – bringt die Betriebsdaten per Plug-and-Play in die Cloud (Datenverfügbarkeit und Monitoring).
+- [aedifion.analytics](https://www.aedifion.com/produkte/analytics): Automatisierte Analyse-KI deckt Ineffizienzen auf, identifiziert Optimierungspotenziale und gibt priorisierte Handlungsempfehlungen; mit Dashboards für Anlagenleistung und ESG-Kennzahlen.
+- [aedifion.controls](https://www.aedifion.com/produkte/controls): Smarte Anlagenregelung aus der Cloud steuert die TGA-Systeme autonom und proaktiv – abhängig von Bedarf, Wettervorhersagen und Auslastung.
+- [aedifion.elevate](https://www.aedifion.com/produkte/elevate): Full-Service-Paket – erfahrene aedifion-Ingenieure setzen Optimierungsmaßnahmen planvoll und zielgerichtet mit um.
+- [aedifion.engineering](https://www.aedifion.com/produkte/engineering): Partner für Digitalisierung, Refurbishment, Smart Building, White Labeling, Zertifizierung und Reporting.
+- [aedifion.dynamics](https://www.aedifion.com/produkte/dynamics): Demand Side Management und intelligente Stromkostenoptimierung – günstigste Tarife nutzen, Eigenverbrauch maximieren und das Gebäude aktiv in die Energiewende einbinden.
+- [aedifion.smartkit](https://www.aedifion.com/produkte/smartkit): Plug-and-Play-Kit aus Sensorik, LTE-Gateway und Cloud-Plattform für Heizungsmonitoring in kompakten Gebäuden; ermöglicht GEG-Konformität (§ 60b und § 71a) im gesamten Portfolio.
+- [aedifion AI Assistant](https://www.aedifion.com/produkte/ai-assistant): Intelligenter Chatbot auf Basis generativer KI – liefert Betreibern und Asset Managern schnell präzise Informationen zu Immobilien und deren technischen Anlagen.
+
+## Lösungen
+
+- [Lösungsübersicht](https://www.aedifion.com/loesungen): Vorkonfigurierte Bundles, die aedifion-Produkte und Services für konkrete Betreiberziele kombinieren.
+- [Optimization Bundle](https://www.aedifion.com/loesungen/optimization-bundle): KI-gestützte Betriebsoptimierung mit Datenerfassung und autonomer Regelung – Einsparungen von bis zu 40 %.
+- [Sustainability Bundle](https://www.aedifion.com/loesungen/sustainability-bundle): Add-on für Dekarbonisierung, nachhaltiges Facility-Management und DGNB-Zertifizierung.
+- [Energy Bundle](https://www.aedifion.com/loesungen/energy-bundle): Add-on für strukturiertes Energiemanagement und ISO-50001-Konformität.
+
+## Use Cases
+
+- [Betriebsoptimierung](https://www.aedifion.com/use-cases/betriebsoptimierung): Gebäudebetrieb mit KI wirtschaftlich und ökologisch verbessern, Energieverbrauch und CO₂-Ausstoß senken.
+- [Energieeffizienz](https://www.aedifion.com/use-cases/energieeffizienz): Energieeffizienz einzelner Gebäude oder ganzer Portfolios durch cloudbasierte Optimierung steigern.
+- [Nachhaltigkeit](https://www.aedifion.com/use-cases/nachhaltigkeit): Gebäude in die Nachhaltigkeitsstrategie eines Portfolios einbinden und ihren Energieverbrauch reduzieren.
+- [Technisches Monitoring](https://www.aedifion.com/use-cases/technisches-monitoring): Kontinuierliche Überwachung der Gebäudetechnik auf Basis der Plug-and-Play-Datenerfassung.
+- [Datenverfügbarkeit](https://www.aedifion.com/use-cases/datenverfuegbarkeit): Ganzheitliche Datenerfassung vom einzelnen Datenpunkt bis zur Portfolio-Ebene per Plug-and-Play oder Retrofit.
+- [Smart Building](https://www.aedifion.com/use-cases/smart-building): Zentrale IoT-Services über die Cloud-Plattform, von Flächennutzung bis Raumklima.
+
+## Wissen und Nachweise
+
+- [Erfolgsgeschichten](https://www.aedifion.com/erfolgsgeschichten): Referenzprojekte mit konkreten Einspar- und Optimierungsergebnissen.
+- [Whitepaper](https://www.aedifion.com/whitepaper): Fachpublikationen zu Gebäudeoptimierung, Dekarbonisierung und Energiemanagement.
+- [Blog](https://www.aedifion.com/blog): Fachartikel und Neuigkeiten zu digitalem Gebäudebetrieb.
+- [Forschung](https://www.aedifion.com/forschung): Forschungsprojekte und wissenschaftliche Grundlagen hinter der Plattform.
+- [GEG-Konformität](https://www.aedifion.com/geg): Unterstützung bei der Erfüllung des Gebäudeenergiegesetzes (TÜV-Rheinland-zertifiziert).
+- [Gebäudezertifizierung](https://www.aedifion.com/gebaeudezertifizierung): Unterstützung bei DGNB und weiteren Zertifizierungen.
+- [Sicherheit](https://www.aedifion.com/sicherheit): Informationssicherheit und Datenschutz, zertifiziert nach DIN EN ISO 27001.
+- [Glossar](https://www.aedifion.com/glossar): Begriffe rund um Gebäudeautomation, Energie und Digitalisierung.
+- [FAQ](https://www.aedifion.com/faq): Häufige Fragen zu Plattform, Anbindung und Leistungen.
+
+## Unternehmen
+
+- [Über aedifion](https://www.aedifion.com/ueber): Mission, Team und Ansatz von aedifion.
+- [Unternehmensfakten](https://www.aedifion.com/unternehmen-fakten): Kennzahlen zu Gründung, Team, Projekten und Finanzierung.
+- [Partner](https://www.aedifion.com/partner): Technologie- und Umsetzungspartner im aedifion-Ökosystem.
+- [Karriere](https://www.aedifion.com/karriere): Offene Stellen und Arbeiten bei aedifion.
+- [Kontakt](https://www.aedifion.com/kontakt): Ansprechpartner und Kontaktmöglichkeiten.
+
+## Optional
+
+- [Presse](https://www.aedifion.com/presse): Pressemitteilungen und Medienkontakt.
+- [Newsletter](https://www.aedifion.com/newsletter): Anmeldung zum aedifion-Newsletter.

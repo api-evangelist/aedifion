@@ -1,0 +1,44 @@
+generated: '2026-09-09'
+method: generated
+source: openapi/_original/aedifion-openapi.json
+note: >-
+  Packaged Agent Skills for the aedifion HTTP API, authored by API Evangelist. aedifion
+  publishes no AGENTS.md, skills directory or agent guidance of its own - searched the docs
+  site, the GitHub organisation and the web. Every operationId referenced in these skills was
+  grepped out of the live OpenAPI and exists verbatim; none is invented. The conventions,
+  error, idempotency and reversibility rules cited come from
+  conventions/aedifion-conventions.yml and errors/aedifion-problem-types.yml.
+skills:
+- file: aedifion-authenticate-and-discover.md
+  name: Authenticate and discover a building
+  api: openapi/aedifion-openapi.yml
+  operations: [get_user, get_user_projects, get_project, get_project_components,
+    get_project_datapoints_bytag, get_project_datapoints_by_page, get_datapoint]
+- file: aedifion-read-timeseries.md
+  name: Read and import building timeseries
+  api: openapi/aedifion-openapi.yml
+  operations: [get_datapoint_timeseries, post_project_import_timeseries,
+    get_project_datapoints_bytag]
+- file: aedifion-write-setpoint-safely.md
+  name: Write a setpoint to building equipment safely
+  api: openapi/aedifion-openapi.yml
+  operations: [get_project_setpoints, post_datapoint_setpoint, get_datapoint_setpoint,
+    get_datapoint]
+  consequence: physical
+- file: aedifion-analytics-and-tasks.md
+  name: Run analytics and act on optimization findings
+  api: openapi/aedifion-openapi.yml
+  operations: [get_analysis_instances, get_instance_results, get_component_results,
+    get_kpi_aggregation, get_projects_kpis_aggregation, get_project_tasks, post_task]
+- file: aedifion-alerts-and-monitoring.md
+  name: Configure alerts and notification channels
+  api: openapi/aedifion-openapi.yml
+  operations: [get_alerts, post_alert_threshold, post_alert_discrete, post_alert_throughput,
+    enable_alert, disable_alert, delete_alert_new]
+- file: aedifion-controls-apps.md
+  name: Deploy and supervise autonomous controls apps
+  api: openapi/aedifion-openapi.yml
+  operations: [get_controls_algorithms_by_component, get_controls_apps, get_controls_app,
+    post_controls_app, post_controls_app_run, post_controls_apps_run, get_controls_app_logs,
+    delete_controls_app]
+  consequence: physical

@@ -1,0 +1,69 @@
+generated: '2026-09-09'
+method: searched
+source: https://docs.aedifion.io/en/products/io/quota/
+spec_source: openapi/_original/aedifion-openapi.json
+limit_count: 2
+note: >-
+  aedifion publishes no request-rate limit - there is no requests-per-second or
+  requests-per-minute figure anywhere in the docs or the spec. What it does publish is a
+  RESOURCE QUOTA model per licence tier, and two operation-specific throttles visible in the
+  OpenAPI. No rate-limit response headers are declared on any of the 208 operations, so an
+  agent has no runtime signal to back off on - it can only react to a 423 or 429 after the
+  fact.
+response_headers:
+  ratelimit_headers: none
+  retry_after: false
+  note: No X-RateLimit-*, RateLimit-* or Retry-After header is declared anywhere in the spec.
+limits:
+- scope: per-project
+  operation: post_project_object_report
+  window: daily
+  limit: null
+  limit_stated: false
+  status_on_exhaustion: 429
+  description: 'Too many requests. Daily report generation quota exceeded for this project.'
+  source: openapi/_original/aedifion-openapi.json
+  note: The docs state a daily quota exists but never publish the number.
+- scope: per-user
+  operation: put_user_password
+  window: not stated
+  limit: null
+  limit_stated: false
+  status_on_exhaustion: 423
+  description: Endpoint is locked due to too many requests.
+  source: openapi/_original/aedifion-openapi.json
+  note: >-
+    Brute-force protection on password change, signalled as 423 Locked rather than 429. A
+    generic HTTP client will not recognise this as throttling.
+quotas:
+  enforcement:
+    soft: >-
+      "Requests that exceed the quota limits will not be blocked and the platform will work as
+      normal" - applies to users, logged datapoints and writable datapoints.
+    hard: >-
+      "Requests that exceed the quota limits will be blocked and a corresponding error is
+      returned" - applies to the document database.
+  company_level:
+    document_database: 2 GB, 20000 files
+  project_level:
+  - tier: Regular
+    users: 3
+    logged_datapoints: 2500
+    writable_datapoints: 100
+    document_database: 200 MB, 2000 files
+  - tier: Medium
+    users: 10
+    logged_datapoints: 10000
+    writable_datapoints: 500
+    document_database: 500 MB, 5000 files
+  - tier: Premium
+    users: unlimited
+    logged_datapoints: 50000
+    writable_datapoints: not stated
+    document_database: 2 GB, 20000 files
+  source: https://docs.aedifion.io/en/products/io/quota/
+gaps:
+- No published requests-per-second or per-minute limit.
+- The two throttles that exist declare no numeric limit.
+- No rate-limit response headers, so backoff must be reactive.
+- Inconsistent exhaustion status codes (423 on one operation, 429 on another).

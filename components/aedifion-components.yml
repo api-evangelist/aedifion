@@ -1,0 +1,43 @@
+generated: '2026-09-09'
+method: searched
+source: https://github.com/aedifion/aedifion-excel-plugin
+component_count: 1
+note: >-
+  aedifion ships no embeddable web components, element library or JavaScript widget SDK. The
+  one client-side artifact it distributes is a Microsoft Excel add-in for analysts.
+components:
+- name: aedifion Excel Plugin
+  family: desktop-add-in
+  platform: Microsoft Excel (Windows, VSTO / ClickOnce)
+  description: >-
+    Imports, resamples and plots aedifion timeseries data directly inside an Excel worksheet,
+    so building analysts can work with platform data without writing API calls.
+  distribution: >-
+    setup.exe plus an Application Files directory committed to the GitHub repository. Not
+    published to any registry, not version-tagged, and no release exists - the version a user
+    installs is whatever is on the default branch.
+  url: https://github.com/aedifion/aedifion-excel-plugin
+  version: null
+  official: true
+  last_updated: '2020-10-28'
+  status: stale
+  note: >-
+    A companion repository, excel-plugin-opensource, was created to open-source this plugin but
+    is empty.
+- name: aedifion.io web frontend
+  family: hosted-application
+  description: >-
+    The platform's own single-page application at https://www.aedifion.io/ - asset overview,
+    datapoints, energy and CO2, optimization, reporting, status and alerts, and AI controls
+    views. Hosted and operated by aedifion; it is not embeddable in a customer application and
+    exposes no component API.
+  url: https://www.aedifion.io/login
+  official: true
+  embeddable: false
+  note: >-
+    Whitelabelling is referenced on the Company resource in the HTTP API (a `whitelabel`
+    property), and aedifion.engineering is marketed as offering white labelling, but no public
+    embedding or theming API is documented.
+gaps:
+- No web components, React/Vue component library or embeddable dashboard SDK.
+- The Excel add-in is unversioned and five years stale.

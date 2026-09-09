@@ -1,0 +1,111 @@
+generated: '2026-09-09'
+method: searched
+source: >-
+  registry.npmjs.org, pypi.org, rubygems.org, crates.io, api.nuget.org, search.maven.org,
+  proxy.golang.org, packagist.org and the aedifion GitHub organisation
+package_count: 0
+official_sdk_count: 0
+note: >-
+  aedifion publishes NO client SDK in any public package registry. Searched npm (including a
+  full-text search for "aedifion", 0 results), PyPI, RubyGems, crates.io, NuGet, Maven Central,
+  pkg.go.dev and Packagist. The one npm name that exists, `aedifion-api`, was published and
+  UNPUBLISHED within six minutes on 2021-03-08 and resolves to no installable version today.
+  The GitHub organisation is real but dormant - five public repositories, the most recent
+  pushed in October 2020 - and none of them is a client library. Developers integrate against
+  the raw HTTP API and the Swagger UI, or generate their own client from
+  https://api.aedifion.io/openapi.json.
+registries_checked:
+- registry: npm
+  query: aedifion
+  result: 0 packages
+- registry: npm
+  query: aedifion-api
+  result: unpublished 2021-03-08, no installable version
+- registry: pypi
+  queries: [aedifion, aedifion-api, pyaedifion]
+  result: 404 on all
+- registry: rubygems
+  result: none
+- registry: crates.io
+  result: none
+- registry: nuget
+  result: none
+- registry: maven-central
+  result: none
+- registry: pkg.go.dev
+  result: none
+- registry: packagist
+  result: none
+packages: []
+unpublished:
+- language: javascript
+  registry: npm
+  name: aedifion-api
+  url: https://www.npmjs.com/package/aedifion-api
+  version: null
+  published: null
+  unpublished: '2021-03-08'
+  last_version_seen: 6.3.0
+  official: unknown
+  note: >-
+    Registry metadata shows version 6.3.0 created at 15:35:01Z on 2021-03-08 and unpublished at
+    15:41:26Z the same day - six minutes later. Nothing is installable. Recorded because an
+    integrator searching npm will find the name and should know it is dead.
+source_repositories:
+- name: tutorial-api-client
+  url: https://github.com/aedifion/tutorial-api-client
+  language: null
+  official: true
+  is_sdk: false
+  version: null
+  published: null
+  last_push: '2019-10-30'
+  note: README only - the repository contains no code. It links to the API documentation.
+- name: tutorials
+  url: https://github.com/aedifion/tutorials
+  language: python
+  official: true
+  is_sdk: false
+  version: null
+  published: null
+  last_push: '2019-11-05'
+  note: Python tutorial scripts for the aedifion.io platform. Example code, not a packaged
+    client library.
+- name: mqtt-ws-demo
+  url: https://github.com/aedifion/mqtt-ws-demo
+  language: javascript
+  official: true
+  is_sdk: false
+  version: null
+  published: null
+  last_push: '2018-12-20'
+  note: MQTT-over-WebSockets browser demo (one JS file plus an HTML page).
+- name: aedifion-excel-plugin
+  url: https://github.com/aedifion/aedifion-excel-plugin
+  language: dotnet-vsto
+  registry: github
+  official: true
+  is_sdk: false
+  version: null
+  published: null
+  last_push: '2020-10-28'
+  note: >-
+    Distributed as a VSTO ClickOnce installer (setup.exe plus Application Files) committed to
+    the repository, not through a package registry, and not version-tagged - so a consumer
+    cannot tell which build they are getting. See components/aedifion-components.yml.
+- name: excel-plugin-opensource
+  url: https://github.com/aedifion/excel-plugin-opensource
+  official: true
+  is_sdk: false
+  version: null
+  published: null
+  note: >-
+    Announced as "Open source project of the aedifion Excel plugin. You are welcome to
+    contribute" but the repository is EMPTY - the GitHub contents API returns "This repository
+    is empty." The open-sourcing never landed.
+decay_signal: >-
+  Strong. The API is actively developed - the changelog shows a release on 2026-09-04 and the
+  live OpenAPI carries 208 well-documented operations - but every piece of client tooling the
+  company ever published predates 2021, and the only SDK-shaped npm package was withdrawn six
+  minutes after publication. The gap between a maintained API and abandoned client tooling is
+  the clearest finding in this profile.

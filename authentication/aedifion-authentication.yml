@@ -1,0 +1,71 @@
+generated: '2026-09-09'
+method: searched
+source: openapi/aedifion-openapi.yml
+docs: https://docs.aedifion.io/en/developers/http-api/guides-and-tutorials/authentication/
+discovery: well-known/aedifion-openid-configuration.json
+summary:
+  types: [http, oauth2, openIdConnect]
+  http_schemes: [basic]
+  oauth2_flows: [implicit, authorizationCode, password, clientCredentials]
+  pkce: [S256, plain]
+  mtls_client_auth: true
+  preferred: openIDConnect
+schemes:
+- name: basicAuth
+  type: http
+  scheme: basic
+  status: legacy
+  header: 'Authorization: Basic base64(email:password)'
+  rfc: RFC 7617
+  note: >-
+    The docs state "The aedifion HTTP API supports Basic Auth for legacy reasons until
+    further notice. HTTP Basic Auth may be deprecated in future." Credentials are the user's
+    platform email and password, sent on every request, so it must only be used over HTTPS.
+  sources: [openapi/aedifion-openapi.yml]
+- name: openIDConnect
+  type: oauth2
+  subtype: openIdConnect
+  issuer: https://auth.aedifion.io/realms/aedifion
+  provider: Keycloak
+  header: 'Authorization: Bearer <access_token>'
+  endpoints:
+    authorization: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+    token: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/token
+    introspection: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/token/introspect
+    jwks_uri: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/certs
+  flows:
+  - flow: implicit
+    declared_in: openapi
+  - flow: authorizationCode
+    declared_in: oidc-discovery
+  - flow: password
+    declared_in: docs
+    note: Keycloak Direct Access Grant - grant_type=password with client_id, username, password.
+  - flow: clientCredentials
+    declared_in: oidc-discovery
+  token_endpoint_auth_methods:
+  - private_key_jwt
+  - client_secret_basic
+  - client_secret_post
+  - tls_client_auth
+  - client_secret_jwt
+  sources: [openapi/aedifion-openapi.yml, well-known/aedifion-openid-configuration.json]
+- name: mqtt-credentials
+  type: other
+  transport: mqtt
+  note: >-
+    The MQTT broker at mqtt.aedifion.io authenticates with username/password in the MQTT
+    CONNECT packet over TLS. Limited-validity credentials are minted through the HTTP API's
+    MQTT user-management endpoints; unlimited-validity credentials are issued only on
+    request by aedifion staff. Authorization is per-topic read/write.
+  docs: https://docs.aedifion.io/en/developers/http-api/guides-and-tutorials/mqtt-user-management/
+- name: kafka-sasl
+  type: other
+  transport: kafka
+  mechanism: SASL/SCRAM-SHA-512 over SSL
+  note: Kafka consumers authenticate with SASL_SCRAM_SHA512 and security_protocol SSL.
+  docs: https://docs.aedifion.io/en/developers/kafka/
+sso:
+  supported: true
+  protocols: [OpenID Connect, OAuth 2.0, SAML, LDAP, Active Directory]
+  docs: https://docs.aedifion.io/en/admins/sso/

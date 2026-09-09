@@ -1,0 +1,40 @@
+generated: '2026-09-09'
+method: searched
+source: https://api.aedifion.io/ui/
+sandbox_available: false
+console_available: true
+note: >-
+  aedifion publishes NO sandbox or test environment. There is no test/live key separation, no
+  test-mode prefix, no magic test identifiers, no fixture or trigger tooling and no time
+  simulation - searched the developer documentation, the tutorials repository and the web. A
+  developer cannot exercise this API without a real customer account against a real building.
+console:
+  url: https://api.aedifion.io/ui/
+  kind: Swagger UI
+  interactive: true
+  description: >-
+    The API's own interactive console. The spec's info block states it "allows you to browse
+    documentation of all endpoints, explore schemas and examples of request parameters and
+    responses, [and] call endpoints and view responses."
+  caveat: >-
+    IMPORTANT - this console calls PRODUCTION. There is no sandbox behind it. Executing
+    post_datapoint_setpoint or post_controls_app_run from this UI actuates real equipment in a
+    real building, and the 43 DELETE operations destroy real data with no undo. It is a console,
+    not a sandbox, and the distinction matters more here than for most APIs.
+  note: >-
+    The UI works because the browser resolves the spec's empty servers[] url relative to the
+    page. A client that downloads the same spec gets no host at all - see
+    overlays/aedifion-http-api-overlay.yaml.
+dry_run:
+  available: true
+  scope: [post_datapoint_setpoint]
+  parameter: dryrun
+  note: >-
+    The nearest thing to a safe rehearsal on this platform. Documented as "Do a dry run without
+    actually writing anything" and present only on the setpoint write. See
+    conventions/aedifion-conventions.yml dry_run_mode.
+gaps:
+- No sandbox or staging environment.
+- No test credentials, demo project or seeded dataset for evaluation.
+- The interactive console is wired to production.
+- Dry-run exists on one operation out of 129 writes.

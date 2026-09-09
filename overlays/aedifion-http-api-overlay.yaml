@@ -1,0 +1,128 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the aedifion HTTP API
+  version: 1.0.0
+extends: openapi/aedifion-openapi.yml
+x-generated: '2026-09-09'
+x-method: generated
+x-source: >-
+  Derived from the live spec at https://api.aedifion.io/openapi.json plus aedifion's published
+  documentation. This overlay records API Evangelist's enhancements without mutating the
+  harvested original at openapi/_original/aedifion-openapi.json.
+actions:
+- target: $.info
+  description: >-
+    The published spec's info block is nearly empty - title is the generic "API Docs", version
+    is an empty string, and there is no contact, licence or externalDocs. Fill it in.
+  update:
+    title: aedifion HTTP API
+    version: '2'
+    x-apievangelist-note: >-
+      info.title in the published spec is "API Docs" and info.version is an empty string. A
+      generated client would be named after the Swagger UI page rather than the product, and no
+      client can pin a version.
+    contact:
+      name: aedifion GmbH
+      url: https://www.aedifion.com/kontakt
+      email: contact@aedifion.com
+    externalDocs:
+      description: aedifion developer documentation
+      url: https://docs.aedifion.io/en/developers/http-api/
+- target: $.servers
+  description: >-
+    THE SINGLE HIGHEST-VALUE FIX. The published spec declares servers as [{"url": ""}] - an
+    empty string. The Swagger UI at api.aedifion.io/ui/ works because the browser resolves the
+    empty URL relative to the page it is served from, but any client generated from the
+    downloaded document has no host to call and every generated SDK is dead on arrival. The
+    real hosts are documented at
+    https://docs.aedifion.io/en/developers/http-api/ and are supplied here.
+  update:
+  - url: https://api.aedifion.io
+    description: aedifion cloud platform
+  - url: https://api.{realm}.aedifion.io
+    description: Dedicated single-tenant instance
+    variables:
+      realm:
+        default: aedifion
+        description: The customer's dedicated realm name.
+- target: $.components.securitySchemes.openIDConnect
+  description: >-
+    The spec models the Keycloak provider as an oauth2 scheme with only an implicit flow and
+    only the `openid` scope. The realm's own discovery document advertises authorizationCode,
+    clientCredentials and password grants, PKCE with S256, and 13 scopes. Implicit is
+    discouraged by OAuth 2.1; authorizationCode + PKCE is what a client should use.
+  update:
+    x-apievangelist-discovery: https://auth.aedifion.io/realms/aedifion/.well-known/openid-configuration
+    x-apievangelist-recommended-flow: authorizationCode with PKCE (S256)
+    x-apievangelist-available-grants:
+    - authorization_code
+    - client_credentials
+    - password
+    - refresh_token
+    x-apievangelist-note: >-
+      Declared flows in the spec (implicit only) are a subset of what the identity provider
+      actually supports. See scopes/aedifion-scopes.yml.
+- target: $.components.securitySchemes.basicAuth
+  description: Record the provider's own statement that this scheme is legacy.
+  update:
+    x-apievangelist-status: legacy
+    x-apievangelist-note: >-
+      aedifion's documentation states "The aedifion HTTP API supports Basic Auth for legacy
+      reasons until further notice. HTTP Basic Auth may be deprecated in future." No Sunset
+      date is published.
+- target: $.paths['/v2/datapoint/setpoint'].post
+  description: >-
+    Flag the highest-consequence operation on the API with an agentic execution contract. This
+    operation actuates physical building plant.
+  update:
+    x-agentic-access:
+      action-class: acting
+      consequence: physical
+      audit: required
+      human-in-the-loop: recommended
+      token-ttl-seconds: 300
+      dry-run:
+        supported: true
+        parameter: dryrun
+      reversal:
+        supported: true
+        how: re-issue with value='null' to reset the point to local building automation control
+        window: not stated
+    x-apievangelist-note: >-
+      aedifion describes this endpoint as "no-frills, non-acked, stateless, best-effort" and is
+      explicit that a 200 means the request was authorized and well-formed, NOT that the
+      building network applied the value. Callers must pass acked=true and redeem the returned
+      reference at get_datapoint_setpoint to confirm.
+- target: $.paths['/v2/controls/app/{controls_app_id}/run'].post
+  description: Flag autonomous control deployment as a consequential action.
+  update:
+    x-agentic-access:
+      action-class: acting
+      consequence: physical
+      audit: required
+      human-in-the-loop: recommended
+      token-ttl-seconds: 300
+    x-apievangelist-note: This operation both starts and stops an autonomous control
+      application that operates HVAC plant without further human input.
+- target: $.info
+  description: >-
+    Record the cross-cutting semantics an integrator needs that the spec does not state - error
+    format, rate-limit signalling and idempotency posture.
+  update:
+    x-apievangelist-conventions:
+      error_format: custom-json (not RFC 9457); single Error schema across all 269 error
+        responses
+      idempotency: partial - no Idempotency-Key header; two set-membership operations
+        documented as idempotent
+      rate_limit_headers: none declared
+      rate_limit_status_codes: [423, 429]
+      pagination: page/per_page with a PaginationMeta envelope, on 20 of 208 operations
+      conditional_requests: no ETag or If-Match support
+      request_tracing: no request-id header
+    x-apievangelist-artifacts:
+      conventions: conventions/aedifion-conventions.yml
+      errors: errors/aedifion-problem-types.yml
+      authentication: authentication/aedifion-authentication.yml
+      rate_limits: rate-limits/aedifion-rate-limits.yml
+      data_model: data-model/aedifion-data-model.yml
+      events: asyncapi/aedifion-event-surface.yml

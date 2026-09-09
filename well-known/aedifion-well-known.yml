@@ -1,0 +1,158 @@
+generated: '2026-09-09'
+method: probed
+source: live probe of every host in apis.yml plus the Keycloak realm named by the OpenAPI openIDConnect scheme
+notes: >-
+  Six hosts probed against the closed named path list. Only one real document was found:
+  the OpenID Connect / OAuth 2.0 authorization-server metadata served by the aedifion
+  Keycloak realm. It does NOT live at the host root - Keycloak serves realm discovery under
+  /realms/<realm>/.well-known/, so the root /.well-known/openid-configuration on
+  auth.aedifion.io returns 404 while the realm path returns a complete RFC 8414 / OIDC
+  Discovery document. The realm name was taken from the authorizationUrl in the OpenAPI
+  openIDConnect securityScheme, not guessed.
+  aedifion.io is the platform single-page web application and answers HTTP 200 with the same
+  5,659-byte SPA shell for every path, including a negative control that cannot exist. Every
+  apparent hit on that host is therefore discarded and none is recorded as a document.
+hit_count: 1
+path_echo_control:
+  aedifion.io: failed
+  aedifion.com: passed
+  www.aedifion.com: passed
+  api.aedifion.io: passed
+  docs.aedifion.io: passed
+  auth.aedifion.io: passed
+hosts:
+- host: https://auth.aedifion.io
+  documents:
+  - path: /realms/aedifion/.well-known/openid-configuration
+    status: 200
+    file: aedifion-openid-configuration.json
+  - path: /realms/aedifion/.well-known/oauth-authorization-server
+    status: 200
+    file: aedifion-openid-configuration.json
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+- host: https://api.aedifion.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+- host: https://www.aedifion.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+- host: https://aedifion.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+- host: https://docs.aedifion.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+- host: https://aedifion.io
+  note: >-
+    Single-page-application catch-all. Every path returns HTTP 200 with an identical
+    5,659-byte HTML shell, including /.well-known/aedifion-negative-control-7f3ab91c.json.
+    All hits discarded; no documents recorded.
+  soft_404_control:
+    path: /.well-known/aedifion-negative-control-7f3ab91c.json
+    status: 200
+    bytes: 5659
+    content_type: text/html
+  documents: []

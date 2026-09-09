@@ -1,0 +1,133 @@
+generated: '2026-09-09'
+method: derived
+source: openapi/_original/aedifion-openapi.json
+format: custom-json
+rfc9457: false
+note: >-
+  aedifion does NOT use RFC 9457 problem+json. Every error across all 208 operations is
+  returned as application/json using a single `Error` schema. The envelope is consistent,
+  which is the useful property for an agent, but it carries no machine-readable `type` URI
+  and no per-error code - the discriminating information is free-text prose in the `error`
+  field. 269 error responses were declared across the surface.
+envelope:
+  media_type: application/json
+  schema: '#/components/schemas/Error'
+  fields:
+  - name: error
+    type: string
+    required: true
+    description: Human-readable error message. This is the only required field and the only
+      place the specific cause appears.
+  - name: success
+    type: boolean
+    default: false
+    description: Always false on an error response.
+  - name: operation
+    type: string
+    enum: ['', get, create, delete, update]
+    description: Which CRUD operation was attempted. Many 401/403 descriptions state the
+      expected value explicitly, so it is usable for correlation.
+  - name: details
+    type: object
+    description: Free-form object for additional context. No schema is declared for it.
+success_envelope:
+  schema: '#/components/schemas/Success'
+  fields: [success, message, operation, resource]
+coverage:
+  operations_total: 208
+  error_responses_declared: 269
+  operations_with_4xx: 208
+problems:
+- status: 400
+  title: Bad request
+  occurrences: 28
+  meaning: Malformed or invalid parameters, body, file path or filename.
+  remediation: Validate parameters against the schema before retrying; a retry with the same
+    payload will fail identically.
+  retryable: false
+  examples:
+  - Parameter title is missing or invalid.
+  - The file path is invalid or the folder nesting depth exceeds the configured maximum.
+- status: 401
+  title: Unauthorized request
+  occurrences: 175
+  meaning: Missing, malformed or expired credentials. Applies to nearly every operation - it
+    is declared on 175 of 208.
+  remediation: Re-authenticate. For OIDC, obtain a fresh bearer token from the token endpoint;
+    for Basic, verify the email/password pair.
+  retryable: true
+  retry_after_reauth: true
+- status: 403
+  title: Forbidden
+  occurrences: 8
+  meaning: Authenticated but not authorized for this project, datapoint or operation under the
+    platform's role-based access control. Also used for a temporarily disabled capability
+    (project creation).
+  remediation: The token is valid; the role is not. Do not retry with the same principal.
+  retryable: false
+- status: 404
+  title: Not found
+  occurrences: 30
+  meaning: The referenced project, alert, datapoint, component or file does not exist, or is
+    not visible to this principal.
+  remediation: Re-resolve the id. Note that RBAC scoping can make an existing resource read as
+    404 rather than 403.
+  retryable: false
+- status: 409
+  title: Conflict
+  occurrences: 3
+  meaning: The resource already exists or a long-running job of the same kind is already in
+    flight for this project.
+  remediation: >-
+    This is the natural de-duplication signal on the write surface. A 409 on report
+    generation or digital-twin import means the prior request is still running - poll for
+    the existing job rather than re-issuing.
+  retryable: false
+  source_operations:
+  - post_project_report
+  - post_project_object_report
+- status: 415
+  title: Unsupported media type
+  occurrences: 3
+  meaning: Request body content type is not accepted by the endpoint.
+  remediation: Send application/json, or multipart/form-data for file upload endpoints.
+  retryable: false
+- status: 422
+  title: Unprocessable entity
+  occurrences: 5
+  meaning: Syntactically valid but semantically rejected - a missing `units` tag, an
+    unsupported unit conversion, an over-long path, or an incorrect current password.
+  remediation: Read the `error` field; the cause is specific and not inferable from the status.
+  retryable: false
+- status: 423
+  title: Locked - too many requests
+  occurrences: 1
+  meaning: Endpoint is locked due to too many requests.
+  remediation: Back off. This is a rate-limit signal returned as 423 rather than 429, which
+    a generic client will not treat as throttling.
+  retryable: true
+  source_operations: [put_user_password]
+- status: 429
+  title: Too many requests
+  occurrences: 1
+  meaning: Daily report generation quota exceeded for this project.
+  remediation: Wait for the daily quota window to reset. No Retry-After header is declared.
+  retryable: true
+  source_operations: [post_project_object_report]
+- status: 500
+  title: Internal server error
+  occurrences: 13
+  meaning: Unhandled server fault, or "Out of service" for a temporarily withdrawn capability.
+  remediation: Retry with exponential backoff; escalate to support if persistent.
+  retryable: true
+- status: 503
+  title: Service unavailable
+  occurrences: 3
+  meaning: A dependency is unavailable - provisioning backend, load-balancing group not
+    configured, readiness check failing, or digital-twin import offline.
+  remediation: Retry with backoff; check https://status.aedifion.io/.
+  retryable: true
+gaps:
+- No error `code` or `type` URI - callers must string-match on `error` prose.
+- No Retry-After header declared on 429 or 423.
+- Rate limiting is signalled inconsistently (423 on one operation, 429 on another).

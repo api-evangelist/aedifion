@@ -1,0 +1,62 @@
+generated: '2026-09-09'
+method: searched
+source: https://docs.aedifion.io/en/products/io/quota/
+plan_count: 3
+public_pricing: false
+note: >-
+  aedifion publishes NO pricing page. /preise, /pricing and /en/pricing all return 404 on
+  www.aedifion.com, and no price appears anywhere on the site or in the docs; the commercial
+  motion is enterprise sales through https://www.aedifion.com/kontakt. Three licence tiers
+  ARE named publicly, but only in the developer documentation's quota table, and only as
+  resource entitlements - no currency figure, billing period, or overage rate is published
+  for any of them. The tiers are recorded here because they are real, named, provider-published
+  plans; the absent prices are recorded as absent rather than guessed.
+currency: null
+billing_period: null
+plans:
+- name: Regular
+  price: null
+  currency: null
+  billing_period: null
+  included:
+    users_per_project: 3
+    logged_datapoints_per_project: 2500
+    writable_datapoints_per_project: 100
+    document_database_per_project: 200 MB, 2000 files
+    document_database_per_company: 2 GB, 20000 files
+  overage: >-
+    Soft enforcement on users and datapoints - the platform keeps working past the limit.
+    Hard enforcement on the document database - requests are blocked and an error returned.
+  source: https://docs.aedifion.io/en/products/io/quota/
+- name: Medium
+  price: null
+  currency: null
+  billing_period: null
+  included:
+    users_per_project: 10
+    logged_datapoints_per_project: 10000
+    writable_datapoints_per_project: 500
+    document_database_per_project: 500 MB, 5000 files
+    document_database_per_company: 2 GB, 20000 files
+  overage: Soft on users and datapoints; hard on the document database.
+  source: https://docs.aedifion.io/en/products/io/quota/
+- name: Premium
+  price: null
+  currency: null
+  billing_period: null
+  included:
+    users_per_project: unlimited
+    logged_datapoints_per_project: 50000
+    writable_datapoints_per_project: not stated
+    document_database_per_project: 2 GB, 20000 files
+    document_database_per_company: 2 GB, 20000 files
+  overage: Soft on users and datapoints; hard on the document database.
+  source: https://docs.aedifion.io/en/products/io/quota/
+sales_contact: https://www.aedifion.com/kontakt
+evidence:
+- url: https://www.aedifion.com/preise
+  status: 404
+- url: https://www.aedifion.com/pricing
+  status: 404
+- url: https://docs.aedifion.io/en/products/io/quota/
+  status: 200

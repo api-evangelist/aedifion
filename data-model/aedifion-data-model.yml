@@ -1,0 +1,249 @@
+generated: '2026-09-09'
+method: derived
+source: openapi/_original/aedifion-openapi.json
+docs: https://docs.aedifion.io/en/products/io/data/semantic-data-model/
+note: >-
+  Entity-relationship graph derived from the 239 component schemas and the id-reference fields
+  and path hierarchies of the 147 paths. The shape of this API is a four-level ownership chain -
+  Realm > Company > Project > Datapoint - with a parallel SEMANTIC layer (Component / Pin /
+  Tag) that gives raw datapoints meaning, and an ANALYTICS/CONTROLS layer that consumes both.
+  The Project is the pivot: 83 of 208 operations are tagged Project and project_id appears as a
+  parameter on 129 of them.
+identifiers:
+  numeric_ids: [company_id, project_id, user_id, role_id, alert_id, task_id, tag_id,
+    component_id, componentinproject_id, instance_id, result_id, plot_view_id, comment_id]
+  string_ids:
+  - field: dataPointID
+    note: Not numeric. A protocol-shaped string, the spec's own example being
+      "bacnet100-4120-CO2" - it encodes the source bus and device.
+  - field: handle
+    note: Project handle, the human-facing slug used in MQTT and Kafka topic names.
+  - field: alphanumeric_id
+    note: Used on Component and AnalysisResult.
+  - field: reference
+    note: Opaque token returned by a setpoint write, redeemable for its acknowledgement.
+entities:
+- name: Realm
+  description: Top-level tenancy. Dedicated instances get their own realm and their own API
+    host (api.<REALM>.aedifion.io) and MQTT broker (mqtt.<REALM>.aedifion.io).
+  operations: 7
+- name: Company
+  description: Customer organisation. Owns projects, roles, users and a document database.
+  key: id
+  operations: 29
+- name: ProjectGroup
+  description: Grouping of projects within a company. Membership is managed by the two
+    operations documented as idempotent.
+- name: Project
+  description: One building or site. The central entity - carries address, latitude/longitude,
+    handle, load_balancing_group, units_system, currency_system and a status report.
+  key: id
+  operations: 83
+- name: User
+  description: Person, belonging to a company, with a realm role and per-project roles.
+  operations: 11
+- name: Role
+  description: RBAC role. Exists at realm, company and project level, granting read or write on
+    projects and individual datapoints.
+- name: Datapoint
+  description: A single measured or writable point in the building, identified by dataPointID
+    within a project.
+  key: dataPointID
+  operations: 12
+- name: VirtualDatapoint
+  description: A computed datapoint derived from other datapoints by a typed function
+    (vdp_type) with parameters and pins.
+- name: Timeseries
+  description: The observation history of a datapoint. Read by time window, imported by CSV or
+    InfluxDB line protocol, deletable.
+- name: Tag
+  description: Key/value label on a datapoint or project.
+- name: TagAssociation
+  description: >-
+    The binding of a tag to a datapoint, carrying confirmed, probability, protected and source.
+    The probability and confirmed fields are the machine-learning provenance of AI-generated
+    metadata - a human confirms or rejects what the model proposed.
+- name: Component
+  description: A catalogue definition of a real-world device class (boiler, pump, valve), with
+    a category and localized names.
+- name: ComponentInProject
+  description: An instance of a Component placed in a Project. The unit the analytics and
+    controls algorithms operate on.
+- name: Pin
+  description: A named placeholder on a component to which a datapoint is mapped. Mapping a
+    datapoint to a pin is what gives it semantic role.
+- name: ComponentAttributeDefinition
+  description: Typed metadata slot on a component instance.
+- name: AnalysisInstance
+  description: A configured run of an analytics function against a component instance.
+- name: AnalysisResult
+  description: Output of an analysis - KPIs, plots, interpretation, recommendation,
+    signal_color, savings potential.
+- name: KPIResult
+  description: A single computed key performance indicator.
+- name: Saving
+  description: A quantified savings record produced by the savings analyses.
+- name: ControlsApp
+  description: A deployed cloud control algorithm that autonomously operates plant in a
+    project. Has a lifecycle status and logs, and can be run or stopped.
+- name: Setpoint
+  description: A value written to a writable datapoint, with a priority and an acknowledgement.
+- name: Schedule
+  description: Time-based operating mode plan for a component. As of changelog 2.1.13
+    schedules deploy via a Schedule controls app rather than by direct datapoint write.
+- name: Alert
+  description: A threshold, discrete or throughput rule on a datapoint, with severity levels
+    and notification channels.
+- name: AlertNotification
+  description: Notification channel set for an alert - dashboard, email, MS Teams webhook URLs,
+    Telegram chat ids.
+- name: Task
+  description: Work item raised from an analysis result, with assignee, reporter, priority,
+    status and savings_potential.
+- name: File / Folder
+  description: The per-project and per-company document database.
+- name: AIThread
+  description: Conversation thread for the aedifion AI Assistant.
+relationships:
+- from: Company
+  to: Project
+  type: has_many
+  via: company_id
+- from: Company
+  to: User
+  type: has_many
+  via: company_id
+- from: Company
+  to: CompanyRole
+  type: has_many
+  via: roles
+- from: Company
+  to: ProjectGroup
+  type: has_many
+  via: path /v2/company/{company_id}/project-groups
+- from: ProjectGroup
+  to: Project
+  type: has_many
+  via: path /v2/company/{company_id}/project-groups/{project_group_id}/projects/{project_id}
+  note: Many-to-many membership; both assignment operations are idempotent.
+- from: Project
+  to: Datapoint
+  type: has_many
+  via: project_id
+- from: Project
+  to: ComponentInProject
+  type: has_many
+  via: project_id
+- from: Project
+  to: Alert
+  type: has_many
+  via: project_id
+- from: Project
+  to: Task
+  type: has_many
+  via: project_id
+- from: Project
+  to: Role
+  type: has_many
+  via: path /v2/project/{project_id}/role/{role_id}
+- from: Project
+  to: PlotView
+  type: has_many
+  via: plot_view_id
+- from: Project
+  to: CustomPage
+  type: has_many
+  via: custom_page_id
+- from: Component
+  to: ComponentInProject
+  type: has_many
+  via: component_id
+- from: ComponentInProject
+  to: Pin
+  type: has_many
+  via: path /v2/project/{project_id}/componentInProject/pin/datapoint
+- from: Pin
+  to: Datapoint
+  type: has_one
+  via: pin/datapoint mapping
+  note: This mapping is the semantic core - it is what turns "bacnet100-4120-CO2" into "the
+    supply air CO2 sensor of air handling unit 3".
+- from: ComponentInProject
+  to: ComponentInProject
+  type: has_many
+  via: relationship_id
+  note: Components form a graph among themselves (relationship endpoints), so plant topology
+    is representable.
+- from: Datapoint
+  to: TagAssociation
+  type: has_many
+  via: dataPointID
+- from: TagAssociation
+  to: Tag
+  type: belongs_to
+  via: allOf Tag
+- from: Datapoint
+  to: Timeseries
+  type: has_many
+  via: dataPointID
+- from: Datapoint
+  to: Setpoint
+  type: has_many
+  via: dataPointID
+- from: VirtualDatapoint
+  to: Datapoint
+  type: has_many
+  via: pins
+- from: AnalysisInstance
+  to: ComponentInProject
+  type: belongs_to
+  via: componentinproject_id
+- from: AnalysisInstance
+  to: AnalysisResult
+  type: has_many
+  via: instance_id
+- from: AnalysisResult
+  to: KPIResult
+  type: has_many
+  via: kpi
+- from: Task
+  to: AnalysisResult
+  type: has_many
+  via: analytics_result
+- from: Task
+  to: ComponentInProject
+  type: belongs_to
+  via: componentinproject
+- from: Task
+  to: User
+  type: has_one
+  via: assignee
+- from: Task
+  to: User
+  type: has_one
+  via: reporter
+- from: Alert
+  to: Datapoint
+  type: belongs_to
+  via: dataPointID
+- from: Alert
+  to: AlertNotification
+  type: has_one
+  via: attributes
+- from: ControlsApp
+  to: Project
+  type: belongs_to
+  via: project_id
+- from: User
+  to: Company
+  type: belongs_to
+  via: company_id
+- from: User
+  to: Role
+  type: has_many
+  via: realm_role and per-project role assignments
+shared_envelopes:
+  Error: 269 references
+  Success: 78 references
+  PaginationMeta: 21 references
+  ShortUser: 11 references

@@ -1,0 +1,64 @@
+generated: '2026-09-09'
+method: searched
+source: https://docs.aedifion.io/en/changelog/
+versioning:
+  scheme: uri-path
+  current: v2
+  docs: https://docs.aedifion.io/en/developers/http-api/
+  note: >-
+    All 147 paths are prefixed /v2. Dedicated instances vary the host
+    (https://api.<REALM>.aedifion.io/) rather than the version segment.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: >-
+    No written API deprecation or sunset policy was found, and no operation in the OpenAPI
+    carries deprecated: true. Two concrete deprecations ARE announced in prose and are worth
+    recording because an integrator cannot discover them from the spec:
+  announced_deprecations:
+  - item: HTTP Basic authentication
+    status: legacy, deprecation signalled
+    statement: >-
+      "The aedifion HTTP API supports Basic Auth for legacy reasons until further notice.
+      HTTP Basic Auth may be deprecated in future."
+    source: https://docs.aedifion.io/en/developers/http-api/guides-and-tutorials/authentication/
+    replacement: OpenID Connect bearer tokens
+    sunset_date: not stated
+  - item: MQTT metadata scheme V1
+    status: deprecated
+    statement: Metadata messages support two schemes; V1 is deprecated and V2 is current.
+    source: https://docs.aedifion.io/en/developers/mqtt-api/
+    replacement: metadata scheme V2 (entity/mode/tags structure)
+    sunset_date: not stated
+  - item: Schedule deployment by direct datapoint write
+    status: breaking change, already landed
+    statement: >-
+      Changelog 2.1.13 (11.08.2026) - schedules now deploy via the Schedule .controls app
+      instead of writing to datapoints; the tutorial was updated with new endpoints.
+    source: https://docs.aedifion.io/en/changelog/
+sla:
+  url: https://docs.aedifion.io/en/products/general/security/overview/
+  uptime_target: '97%'
+  statement: 'aedifion guarantees 97% uptime for the aedifion.io platform.'
+  custom: Custom SLAs available upon negotiation.
+status_page: https://status.aedifion.io/
+status_page_machine_readable: false
+status_page_note: >-
+  status.aedifion.io serves a client-rendered status page. It is not Atlassian Statuspage -
+  /api/v2/status.json and /api/v2/summary.json both 404 - so there is no machine-readable
+  incident feed an agent can poll.
+support:
+  contact: https://www.aedifion.com/kontakt
+  email: contact@aedifion.com
+  phone: '+49 221 98650-770'
+release_notes:
+- product: aedifion.io platform
+  url: https://docs.aedifion.io/en/products/io/release/
+- product: aedifion.analytics
+  url: https://docs.aedifion.io/en/products/analytics/release/
+- product: aedifion.controls
+  url: https://docs.aedifion.io/en/products/controls/release/
+deprecated_operations: []

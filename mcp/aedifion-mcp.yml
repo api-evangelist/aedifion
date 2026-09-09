@@ -1,0 +1,141 @@
+generated: '2026-09-09'
+method: derived
+status: candidate
+source: openapi/_original/aedifion-openapi.json
+note: >-
+  aedifion ships NO MCP server. Searched the docs, the GitHub organisation, npm (including the
+  @modelcontextprotocol namespace) and the web, and probed mcp.aedifion.io/mcp (DNS does not
+  resolve), api.aedifion.io/mcp, api.aedifion.io/v2/mcp and docs.aedifion.io/mcp (all HTTP 404)
+  with a JSON-RPC tools/list POST. The tool list below is a CANDIDATE derived by API Evangelist
+  from real operationIds in the live OpenAPI - every source_operation was grepped out of the
+  spec and exists verbatim. It is a design proposal for aedifion, not something an agent can
+  call today.
+
+
+  Worth noting: aedifion does ship an LLM surface - the "aedifion AI Assistant", a generative-AI
+  chatbot for operators and asset managers, with four AI-tagged operations in the HTTP API
+  (conversation threads). That is a hosted chat product, not an MCP server, and it exposes no
+  tool interface to third-party agents.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: probed
+probes:
+- url: https://mcp.aedifion.io/mcp
+  method: POST tools/list
+  status: 000
+  note: host does not resolve
+- url: https://api.aedifion.io/mcp
+  method: POST tools/list
+  status: 404
+- url: https://api.aedifion.io/v2/mcp
+  method: POST tools/list
+  status: 404
+- url: https://docs.aedifion.io/mcp
+  method: POST tools/list
+  status: 404
+existing_ai_surface:
+  name: aedifion AI Assistant
+  kind: hosted chatbot
+  url: https://www.aedifion.com/produkte/ai-assistant
+  api_tag: AI
+  operations: 4
+  note: Conversation-thread endpoints under /v2/user/ai/. Not an agent tool interface.
+server:
+  name: aedifion
+  transport: http
+  url: null
+tools:
+- name: list_projects
+  description: List the buildings and sites the authenticated user can access.
+  source_operation: openapi/aedifion-openapi.yml#get_user_projects
+  read_only: true
+- name: get_project
+  description: Get details of one building or site, including address, coordinates and handle.
+  source_operation: openapi/aedifion-openapi.yml#get_project
+  read_only: true
+- name: get_portfolio
+  description: Get the user's project portfolio rollup.
+  source_operation: openapi/aedifion-openapi.yml#get_user_projects_portfolio
+  read_only: true
+- name: list_datapoints
+  description: List the datapoints of a project, paged.
+  source_operation: openapi/aedifion-openapi.yml#get_project_datapoints_by_page
+  read_only: true
+- name: find_datapoints_by_tag
+  description: Find a project's datapoints by semantic tag - the intended way to locate a point
+    by meaning rather than by protocol identifier.
+  source_operation: openapi/aedifion-openapi.yml#get_project_datapoints_bytag
+  read_only: true
+- name: get_datapoint
+  description: Get details about a single datapoint.
+  source_operation: openapi/aedifion-openapi.yml#get_datapoint
+  read_only: true
+- name: get_timeseries
+  description: Read the observation history of a datapoint over a time window.
+  source_operation: openapi/aedifion-openapi.yml#get_datapoint_timeseries
+  read_only: true
+- name: list_components
+  description: List the semantic components (boilers, pumps, air handling units) in a project.
+  source_operation: openapi/aedifion-openapi.yml#get_project_components
+  read_only: true
+- name: list_alerts
+  description: List the alerts configured on a project.
+  source_operation: openapi/aedifion-openapi.yml#get_alerts
+  read_only: true
+- name: list_analysis_instances
+  description: List configured analytics instances for a project.
+  source_operation: openapi/aedifion-openapi.yml#get_analysis_instances
+  read_only: true
+- name: get_analysis_results
+  description: Get the results of an analytics instance, including KPIs, interpretation and
+    recommendations.
+  source_operation: openapi/aedifion-openapi.yml#get_instance_results
+  read_only: true
+- name: get_kpi_aggregation
+  description: Aggregate KPIs across components or projects for portfolio reporting.
+  source_operation: openapi/aedifion-openapi.yml#get_kpi_aggregation
+  read_only: true
+- name: list_tasks
+  description: List optimization tasks raised for a project, with savings potential.
+  source_operation: openapi/aedifion-openapi.yml#get_project_tasks
+  read_only: true
+- name: list_controls_apps
+  description: List the autonomous control applications deployed in a project.
+  source_operation: openapi/aedifion-openapi.yml#get_controls_apps
+  read_only: true
+- name: list_setpoints
+  description: List the setpoints defined for a project.
+  source_operation: openapi/aedifion-openapi.yml#get_project_setpoints
+  read_only: true
+- name: write_setpoint
+  description: >-
+    Write a setpoint to a datapoint in a live building. HIGH CONSEQUENCE - this actuates
+    physical HVAC equipment.
+  source_operation: openapi/aedifion-openapi.yml#post_datapoint_setpoint
+  read_only: false
+  consequence: physical
+  safeguards:
+    dry_run: The operation accepts dryrun=true, documented as "Do a dry run without actually
+      writing anything." An agent should always rehearse first.
+    reversal: Re-issue with value='null' to reset the point back to local building automation
+      control.
+    acknowledgement: Pass acked=true and redeem the returned reference at
+      get_datapoint_setpoint to learn whether the building network applied it - the 200 alone
+      does not mean the write landed.
+    human_in_the_loop: recommended
+design_notes:
+- >-
+  Any real MCP server for aedifion should expose the 79 GET operations freely and gate the
+  write surface. The single operation that needs the most care is post_datapoint_setpoint: it
+  is best-effort, non-acked and stateless by aedifion's own description, and it moves physical
+  plant.
+- >-
+  The 43 DELETE operations have no undo anywhere in the API and should not be exposed as tools
+  without explicit human confirmation.
+- >-
+  Datapoint identifiers are protocol-shaped strings such as "bacnet100-4120-CO2". An agent
+  should resolve points through the tag and component surface, not by guessing identifiers.

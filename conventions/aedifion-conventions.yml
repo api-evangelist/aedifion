@@ -1,0 +1,168 @@
+generated: '2026-09-09'
+method: derived
+source: openapi/_original/aedifion-openapi.json
+docs: https://docs.aedifion.io/en/developers/http-api/
+note: >-
+  Cross-cutting request/response semantics for the aedifion HTTP API, derived from the live
+  OpenAPI 3.0.1 (208 operations) and corroborated against the published developer docs.
+authentication:
+  styles: [http-basic, oidc-bearer]
+  header: Authorization
+  preferred: OpenID Connect bearer token from the aedifion Keycloak realm
+  detail: authentication/aedifion-authentication.yml
+versioning:
+  scheme: uri-path
+  current: v2
+  pattern: https://api.aedifion.io/v2/<resource>
+  docs: https://docs.aedifion.io/en/developers/http-api/
+  note: >-
+    Every one of the 147 paths is prefixed /v2. Dedicated single-tenant instances move the
+    host, not the path - https://api.<REALM>.aedifion.io/v2/.
+  breaking_change_policy: >-
+    Product changes are published in a dated changelog with semantic version numbers, but no
+    written API deprecation policy or Sunset-header commitment was found.
+pagination:
+  style: page-number
+  request_params:
+  - name: page
+    in: query
+    operations: 20
+  - name: per_page
+    in: query
+    operations: 20
+  response_envelope:
+    schema: '#/components/schemas/PaginationMeta'
+    fields: [current_page, items_per_page, total_items, total_pages]
+  coverage: partial
+  note: >-
+    Page/per_page appear on 20 of 208 operations - the list endpoints. There is no cursor
+    pagination and no Link header. Timeseries reads are bounded by `start`/`end` time
+    windows instead of paged.
+filtering_and_sorting:
+  params: [search, filter, sort_by, sort_order, start, end, closed_interval]
+  note: Timeseries and analytics endpoints take start/end datetimes; several list endpoints
+    take a free-text `search` plus `sort_by`/`sort_order`.
+localization:
+  parameter: LanguageQueryParam
+  in: query
+  operations: 27
+  note: A shared language query parameter localizes returned strings on 27 operations - unusual
+    and useful, since the platform is German-first.
+  unit_systems:
+    params: [units_system, currency_system]
+    operations: 11
+    note: Callers can request a units system and currency system per request, so an agent does
+      not have to convert building-engineering units itself.
+idempotency:
+  coverage: partial
+  mechanism: none
+  idempotency_key_header: false
+  scope:
+  - post_project_in_project_group
+  - delete_project_in_project_group
+  detail: >-
+    There is NO Idempotency-Key header and no request-replay protection anywhere on the API.
+    Exactly two operations are explicitly documented as idempotent, and both are set-membership
+    operations that are naturally so - the spec says "assigning an already-assigned project
+    succeeds without creating a duplicate" and "unassigning a project that is not in the group
+    succeeds without error". All 43 DELETE operations are idempotent by HTTP semantics, and all
+    24 PUT operations are replacements rather than increments, so a repeated call is usually
+    safe - but that is a property of the verb, not a guarantee the provider states.
+    The genuinely dangerous case is POST: a retried report generation or digital-twin import
+    is caught by a 409 Conflict rather than an idempotency key, and a retried
+    post_datapoint_setpoint will write to physical building equipment a second time.
+  agent_guidance: >-
+    An agent must treat POST on this API as at-most-once. Use the 409 responses as the
+    de-duplication signal on long-running jobs, and use dryrun plus the setpoint
+    acknowledgement reference to confirm a write landed before considering a retry.
+dry_run_mode:
+  supported: true
+  coverage: partial
+  scope:
+  - post_datapoint_setpoint
+  parameter: dryrun
+  in: query
+  description: 'Do a dry run without actually writing anything.'
+  source: openapi/_original/aedifion-openapi.json#/paths/~1v2~1datapoint~1setpoint/post
+  note: >-
+    Present on the single highest-consequence operation on the API - the one that writes a
+    setpoint into a live building automation system. This is exactly where a rehearsal
+    facility matters, and aedifion ships it.
+reversibility:
+  grade: documented
+  credit: 0.4
+  rationale: >-
+    Reversal paths exist and are documented on the consequential write surfaces, but no
+    reversal WINDOW is stated anywhere in the spec or the docs, so this cannot be graded
+    verified.
+  surfaces:
+  - surface: setpoint write to building equipment
+    write_operation: post_datapoint_setpoint
+    reversal: post_datapoint_setpoint
+    how: >-
+      Re-issue the same operation with value='null', which the parameter description defines
+      as a reset - returning the datapoint to the control of the local building automation
+      system. The prior state is returned to the caller in SetpointAck.state_before when the
+      write was made with acked=true, which is the value an agent needs in order to restore
+      rather than merely reset.
+    window: not stated
+    caveats: >-
+      The endpoint is documented as "no-frills, non-acked, stateless, best-effort" and
+      returns 200 when the request is authorized and well-formed - NOT when the building
+      network has actually applied it. Reversal is therefore also best-effort. The
+      keep_out_of_service parameter pins a value against being overwritten by the local BAS,
+      which makes the write stickier and the reversal more important.
+    evidence: openapi/_original/aedifion-openapi.json#/paths/~1v2~1datapoint~1setpoint/post
+  - surface: controls apps (autonomous cloud control of HVAC plant)
+    write_operation: post_controls_app_run
+    reversal: post_controls_app_run
+    how: The same operation both runs and stops a controls app - its summary is "Request to
+      run or stop a controls app in the project." post_controls_apps_run does this in bulk.
+    window: not stated
+    evidence: openapi/_original/aedifion-openapi.json#/paths/~1v2~1controls~1app~1{controls_app_id}~1run/post
+  - surface: alerting
+    write_operation: disable_alert
+    reversal: enable_alert
+    how: Explicit enable/disable pair on /v2/alert/{alert_id}.
+    window: not stated
+  - surface: resource deletion
+    write_operation: 43 DELETE operations across projects, datapoints, components, files,
+      roles, tasks and users
+    reversal: none
+    how: No restore, undelete, trash or archive operation exists anywhere on the API.
+    window: none
+    caveats: >-
+      Deletion is unconditional and permanent as far as the published contract is concerned.
+      delete_project and delete_project_datapoints destroy building history; an agent should
+      treat every DELETE here as irreversible.
+error_envelope:
+  format: custom-json
+  rfc9457: false
+  schema: '#/components/schemas/Error'
+  detail: errors/aedifion-problem-types.yml
+rate_limit_signaling:
+  headers: none
+  retry_after: false
+  status_codes: [423, 429]
+  detail: rate-limits/aedifion-rate-limits.yml
+  note: No X-RateLimit-* or RateLimit-* headers are declared on any of the 208 operations.
+request_tracing:
+  request_id_header: none
+  correlation: >-
+    No request-id or trace header is declared. The closest thing is the setpoint `reference`
+    token returned by post_datapoint_setpoint and redeemable at
+    get_datapoint_setpoint/{reference} - a per-write correlation handle, but only for setpoints.
+conditional_requests:
+  etag: false
+  if_match: false
+  note: No ETag, If-Match or If-None-Match support is declared. Concurrent writers cannot
+    detect a lost update.
+metadata_and_tagging:
+  supported: true
+  note: >-
+    First-class tag surface (datapoint tags, project tags, tag associations with a
+    confirmed/unconfirmed state) plus a semantic component/pin data model. This is how the
+    building's meaning is attached to raw datapoints.
+media_types:
+  request: [application/json, multipart/form-data]
+  response: [application/json]

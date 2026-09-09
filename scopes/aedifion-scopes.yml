@@ -1,0 +1,67 @@
+generated: '2026-09-09'
+method: probed
+source: https://auth.aedifion.io/realms/aedifion/.well-known/openid-configuration
+docs: https://docs.aedifion.io/en/developers/http-api/guides-and-tutorials/authentication/
+note: >-
+  The OpenAPI declares a single openIDConnect scheme exposing only the mandatory `openid`
+  scope. The authoritative scope list is the one advertised by the aedifion Keycloak realm's
+  own OIDC discovery document, fetched live and saved to
+  well-known/aedifion-openid-configuration.json. These are Keycloak's standard realm scopes
+  plus an `api` scope; aedifion publishes no per-resource scope reference page, and
+  fine-grained authorization on the HTTP API is enforced by role-based access control on
+  projects and datapoints rather than by OAuth scopes.
+schemes:
+- name: openIDConnect
+  source: openapi/aedifion-openapi.yml
+  issuer: https://auth.aedifion.io/realms/aedifion
+  flows:
+  - flow: implicit
+    authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+  - flow: authorizationCode
+    authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+    tokenUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/token
+  - flow: password
+    tokenUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/token
+  - flow: clientCredentials
+    tokenUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/token
+scopes:
+- scope: openid
+  description: Use OpenID Connect (required). The only scope the OpenAPI itself declares.
+  flows: [implicit, authorizationCode]
+  sources: [openapi/aedifion-openapi.yml, well-known/aedifion-openid-configuration.json]
+- scope: profile
+  description: Basic profile claims (name, preferred_username, locale).
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: email
+  description: Email address and verification status.
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: address
+  description: Address claim.
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: phone
+  description: Phone number claim.
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: roles
+  description: Realm and client role mappings, which carry the platform's RBAC assignments.
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: api
+  description: Access to the aedifion HTTP API as a resource.
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: offline_access
+  description: Issue a refresh token usable while the user is offline.
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: service_account
+  description: Client-credentials service account access.
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: basic
+  description: Keycloak basic scope (sub, auth_time claims).
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: acr
+  description: Authentication context class reference claim.
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: microprofile-jwt
+  description: MicroProfile JWT claims (upn, groups).
+  sources: [well-known/aedifion-openid-configuration.json]
+- scope: web-origins
+  description: CORS allowed origins claim.
+  sources: [well-known/aedifion-openid-configuration.json]

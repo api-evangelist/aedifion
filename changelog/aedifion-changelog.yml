@@ -1,0 +1,61 @@
+generated: '2026-09-09'
+method: searched
+source: https://docs.aedifion.io/en/changelog/
+scheme: semver
+date_format: DD.MM.YYYY
+current_version: 2.1.17
+note: >-
+  A single dated changelog covers the documentation and platform together, versioned
+  MAJOR.MINOR.PATCH. It is product- and analytics-heavy rather than API-surface-focused, so
+  most entries describe algorithm and documentation changes rather than endpoint changes. The
+  recent window is captured here; the live page is the source of truth. Per-product release
+  notes are published separately (see lifecycle/aedifion-lifecycle.yml release_notes).
+entries:
+- version: 2.1.17
+  date: '2026-09-04'
+  breaking: false
+  highlights: Flexible Tariff analysis now sources electricity pricing differently; default
+    tariff static component lowered.
+- version: 2.1.16
+  date: '2026-09-02'
+  breaking: false
+  highlights: Documented supply-air fan operating message pins and temperature increase
+    attributes for FROG control variations.
+- version: 2.1.15
+  date: '2026-08-17'
+  breaking: false
+  highlights: Building pins documented as the source for energy pricing and CO2 factors across
+    multiple analyses.
+- version: 2.1.14
+  date: '2026-08-12'
+  breaking: false
+  highlights: Weather normalization documented for reference consumption in the Savings
+    Aggregation analysis.
+- version: 2.1.13
+  date: '2026-08-11'
+  breaking: true
+  highlights: >-
+    Schedules now deploy via the Schedule .controls app instead of writing to datapoints;
+    tutorial updated with new endpoints. This is the one breaking API-surface change in the
+    recent window.
+- version: 2.1.12
+  date: '2026-08-03'
+  breaking: false
+  highlights: Per-energy-source KPI documentation added for consumption, cost and emissions
+    analyses.
+- version: 2.1.11
+  date: '2026-06-11'
+  breaking: false
+  highlights: Asset Overview page documentation updated.
+- version: 2.1.10
+  date: '2026-06-03'
+  breaking: false
+  highlights: Savings Aggregation analysis function documented.
+- version: 2.1.9
+  date: '2026-03-30'
+  breaking: false
+  highlights: Savings-potential calculation documented for the setpoint check analysis.
+- version: 2.1.8
+  date: '2026-03-25'
+  breaking: false
+  highlights: Component models documentation updated to version 2026.2.1.
