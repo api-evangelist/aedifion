@@ -1,32 +1,29 @@
 aid: aedifion
 name: Aedifion
-description: >-
-  aedifion GmbH is a Cologne-based PropTech founded in 2017 that operates a vendor-neutral,
-  patented cloud platform for the optimized operation of non-residential buildings. The
-  platform ingests real-time operating data from all building trades via plug-and-play edge
-  devices, applies analytics and AI to detect faults and inefficiencies, and autonomously
-  controls HVAC and building services based on weather forecasts, occupancy and electricity
-  prices - cutting energy use, CO2 emissions and operating costs by up to 40% without
-  structural retrofits. Products span aedifion.io (connectivity and monitoring),
-  aedifion.analytics, aedifion.controls, aedifion.dynamics (demand-side management) and
-  aedifion.smartkit. Developers get a documented HTTP API (OpenAPI 3.0, 208 operations
-  across projects, datapoints, timeseries, analytics, controls, alerts and tasks), an MQTT
-  broker and a Kafka interface for streaming building telemetry. The company serves owners,
-  operators and asset managers of commercial real estate and supports decarbonization, ESG
-  reporting and DGNB, ISO 50001 and GEG certification.
+description: aedifion GmbH is a Cologne-based PropTech founded in 2017 that operates a vendor-neutral,
+  patented cloud platform for the optimized operation of non-residential buildings. The platform ingests
+  real-time operating data from all building trades via plug-and-play edge devices, applies analytics
+  and AI to detect faults and inefficiencies, and autonomously controls HVAC and building services based
+  on weather forecasts, occupancy and electricity prices - cutting energy use, CO2 emissions and operating
+  costs by up to 40% without structural retrofits. Products span aedifion.io (connectivity and monitoring),
+  aedifion.analytics, aedifion.controls, aedifion.dynamics (demand-side management) and aedifion.smartkit.
+  Developers get a documented HTTP API (OpenAPI 3.0, 208 operations across projects, datapoints, timeseries,
+  analytics, controls, alerts and tasks), an MQTT broker and a Kafka interface for streaming building
+  telemetry. The company serves owners, operators and asset managers of commercial real estate and supports
+  decarbonization, ESG reporting and DGNB, ISO 50001 and GEG certification.
 image: https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/6942a43e5bcce46ebe9f7529_65f998eafa61f2995943d60d_favicon-32x32.png
 url: https://raw.githubusercontent.com/api-evangelist/aedifion/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.20'
 created: '2026-09-09'
-modified: '2026-09-09'
+modified: '2026-09-16'
 tags:
 - Building Automation
 - Smart Buildings
 - Energy Management
 - Internet of Things
-- Real Estate
+- Real-Estate
 - HVAC
 - Sustainability
 - Time Series
@@ -52,59 +49,12 @@ tags_raw:
 - proptech
 - germany
 apis:
-- name: aedifion HTTP API
-  description: >-
-    Versioned REST API (v2) for the aedifion.io building operations platform. Covers
-    company, realm, project and user administration; datapoint and timeseries read/write;
-    virtual datapoints; the semantic component/pin data model; analytics runs and results;
-    cloud-based controls apps, setpoints and schedules; alerts and tasks; a document
-    database; and an AI assistant. 208 operations across 147 paths, every one carrying an
-    operationId, summary, description and tag. Authentication is HTTP Basic (legacy) or
-    OpenID Connect bearer tokens issued by the aedifion Keycloak realm.
-  humanURL: https://docs.aedifion.io/en/developers/http-api/
-  image: https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/6942a43e5bcce46ebe9f7529_65f998eafa61f2995943d60d_favicon-32x32.png
-  baseURL: https://api.aedifion.io
-  tags:
-  - Building Automation
-  - Smart Buildings
-  - Energy Management
-  - Time Series
-  - Analytics
-  - Internet of Things
-  - HVAC
-  tags_raw:
-  - building-automation
-  - smart-buildings
-  - energy-management
-  - time-series
-  - analytics
-  - internet-of-things
-  - hvac
-  properties:
-  - type: OpenAPI
-    url: openapi/aedifion-openapi.yml
-  - type: Documentation
-    url: https://docs.aedifion.io/en/developers/http-api/
-  - type: APIReference
-    url: https://api.aedifion.io/ui/
-  - type: Authentication
-    url: authentication/aedifion-authentication.yml
-  - type: Conventions
-    url: conventions/aedifion-conventions.yml
-  - type: ErrorCatalog
-    url: errors/aedifion-problem-types.yml
-  - type: DataModel
-    url: data-model/aedifion-data-model.yml
-  - type: Overlay
-    url: overlays/aedifion-http-api-overlay.yaml
 - name: aedifion MQTT API
-  description: >-
-    MQTT 3.1.1 broker interface at mqtt.aedifion.io for streaming building telemetry into
-    and out of the aedifion.io platform. TLS-only (ports 8883 for native MQTT, 9001 for
-    MQTT over WebSockets), username/password authentication with per-topic read/write
-    authorization. Three topic families - timeseries, META and CONTROLS - are namespaced by
-    load-balancing group and project handle. Timeseries payloads use InfluxDB Line
-    Protocol; metadata and controls payloads are JSON.
+  description: MQTT 3.1.1 broker interface at mqtt.aedifion.io for streaming building telemetry into and
+    out of the aedifion.io platform. TLS-only (ports 8883 for native MQTT, 9001 for MQTT over WebSockets),
+    username/password authentication with per-topic read/write authorization. Three topic families - timeseries,
+    META and CONTROLS - are namespaced by load-balancing group and project handle. Timeseries payloads
+    use InfluxDB Line Protocol; metadata and controls payloads are JSON.
   humanURL: https://docs.aedifion.io/en/developers/mqtt-api/
   image: https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/6942a43e5bcce46ebe9f7529_65f998eafa61f2995943d60d_favicon-32x32.png
   baseURL: mqtts://mqtt.aedifion.io:8883
@@ -125,6 +75,292 @@ apis:
     url: asyncapi/aedifion-mqtt-asyncapi.yml
   - type: Documentation
     url: https://docs.aedifion.io/en/developers/mqtt-api/
+- aid: aedifion:aedifion-ai-api
+  name: Aedifion AI API
+  description: Creating, modifying, and accessing AI related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - AI
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-ai-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-alert-api
+  name: Aedifion Alert API
+  description: Creating, modifying, and accessing alerts and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Alert
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-alert-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-analytics-api
+  name: Aedifion Analytics API
+  description: Creating, modifying, and accessing analytics and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Analytics
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-analytics-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-company-api
+  name: Aedifion Company API
+  description: Creating, modifying, and accessing companies and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Company
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-company-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-component-api
+  name: Aedifion Component API
+  description: Creating, modifying, and accessing components and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Component
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-component-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-controls-api
+  name: Aedifion Controls API
+  description: Creating, modifying, and accessing controls apps and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Controls
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-controls-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-datapoint-api
+  name: Aedifion Datapoint API
+  description: Creating, modifying, and accessing datapoints and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Datapoint
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-datapoint-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-meta-api
+  name: Aedifion Meta API
+  description: Meta management resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Meta
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-meta-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-project-api
+  name: Aedifion Project API
+  description: Creating, modifying, and accessing projects and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Project
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-project-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-realm-api
+  name: Aedifion Realm API
+  description: Accessing realm-level resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Realm
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-realm-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-task-api
+  name: Aedifion Task API
+  description: Creating, modifying, and accessing tasks and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Task
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-task-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-timeseries-api
+  name: Aedifion Timeseries API
+  description: The Timeseries API from Aedifion — 2 operation(s) for timeseries.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - Timeseries
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-timeseries-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
+- aid: aedifion:aedifion-user-api
+  name: Aedifion User API
+  description: Creating, modifying, and accessing users and related resources.
+  humanURL: https://docs.aedifion.io/en/developers/http-api/
+  baseURL: https://api.aedifion.io
+  tags:
+  - User
+  properties:
+  - type: OpenAPI
+    url: openapi/aedifion-user-api-openapi.yml
+  - type: Documentation
+    url: https://docs.aedifion.io/en/developers/http-api/
+  - type: APIReference
+    url: https://api.aedifion.io/ui/
+  - type: Authentication
+    url: authentication/aedifion-authentication.yml
+  - type: Conventions
+    url: conventions/aedifion-conventions.yml
+  - type: ErrorCatalog
+    url: errors/aedifion-problem-types.yml
+  - type: DataModel
+    url: data-model/aedifion-data-model.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -164,7 +400,7 @@ common:
 - type: Compliance
   url: https://www.aedifion.com/sicherheit
 - type: OpenAPI
-  url: openapi/aedifion-openapi.yml
+  url: openapi/_original/aedifion-openapi.yml
 - type: AsyncAPI
   url: asyncapi/aedifion-mqtt-asyncapi.yml
 - type: LLMsTxt
