@@ -50,13 +50,15 @@ tags_raw:
 - germany
 apis:
 - name: aedifion MQTT API
-  description: MQTT 3.1.1 broker interface at mqtt.aedifion.io for streaming building telemetry into and
-    out of the aedifion.io platform. TLS-only (ports 8883 for native MQTT, 9001 for MQTT over WebSockets),
-    username/password authentication with per-topic read/write authorization. Three topic families - timeseries,
-    META and CONTROLS - are namespaced by load-balancing group and project handle. Timeseries payloads
-    use InfluxDB Line Protocol; metadata and controls payloads are JSON.
+  description: >-
+    MQTT 3.1.1 broker interface at mqtt.aedifion.io for streaming building telemetry into and out of the
+    aedifion.io platform. TLS-only (ports 8883 for native MQTT, 9001 for MQTT over WebSockets), username/password
+    authentication with per-topic read/write authorization. Three topic families - timeseries, META and
+    CONTROLS - are namespaced by load-balancing group and project handle. Timeseries payloads use InfluxDB
+    Line Protocol; metadata and controls payloads are JSON.
   humanURL: https://docs.aedifion.io/en/developers/mqtt-api/
-  image: https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/6942a43e5bcce46ebe9f7529_65f998eafa61f2995943d60d_favicon-32x32.png
+  image: >-
+    https://cdn.prod.website-files.com/6942a43e5bcce46ebe9f73a1/6942a43e5bcce46ebe9f7529_65f998eafa61f2995943d60d_favicon-32x32.png
   baseURL: mqtts://mqtt.aedifion.io:8883
   tags:
   - MQTT
@@ -317,16 +319,16 @@ apis:
     url: errors/aedifion-problem-types.yml
   - type: DataModel
     url: data-model/aedifion-data-model.yml
-- aid: aedifion:aedifion-timeseries-api
-  name: Aedifion Timeseries API
-  description: The Timeseries API from Aedifion — 2 operation(s) for timeseries.
+- aid: aedifion:aedifion-user-api
+  name: Aedifion User API
+  description: Creating, modifying, and accessing users and related resources.
   humanURL: https://docs.aedifion.io/en/developers/http-api/
   baseURL: https://api.aedifion.io
   tags:
-  - Timeseries
+  - User
   properties:
   - type: OpenAPI
-    url: openapi/aedifion-timeseries-api-openapi.yml
+    url: openapi/aedifion-user-api-openapi.yml
   - type: Documentation
     url: https://docs.aedifion.io/en/developers/http-api/
   - type: APIReference
@@ -339,16 +341,16 @@ apis:
     url: errors/aedifion-problem-types.yml
   - type: DataModel
     url: data-model/aedifion-data-model.yml
-- aid: aedifion:aedifion-user-api
-  name: Aedifion User API
-  description: Creating, modifying, and accessing users and related resources.
-  humanURL: https://docs.aedifion.io/en/developers/http-api/
-  baseURL: https://api.aedifion.io
+- aid: aedifion:aedifion-time-series-api
+  name: Aedifion Time Series API
+  description: The Time Series API from Aedifion — 2 operation(s) for time series.
+  humanURL: https://docs.aedifion.io/en/developers/mqtt-api/
+  baseURL: mqtts://mqtt.aedifion.io:8883
   tags:
-  - User
+  - Time Series
   properties:
   - type: OpenAPI
-    url: openapi/aedifion-user-api-openapi.yml
+    url: openapi/aedifion-time-series-api-openapi.yml
   - type: Documentation
     url: https://docs.aedifion.io/en/developers/http-api/
   - type: APIReference
