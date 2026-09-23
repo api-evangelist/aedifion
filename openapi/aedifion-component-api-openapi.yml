@@ -1,0 +1,374 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs Component API
+  version: ''
+servers:
+- url: ''
+tags:
+- description: Creating, modifying, and accessing components and related resources.
+  name: Component
+paths:
+  /v2/component/{component_id}/attributeDefinitions:
+    get:
+      description: Gets a list of attribute definitions for the component.
+      operationId: get_component_attribute_definitions
+      parameters:
+      - description: The id of the component.
+        in: path
+        name: component_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ComponentAttributeDefinition'
+                type: array
+          description: 'Successful operation.
+
+            A list of available attribute definitions are returned for the component in the ''resource'' field and the ''operation'' is set to ''get''.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to ''get''.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get all available attribute definitions for the component
+      tags:
+      - Component
+      x-openapi-router-controller: app.controllers.component_controller
+  /v2/component/{component_id}/pins:
+    get:
+      description: Gets all the defined pins for the component.
+      operationId: get_component_pins
+      parameters:
+      - description: The id of the component to get pins.
+        in: path
+        name: component_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Pin'
+                type: array
+          description: 'Successful operation.
+
+            A list of pins and its attributes are returned for the component in the ''resource'' field and the ''operation'' is set to ''get''.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to ''get''.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get all pins and its attributes for the component
+      tags:
+      - Component
+      x-openapi-router-controller: app.controllers.component_controller
+  /v2/components:
+    get:
+      description: Gets all the available components to be used in a project.
+      operationId: get_components
+      parameters:
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Component'
+                type: array
+          description: 'Successful operation.
+
+            A list of component ids along with their english and german names are returned in the ''resource'' field and the ''operation'' is set to ''get''.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to ''get''.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get all available components
+      tags:
+      - Component
+      x-openapi-router-controller: app.controllers.component_controller
+components:
+  parameters:
+    LanguageQueryParam:
+      description: 'Choose language in which the response should be displayed.
+
+        - ''en'' for English
+
+        - ''de'' for German
+
+        - ''fr'' for French
+
+        '
+      in: query
+      name: language
+      schema:
+        enum:
+        - en
+        - de
+        - fr
+        type: string
+  schemas:
+    Component:
+      properties:
+        alphanumeric_id:
+          type: string
+        category:
+          $ref: '#/components/schemas/ComponentCategory'
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        private:
+          type: boolean
+      type: object
+    ComponentAttributeDefinition:
+      properties:
+        alphanumeric_id:
+          type: string
+        default_unit:
+          type: string
+        default_value:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        limits:
+          properties:
+            max:
+              format: float
+              type: number
+            min:
+              format: float
+              type: number
+          type: object
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        unit_type:
+          type: string
+        value_options:
+          items:
+            $ref: '#/components/schemas/EnumValue'
+          type: array
+        value_type:
+          type: string
+      type: object
+    EnumValue:
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      type: object
+    Pin:
+      properties:
+        alphanumeric_id:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        location:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pin_attributes:
+          items:
+            $ref: '#/components/schemas/PinAttribute'
+          type: array
+        unit_type:
+          type: string
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    ComponentCategory:
+      properties:
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      type: object
+    PinAttribute:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        probability:
+          type: number
+        value:
+          type: string
+      type: object
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info

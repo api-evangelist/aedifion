@@ -1,0 +1,378 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs AI API
+  version: ''
+servers:
+- url: ''
+tags:
+- description: Creating, modifying, and accessing AI related resources.
+  name: AI
+paths:
+  /v2/user/ai/chat/{thread_id}:
+    post:
+      description: 'Chat with the AI based on the user''s current context.
+
+
+        Requests tagged in the metadata with `feature` set to `task-description-translate`
+
+        or `task-description-improve` are treated as ephemeral one-shot calls: neither the
+
+        conversation thread nor the chat history is persisted.'
+      operationId: post_chat
+      parameters:
+      - description: The ID of the conversation thread.
+        in: path
+        name: thread_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+        description: The chat request payload including user message and context.
+        required: true
+        x-body-name: chat_request
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+          description: Success. The chat request was processed and an answer provided.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Bad Request.
+
+            The input could not be processed.
+
+            Details on the error are returned in the ''error'' field of the response.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized. Authentication is required.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Chat with the AI scoped to the user
+      tags:
+      - AI
+      x-openapi-router-controller: app.controllers.ai_controller
+  /v2/user/ai/thread/{thread_id}:
+    delete:
+      description: Deletes a specific user AI conversation thread scoped to the user's current context.
+      operationId: delete_user_conversation_thread
+      parameters:
+      - description: The unique idetifier of the user AI conversation thread.
+        in: path
+        name: thread_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          content: {}
+          description: Success. The user AI converstion thread is successfully deleted.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Bad Request.
+
+            The input could not be processed.
+
+            Details on the error are returned in the ''error'' field of the response.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized. Authentication is required.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete a user AI conversation thread
+      tags:
+      - AI
+      x-openapi-router-controller: app.controllers.ai_controller
+    get:
+      description: Retrieves complete chat history, sorted newest to oldest
+      operationId: get_chat_history
+      parameters:
+      - description: The chat thread ID
+        in: path
+        name: thread_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatHistory'
+          description: Success. The chat history for the thread is returned.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get all chat messages for a thread
+      tags:
+      - AI
+      x-openapi-router-controller: app.controllers.ai_controller
+  /v2/user/ai/threads:
+    get:
+      description: Gets all the AI conversation threads based on the user's current context.
+      operationId: get_user_conversation_threads
+      parameters:
+      - description: The page number used for paginating the result. Default to 0
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+      - description: The number of records per page. Default to 10
+        in: query
+        name: per_page
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIConversationThreads'
+          description: Success. The get request was processed and a response provided.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Bad Request.
+
+            The input could not be processed.
+
+            Details on the error are returned in the ''error'' field of the response.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized. Authentication is required.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Gets all conversation threads scoped to the user
+      tags:
+      - AI
+      x-openapi-router-controller: app.controllers.ai_controller
+components:
+  schemas:
+    ChatPrompt:
+      properties:
+        context:
+          description: The user context.
+          type:
+          - string
+          - 'null'
+        message:
+          description: The user's prompt
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          description: Key-value metadata providing structured context.
+          type:
+          - object
+          - 'null'
+      required:
+      - message
+      type: object
+    AIConversationThreads:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AIConversationThread'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    ChatRequest:
+      properties:
+        context:
+          description: Free-text description of the current user context.
+          type:
+          - string
+          - 'null'
+        message:
+          description: The user's input message.
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          description: 'Key-value metadata providing structured context.
+
+            Setting `feature` to `task-description-translate` or `task-description-improve` marks the request as an ephemeral one-shot call that is not persisted.
+
+            '
+          type: object
+      required:
+      - message
+      - metadata
+      type: object
+    PaginationMeta:
+      properties:
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
+      type: object
+    ChatResponse:
+      properties:
+        message:
+          description: Response from the AI agent.
+          type: string
+        sources:
+          description: Sources used to create the response.
+          items:
+            $ref: '#/components/schemas/Source'
+          type: array
+        timestamp:
+          description: Timestamp of the response.
+          format: date-time
+          type: string
+      required:
+      - message
+      - sources
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    ChatHistory:
+      properties:
+        chats:
+          description: The list of chats in a thread
+          items:
+            $ref: '#/components/schemas/Chat'
+          type: array
+      required:
+      - chats
+      type: object
+    Chat:
+      properties:
+        prompt:
+          $ref: '#/components/schemas/ChatPrompt'
+          description: The user's prompt
+        response:
+          $ref: '#/components/schemas/ChatResponse'
+          description: The AI's response to the prompt.
+      required:
+      - prompt
+      type: object
+    Source:
+      properties:
+        name:
+          description: The name of the source.
+          type: string
+        parameters:
+          description: A set of named parameters.
+          type: object
+      required:
+      - name
+      - parameters
+      type: object
+    AIConversationThread:
+      properties:
+        summary:
+          description: Summary of the first prompt.
+          type: string
+        thread_id:
+          description: Unique id of conversation thread.
+          type: string
+        updated_at:
+          description: The last updated date of the conversation thread.
+          format: date-time
+          type: string
+      type: object
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info

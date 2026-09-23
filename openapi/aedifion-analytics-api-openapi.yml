@@ -1,0 +1,2682 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs Analytics API
+  version: ''
+servers:
+- url: ''
+tags:
+- description: Creating, modifying, and accessing analytics and related resources.
+  name: Analytics
+paths:
+  /v2/analytics/componentInProject/{componentinproject_id}/results:
+    get:
+      description: Returns detailed information of a component containing analysis results and a list of result ids associated to it.
+      operationId: get_component_results
+      parameters:
+      - description: '[mandatory] The id of the component in project.'
+        in: path
+        name: componentinproject_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      - description: 'The optional system of units in which the analysis results should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the analysis results should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResultsForComponent'
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get analysis result references for a component
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/components/kpi_aggregation:
+    get:
+      description: Returns aggregated KPI results for components.
+      operationId: get_components_kpi_aggregation
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] The list of component ids.'
+        in: query
+        name: component_ids
+        required: true
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+      - description: The list of KPI identifiers to limit the result.
+        in: query
+        name: kpi_identifiers
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      - description: The start time of the aggregation interval. It defaults to the current timestamp minus one year.
+        in: query
+        name: start
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: The end time of the aggregation interval. It defaults to the current timestamp.
+        in: query
+        name: end
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: 'Components in projects can be filtered by their attributes.
+
+          Format must be in the form of key=value.
+
+          Multiple filters can be applied, separated by a '';'' like: key=value; key2=value
+
+          Filters with same key will be processed as ''Or'' and ''And'' across different keys.
+
+          Note that attribute keys are seen as suffixes. TODO: Improve this text.
+
+          '
+        in: query
+        name: attribute_filter
+        schema:
+          type: string
+      - description: 'The optional system of units in which the KPI aggregation results should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the KPI aggregation results should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      - description: "Desired aggregation method to be used for aggregating KPI results of a project over the given time interval.\nDefault method: \"mean\"\nAvailable options:\n - \"max\"\n - \"mean\"\n - \"min\"\n - \"sum\"\n - \"latest_execution\"\n"
+        in: query
+        name: time_aggregation
+        required: false
+        schema:
+          default: mean
+          enum:
+          - max
+          - mean
+          - min
+          - sum
+          - latest_execution
+          type: string
+      - description: "Desired aggregation method to be used for aggregating the aggregated KPI results of projects.\nDefault method: \"mean\"\nAvailable options:\n - \"max\"\n - \"mean\"\n - \"min\"\n - \"sum\"\n"
+        in: query
+        name: component_aggregation
+        required: false
+        schema:
+          default: mean
+          enum:
+          - max
+          - mean
+          - min
+          - sum
+          type: string
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      - description: Page number.
+        in: query
+        name: page
+        schema:
+          format: int64
+          type: integer
+      - description: Items per page. Defaults to 20, maximum limit is 100.
+        in: query
+        name: per_page
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentsKPIAggregationResult'
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get aggregated KPI results for components
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/componentsInProject:
+    get:
+      description: 'Returns a list of components in a project including their corresponding signal-color.
+
+        **Note** that `"signal_color": "grey"` indicates, that a component does not have results yet.'
+      operationId: get_analysis_components
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: Page number.
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int64
+          type: integer
+      - description: Items per page. Defaults to 20, maximum limit is 100.
+        in: query
+        name: per_page
+        required: false
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      - description: 'Optional parameter, filter on the name of the component in the project.
+
+          You can also search by the component type, translated into the chosen language,
+
+          e.g. "boiler" with language "en" or "Kessel" with language "de".
+
+          '
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+      - description: 'Results can be filtered by keys: alphanumeric_id, signal_color and status.
+
+          alphanumeric_id refers to the corresponding components.
+
+          signal_color can be one of: red, yellow, green, grey
+
+          status can be one of: Success., Failed., Processing.
+
+          Format must be in the form of key=value.
+
+          Multiple filters can be applied, separated by a '';'' like: key=value; key2=value
+
+          Filters with same key will be processed as ''Or'' and ''And'' across different keys.
+
+          '
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResultsForComponents'
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get components in a project with signal color
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/functions:
+    get:
+      description: Returns a list of available analysis functions. If a component name or id is passed, functions are filtered for the component.
+      operationId: get_analysis_functions
+      parameters:
+      - description: Filter functions by component alphanumeric id.
+        in: query
+        name: component_alphanumeric_id
+        required: false
+        schema:
+          type: string
+      - description: Filter functions by component id.
+        in: query
+        name: component_id
+        required: false
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AnalysisFunction'
+                type: array
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get a list of available analysis functions
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/instance:
+    post:
+      description: Creates an analysis config instance for a component in a project.
+      operationId: post_analysis_instance
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewInstanceConfig'
+        description: '[mandatory] The anaylsis config.'
+        required: true
+        x-body-name: instance_config
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceConfig'
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Create an analysis instance
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/instance/{instance_id}:
+    delete:
+      description: Deletes an analysis instance configured in a project.
+      operationId: delete_analysis_instance
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] The id of the instance.'
+        in: path
+        name: instance_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: 'Successful operation.
+
+            The deleted instance is returned in the ''resource'' field and the ''operation'' is set to ''delete''.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unsuccessful request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to ''delete''."
+
+            '
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete an analysis instance configured in a project
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+    get:
+      description: Returns details of an analysis instance configured in a project.
+      operationId: get_analysis_instance
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] The id of the instance.'
+        in: path
+        name: instance_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceConfig'
+          description: Success
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unsuccessful request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to ''get''.
+
+            '
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get a detailed analysis instance
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+    put:
+      description: Updates an analysis instance.
+      operationId: put_analysis_instance
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] The id of the instance.'
+        in: path
+        name: instance_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInstanceConfig'
+        description: '[mandatory] The anaylsis config.'
+        required: true
+        x-body-name: instance_config
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstanceConfig'
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Update an analysis instance
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/instance/{instance_id}/result/{result_id}:
+    get:
+      description: 'Returns the result of an executed instance referenced by its result_id.
+
+
+        aedifion.io and any add-ons do not include energy consulting. All data calculated, analysed and/or displayed by aedifion.io and any add-ons, especially setting values (e.g. room temperature) or the mappings of datapoints, are non-binding recommendations that have to be carefully checked by the user''s qualified personnel in each individual case before implementation ("human-in-the-loop principle").'
+      operationId: get_instance_result
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The id of the instance.
+        in: path
+        name: instance_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: result id to the executed instance.
+        in: path
+        name: result_id
+        required: true
+        schema:
+          type: string
+      - description: 'Choose language in which the results should be displayed.
+
+          -  ''en'' for English
+
+          -  ''de'' for German.
+
+          '
+        in: query
+        name: result_language
+        required: false
+        schema:
+          enum:
+          - en
+          - de
+          type: string
+      - description: 'The optional system of units in which the analysis results should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the analysis results should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get the result of an executed instance
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/instance/{instance_id}/results:
+    get:
+      description: Returns a list of executions for an instance.
+      operationId: get_instance_results
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The id of the instance.
+        in: path
+        name: instance_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: 'Choose language in which the interpretations should be displayed.
+
+          -  ''en'' for English
+
+          -  ''de'' for German.
+
+          '
+        in: query
+        name: result_language
+        required: false
+        schema:
+          enum:
+          - en
+          - de
+          type: string
+      - description: 'The optional system of units in which the analysis results should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the analysis results should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AnalysisResultSummary'
+                type: array
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get list of executions for an analysis instance
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/instance/{instance_id}/run:
+    post:
+      description: Runs the analysis instance and returns a result_id which can be used to retrieve the result of the execution.
+      operationId: post_analysis_instance_run
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] The id of the instance.'
+        in: path
+        name: instance_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] The start timestamp of the interval analysed.'
+        in: query
+        name: start
+        required: true
+        schema:
+          format: date-time
+          type: string
+      - description: '[mandatory] The end timestamp of the interval analysed.'
+        in: query
+        name: end
+        required: true
+        schema:
+          format: date-time
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Success
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Run an analysis instance
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/instances:
+    get:
+      description: Returns details of all analysis config instances configured in a project.
+      operationId: get_analysis_instances
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InstanceConfig'
+                type: array
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get details of all analysis instances
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/instances/run:
+    post:
+      description: 'Runs multiple analysis instances in batch for calculated execution periods based on their execution schedules.
+
+        The execution periods are calculated based on the execution_schedule of each analysis function:
+
+        - Monthly: Always 1st of month to 1st of next month in UTC
+
+        - Weekly: Always Monday to Monday in project timezone'
+      operationId: post_analytics_instances_run
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] List of instance IDs to execute.'
+        in: query
+        name: instance_ids
+        required: true
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+      - description: '[mandatory] The start timestamp of the date range for calculating execution periods.'
+        in: query
+        name: start
+        required: true
+        schema:
+          format: date-time
+          type: string
+      - description: '[optional] The end timestamp of the date range. If not provided, defaults to current date.'
+        in: query
+        name: end
+        required: false
+        schema:
+          format: date-time
+          type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Success. All instances were found and started successfully. Returns list of created result IDs.
+        '207':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Success'
+                - properties:
+                    resource:
+                      $ref: '#/components/schemas/AnalyticsInstancesRunResponse'
+                  type: object
+          description: 'Multi-Status.
+
+            Some instances were not found or some analyses failed to run.
+
+            Returns list of created result IDs and list of instance IDs not found.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Run analysis instances in batch
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/instances/scheduled/run:
+    post:
+      description: 'Runs all scheduled analysis instances of a project for calculated execution periods based on their execution schedules.
+
+        The execution periods are calculated based on the execution_schedule of each analysis function:
+
+        - Monthly: Always 1st of month to 1st of next month in UTC
+
+        - Weekly: Always Monday to Monday in project timezone'
+      operationId: post_analytics_scheduled_instances_run
+      parameters:
+      - description: '[mandatory] The ID of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: Execution schedule of the instances. Defaults to all.
+        in: query
+        name: execution_schedule
+        required: true
+        schema:
+          default: all
+          enum:
+          - all
+          - weekly
+          - monthly
+          type: string
+      - description: '[mandatory] The start timestamp of the date range for calculating execution periods.'
+        in: query
+        name: start
+        required: true
+        schema:
+          format: date-time
+          type: string
+      - description: '[optional] The end timestamp of the date range. If not provided, defaults to current UTC datetime.'
+        in: query
+        name: end
+        required: false
+        schema:
+          format: date-time
+          type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Success. All scheduled instances started successfully. Returns list of created result IDs.
+        '207':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Success'
+                - properties:
+                    resource:
+                      $ref: '#/components/schemas/AnalysisResultReferences'
+                  type: object
+          description: 'Multi-Status.
+
+            Some instances were already running.
+
+            Returns list of created result IDs and a warning message if instances are already running.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Run all scheduled analysis instances of a project
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/kpi:
+    post:
+      description: 'Creates a KPI for a component.
+
+        If a KPI with the same type and identifier already exists, it will be updated.
+
+        Manually created KPIs supersede KPIs generated by .analytics.'
+      operationId: post_analytics_kpi
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KPI'
+        description: 'The KPI to post:
+
+          - **component_in_project_id**: the ID of the project component
+
+          - **identifier**: the unique identifier of the KPI
+
+          - **context**: the context of the KPI
+
+          - **type**: the type of the KPI, either "actual" or "potential"
+
+          - **value**: the value of the KPI
+
+          - **units**: the unit of the KPI
+
+          - **units_context** [optional]: the context of the unit. Defaults to "default"
+
+          '
+        required: true
+        x-body-name: kpi
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Successful operation. The newly created KPI is returned in the 'resource' field.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Post a KPI for a component
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/kpi/{kpi_id}:
+    delete:
+      description: Delete a KPI of a project with the source user. KPIs with other sources cannot be deleted.
+      operationId: delete_user_analytics_kpi
+      parameters:
+      - description: '[mandatory] The id of the KPI.'
+        in: path
+        name: kpi_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Bad request.
+
+            The specified KPI cannot be deleted because it was not created by a user.
+
+            '
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Not Found. The specified KPI does not exist.
+
+            '
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete a KPI of a project
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/kpi_aggregation:
+    get:
+      description: Returns aggregated KPI results for projects.
+      operationId: get_kpi_aggregation
+      parameters:
+      - description: '[mandatory] The list of project ids.'
+        in: query
+        name: project_ids
+        required: true
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+      - description: '[mandatory] KPI identifier to aggregate.
+
+          Request the **GET /v2/analytics/functions** endpoint to fetch available KPIs.
+
+          '
+        in: query
+        name: kpi
+        required: true
+        schema:
+          type: string
+      - description: The start time of the aggregation interval. It defaults to the current timestamp minus one year.
+        in: query
+        name: start
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: The end time of the aggregation interval. It defaults to the current timestamp.
+        in: query
+        name: end
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: 'The length of the time duration for the KPI aggregation.
+
+          **NOTE:** It should be in ISO8601 duration format.
+
+          Examples: P1Y, P5M, P2W, P13D
+
+          '
+        in: query
+        name: time_window
+        required: false
+        schema:
+          format: iso8601
+          type: string
+      - description: 'The optional system of units in which the KPI aggregation results should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the KPI aggregation results should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      - description: "Desired aggregation method to be used for aggregating KPI results of a project over the given time interval.\nDefault method: \"mean\"\nAvailable options:\n - \"max\"\n - \"mean\"\n - \"min\"\n - \"sum\"\n"
+        in: query
+        name: time_aggregation
+        required: false
+        schema:
+          default: mean
+          enum:
+          - max
+          - mean
+          - min
+          - sum
+          type: string
+      - description: "Desired aggregation method to be used for aggregating the aggregated KPI results of projects.\nDefault method: \"mean\"\nAvailable options:\n - \"max\"\n - \"mean\"\n - \"median\"\n - \"min\"\n - \"mode\"\n - \"sum\"\n"
+        in: query
+        name: project_aggregation
+        required: false
+        schema:
+          default: mean
+          enum:
+          - max
+          - mean
+          - median
+          - min
+          - mode
+          - sum
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KPIAggregationResult'
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get aggregated KPI results for projects
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/overview:
+    get:
+      description: Returns an overview of the latest analysis results for all components in project, grouped by component type.
+      operationId: get_analytics_overview
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsOverview'
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get an overview of analysis results for all component types
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/potentials:
+    get:
+      description: Returns the savings potentials calculated by the latest project analyses.
+      operationId: get_potentials
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      - description: 'The optional system of units in which the savings potentials should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the savings potentials results should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SavingsPotential'
+                type: array
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get savings potentials for a project
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/projects/kpis_aggregation:
+    get:
+      description: Returns aggregated KPI results across projects for multiple KPI identifiers at a given reference date.
+      operationId: get_projects_kpis_aggregation
+      parameters:
+      - description: List of project IDs to aggregate KPIs for.
+        in: query
+        name: project_ids
+        required: true
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+      - description: List of KPI identifiers to aggregate.
+        in: query
+        name: kpi_identifiers
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      - description: 'The reference timestamp (RFC3339) used to identify the most recent KPI execution.
+
+          Defaults to current UTC time.
+
+          '
+        in: query
+        name: reference_date
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: 'The optional system of units in which the aggregation results should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the aggregation results should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      - description: "Desired aggregation method to be used for aggregating the KPI results across projects.\nDefault method: \"mean\"\nAvailable options:\n - \"max\"\n - \"mean\"\n - \"median\"\n - \"min\"\n - \"mode\"\n - \"sum\"\n"
+        in: query
+        name: project_aggregation
+        required: false
+        schema:
+          default: mean
+          enum:
+          - max
+          - mean
+          - median
+          - min
+          - mode
+          - sum
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ProjectsKPIAggregation'
+                type: array
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get aggregated KPI results across projects
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/result/{result_id}:
+    delete:
+      description: Deletes an analysis result of a project.
+      operationId: delete_instance_result
+      parameters:
+      - description: '[mandatory] The id of the project.'
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: '[mandatory] id of the analysis result.'
+        in: path
+        name: result_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: 'Successful operation.
+
+            Short summary of the deleted analysis result returned in the ''resource'' field of the response.
+
+            '
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Not found.
+
+            Analysis result for given ''result_id'' could not be found.
+
+            '
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete the result of an executed instance
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/savings:
+    get:
+      description: Returns the kpi savings calculated by the latest project analysis.
+      operationId: get_savings
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      - description: 'The optional system of units in which the savings should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the savings results should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ComponentSavings'
+                type: array
+          description: Success
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get KPI savings for a project
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+    post:
+      description: Creates a saving for a project component.
+      operationId: post_saving
+      parameters:
+      - description: '[mandatory] The id of the component in project.'
+        in: query
+        name: componentinproject_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSaving'
+        description: The details of the saving  to create.
+        required: true
+        x-body-name: new_saving
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentSavings'
+          description: Successful operation. The saving has been created and returned in response.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Post a saving for a project component
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+  /v2/analytics/savings/{saving_id}:
+    delete:
+      description: Delete a saving with given saving_id.
+      operationId: delete_saving
+      parameters:
+      - description: The id of the saving to delete.
+        in: path
+        name: saving_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          content: {}
+          description: Success. The saving has been deleted.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found. The specified saving does not exist.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete a saving
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+    patch:
+      description: Patch a saving with given saving_id.
+      operationId: patch_saving
+      parameters:
+      - description: The id of the saving to update.
+        in: path
+        name: saving_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSaving'
+        description: 'The Saving to patch: only mutable fields could be updated.
+
+          - **open** [optional]: the open value of the saving.
+
+          - **potential** [optional]: the potential value of the saving.
+
+          - **units** [optional]: the unit of the saving.
+
+          - **units_context** [optional]: the context of the unit.
+
+          '
+        required: true
+        x-body-name: saving
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComponentSavings'
+          description: Success. The saving has been update.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not Found. The specified saving does not exist.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Patch a saving
+      tags:
+      - Analytics
+      x-openapi-router-controller: app.controllers.analytics_controller
+components:
+  schemas:
+    PortfolioResult:
+      properties:
+        aggregation:
+          type: string
+        aggregation_value:
+          type: number
+        total_projects:
+          type: integer
+      required:
+      - aggregation
+      - total_projects
+      type: object
+    SignalColorCountOverview:
+      properties:
+        green:
+          type: integer
+        grey:
+          type: integer
+        red:
+          type: integer
+        yellow:
+          type: integer
+      required:
+      - red
+      - yellow
+      - green
+      - grey
+      type: object
+    UpdateInstanceConfig:
+      properties:
+        analysisfunction_id:
+          format: int64
+          type: integer
+        auto_execution:
+          type: boolean
+        componentinproject_id:
+          format: int64
+          type: integer
+        description:
+          type: string
+        enabled:
+          type: boolean
+        name:
+          type: string
+      type: object
+    ComponentWithContext:
+      properties:
+        alphanumeric_id:
+          type: string
+        components_in_project_count:
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      required:
+      - id
+      - alphanumeric_id
+      - nameEN
+      - nameDE
+      - name
+      - components_in_project_count
+      type: object
+    ComponentWithResults:
+      properties:
+        componentinproject_id:
+          format: int64
+          type: integer
+        display_name:
+          type: string
+        display_name_DE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''display_name'' field instead.'
+          type: string
+        signal_color:
+          type: string
+      type: object
+    AnalysisResultSummary:
+      properties:
+        input_parameters:
+          type: object
+        interpretation:
+          type: string
+        result_id:
+          type: string
+        savings_potential_kpis:
+          items:
+            $ref: '#/components/schemas/KPIResult'
+          type: array
+        signal_color:
+          type: string
+        status:
+          type: string
+      type: object
+    AnalysisSavings:
+      properties:
+        analysis_function:
+          $ref: '#/components/schemas/AnalysisFunctionShort'
+        savings:
+          items:
+            $ref: '#/components/schemas/Saving'
+          type: array
+      type: object
+    KPIAggregationItem:
+      properties:
+        kpi:
+          $ref: '#/components/schemas/KPIResult'
+        time_range_info:
+          $ref: '#/components/schemas/TimeRangeInfo'
+      required:
+      - time_range_info
+      - kpi
+      type: object
+    KPIAggregationResult:
+      properties:
+        kpi:
+          type: string
+        portfolio_result:
+          $ref: '#/components/schemas/PortfolioResult'
+        project_results:
+          items:
+            $ref: '#/components/schemas/ProjectKPIAggregationResultItem'
+          type: array
+        units:
+          type: string
+      type: object
+    ProjectKPIAggregationResultItem:
+      properties:
+        aggregation:
+          type: string
+        aggregation_value:
+          type: number
+        kpis:
+          items:
+            $ref: '#/components/schemas/KPIResultShort'
+          type: array
+        project:
+          $ref: '#/components/schemas/ProjectShort'
+        time_range_info:
+          $ref: '#/components/schemas/TimeRangeInfo'
+      required:
+      - project
+      - time_range_info
+      type: object
+    NewSaving:
+      properties:
+        analysis_function_id:
+          description: The id of the analysis function that the saving is associated with.
+          type: integer
+        context:
+          description: The context of the saving.
+          enum:
+          - financial
+          - co2_emissions
+          - energy_consumption
+          type: string
+        open:
+          description: The potential that has not yet been realized as actual saving.
+          format: float
+          type: number
+        potential:
+          description: The potential value selected by the user.
+          format: float
+          type: number
+        units:
+          description: The units of the saving.
+          type: string
+        units_context:
+          description: The units context of the saving.
+          type: string
+      required:
+      - analysis_function_id
+      - context
+      - potential
+      - open
+      - units
+      type: object
+    AnalysisFunctionShort:
+      properties:
+        alphanumeric_id:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - alphanumeric_id
+      - name
+      type: object
+    SummaryKPICurrentResult:
+      properties:
+        time_reference:
+          type: string
+        unit:
+          type: string
+        value:
+          format: float
+          type: number
+      type: object
+    TimeseriesResult:
+      properties:
+        data:
+          items:
+            properties:
+              time:
+                format: date-time
+                type: string
+              value:
+                format: float
+                type: number
+            type: object
+          type: array
+        name:
+          type: string
+        unit:
+          type: string
+      type: object
+    ProjectsKPIAggregation:
+      properties:
+        aggregated_value:
+          description: The aggregated KPI value across projects.
+          type: number
+        kpi_identifier:
+          description: The KPI identifier.
+          type: string
+        projects_kpi:
+          description: Per-project KPI results.
+          items:
+            $ref: '#/components/schemas/ProjectKPI'
+          type: array
+        unit:
+          description: The unit of the aggregated value.
+          type: string
+      required:
+      - aggregated_value
+      - kpi_identifier
+      - unit
+      - projects_kpi
+      type: object
+    ControlsAppStatus:
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        name:
+          description: Stable, language-independent short key for the status, e.g. 'running' or 'died'.
+          type: string
+        type:
+          description: Classification of the status.
+          enum:
+          - normal
+          - error
+          - pending
+          - ready
+          type: string
+      required:
+      - code
+      - message
+      type: object
+    PlotsResult:
+      properties:
+        categories:
+          items:
+            type: string
+          type: array
+        data:
+          items:
+            $ref: '#/components/schemas/PlotsResultData'
+          type: array
+        extras:
+          type: object
+        identifier:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        unit:
+          type: string
+      type: object
+    ComponentControlsApp:
+      properties:
+        algorithm:
+          type: string
+        attributes:
+          items:
+            type: string
+          type: array
+        id:
+          format: uuid
+          type: string
+        pins:
+          items:
+            type: string
+          type: array
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+        variation:
+          deprecated: true
+          description: 'Deprecated: use ''variation_meta.key'' instead.'
+          type: string
+        variation_meta:
+          $ref: '#/components/schemas/ControlsAppVariation'
+      required:
+      - id
+      - algorithm
+      - status
+      type: object
+    AnalyticsResultsForComponentResultIds:
+      properties:
+        alphanumeric_id:
+          type: string
+        analysis_function_id:
+          type: integer
+        analytics_version:
+          type: string
+        display_name:
+          type: string
+        end:
+          format: date-time
+          type: string
+        function_name:
+          type: string
+        instance_id:
+          format: int64
+          type: integer
+        interpretation:
+          type: string
+        result_id:
+          type: string
+        signal_color:
+          type: string
+        start:
+          format: date-time
+          type: string
+        summary_kpi:
+          $ref: '#/components/schemas/SummaryKPIResult'
+      type: object
+    PaginationMeta:
+      properties:
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
+      type: object
+    ComponentInProjectAttribute:
+      properties:
+        alphanumeric_id:
+          type: string
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        source:
+          type: string
+        unit:
+          type: string
+        value:
+          type: string
+      type: object
+    EnumValue:
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      type: object
+    AssignedPin:
+      properties:
+        alphanumeric_id:
+          type: string
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        location:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pin_attributes:
+          items:
+            $ref: '#/components/schemas/PinAttribute'
+          type: array
+        unit_type:
+          type: string
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    ComponentsKPIAggregationResult:
+      properties:
+        aggregated_kpis_overview:
+          items:
+            $ref: '#/components/schemas/KPIResult'
+          type: array
+        items:
+          items:
+            $ref: '#/components/schemas/ComponentInProjectKPIAggregations'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+      - aggregated_kpis_overview
+      - items
+      - meta
+      type: object
+    NewInstanceConfig:
+      properties:
+        analysisfunction_id:
+          format: int64
+          type: integer
+        auto_execution:
+          type: boolean
+        componentinproject_id:
+          format: int64
+          type: integer
+        description:
+          type: string
+        enabled:
+          type: boolean
+        name:
+          type: string
+      required:
+      - componentinproject_id
+      - analysisfunction_id
+      type: object
+    ProjectShort:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
+    Tag:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - key
+      type: object
+    PlotsResultData:
+      properties:
+        name:
+          type: string
+        values:
+          items:
+            format: float
+            type: number
+          type: array
+      type: object
+    AnalysisFunction:
+      properties:
+        alphanumeric_id:
+          type: string
+        attributes:
+          items:
+            $ref: '#/components/schemas/ComponentAttributeDefinition'
+          type: array
+        execution_schedule:
+          type: string
+        id:
+          format: int64
+          type: integer
+        kpis:
+          items:
+            type: string
+          type: array
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pins:
+          items:
+            $ref: '#/components/schemas/Pin'
+          type: array
+      required:
+      - id
+      - alphanumeric_id
+      - nameEN
+      - nameDE
+      - kpis
+      type: object
+    Saving:
+      properties:
+        context:
+          type: string
+        id:
+          format: uuid
+          type: string
+        open:
+          format: float
+          type: number
+        potential:
+          format: float
+          type: number
+        realized:
+          format: float
+          type: number
+        units:
+          type: string
+        units_context:
+          type: string
+      type: object
+    ProjectKPI:
+      properties:
+        end_timestamp_latest_result:
+          description: The timestamp of the last KPI execution.
+          format: date-time
+          type: string
+        kpi_identifier:
+          description: The KPI identifier.
+          type: string
+        project_id:
+          description: The project ID.
+          format: int64
+          type: integer
+        unit:
+          description: The unit of the KPI value.
+          type: string
+        unit_context:
+          description: The unit context.
+          type: string
+        value:
+          description: The KPI value.
+          type: number
+      required:
+      - project_id
+      - value
+      - end_timestamp_latest_result
+      - unit
+      type: object
+    ComponentInProjectWithContext:
+      properties:
+        abbreviation:
+          type: string
+        attributes:
+          items:
+            $ref: '#/components/schemas/ComponentInProjectAttribute'
+          type: array
+        attributes_definitions:
+          items:
+            $ref: '#/components/schemas/ComponentAttributeDefinition'
+          type: array
+        component:
+          $ref: '#/components/schemas/Component'
+        controls_apps:
+          items:
+            $ref: '#/components/schemas/ComponentControlsApp'
+          type: array
+        display_name:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        pins:
+          items:
+            $ref: '#/components/schemas/AssignedPin'
+          type: array
+        project_id:
+          format: int64
+          type: integer
+        relationships:
+          items:
+            $ref: '#/components/schemas/ComponentInProjectRelation'
+          type: array
+        tags:
+          items:
+            $ref: '#/components/schemas/Tag'
+          type: array
+      type: object
+    TimeRangeInfo:
+      properties:
+        end:
+          format: date-time
+          type: string
+        filled:
+          type: boolean
+        start:
+          format: date-time
+          type: string
+      type: object
+    SummaryKPIResult:
+      properties:
+        current:
+          $ref: '#/components/schemas/SummaryKPICurrentResult'
+        development:
+          $ref: '#/components/schemas/SummaryKPIDevelopmentResult'
+      type: object
+    ComponentCategory:
+      properties:
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      type: object
+    AnalysisResultShort:
+      properties:
+        function_id:
+          type: integer
+        id:
+          type: string
+        instance_id:
+          type: integer
+        interpretation:
+          type: string
+        signal_color:
+          enum:
+          - green
+          - grey
+          - yellow
+          - red
+          type: string
+      required:
+      - id
+      - instance_id
+      - function_id
+      type: object
+    PinAttribute:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        probability:
+          type: number
+        value:
+          type: string
+      type: object
+    AnalysisResult:
+      properties:
+        alphanumeric_id:
+          type: string
+        analytics_version:
+          type: string
+        display_name:
+          type: string
+        end:
+          format: date-time
+          type: string
+        function_name:
+          type: string
+        info:
+          items:
+            type: string
+          type: array
+        instance_id:
+          type: integer
+        interpretation:
+          type: string
+        kpi:
+          items:
+            $ref: '#/components/schemas/KPIResult'
+          type: array
+        plots:
+          items:
+            $ref: '#/components/schemas/PlotsResult'
+          type: array
+        project_id:
+          type: integer
+        recommendation:
+          items:
+            type: string
+          type: array
+        signal_color:
+          enum:
+          - green
+          - yellow
+          - red
+          type: string
+        start:
+          format: date-time
+          type: string
+        status:
+          type: string
+        summary_kpi:
+          $ref: '#/components/schemas/SummaryKPIResult'
+        timeseries:
+          items:
+            $ref: '#/components/schemas/TimeseriesResult'
+          type: array
+      type: object
+    SavingsPotential:
+      properties:
+        analysis_function:
+          $ref: '#/components/schemas/AnalysisFunctionShort'
+        analysis_result:
+          $ref: '#/components/schemas/AnalysisResultShort'
+        component:
+          $ref: '#/components/schemas/Component'
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProject'
+        potential_kpis:
+          items:
+            $ref: '#/components/schemas/KPIResult'
+          type: array
+      required:
+      - component_in_project
+      - component
+      - analysis_result
+      - potential_kpis
+      type: object
+    AnalyticsResultsForComponent:
+      properties:
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProjectWithContext'
+        result_ids:
+          items:
+            $ref: '#/components/schemas/AnalyticsResultsForComponentResultIds'
+          type: array
+        signal_color:
+          type: string
+      type: object
+    AnalyticsOverview:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AnalyticsOverviewItem'
+          type: array
+        overview:
+          $ref: '#/components/schemas/AnalysisResultsOverview'
+      required:
+      - overview
+      - items
+      type: object
+    UpdateSaving:
+      properties:
+        open:
+          format: float
+          type: number
+        potential:
+          format: float
+          type: number
+        units:
+          type: string
+        units_context:
+          type: string
+      type: object
+    AnalysisResultReferences:
+      properties:
+        result_ids:
+          description: List of created result reference IDs.
+          items:
+            format: uuid
+            type: string
+          type: array
+      type: object
+    ComponentInProjectKPIAggregations:
+      properties:
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProjectWithContext'
+        kpi_aggregations:
+          items:
+            $ref: '#/components/schemas/KPIAggregationItem'
+          type: array
+      required:
+      - component_in_project
+      - kpi_aggregations
+      type: object
+    AnalyticsInstancesRunResponse:
+      properties:
+        instance_ids_not_found:
+          description: List of instance IDs that were not found.
+          items:
+            format: int64
+            type: integer
+          type: array
+        result_ids:
+          description: List of created result reference IDs.
+          items:
+            format: uuid
+            type: string
+          type: array
+      type: object
+    ComponentSavings:
+      properties:
+        analysis_savings:
+          items:
+            $ref: '#/components/schemas/AnalysisSavings'
+          type: array
+        component:
+          $ref: '#/components/schemas/Component'
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProject'
+      required:
+      - component_in_project
+      - component
+      - analysis_savings
+      type: object
+    AnalyticsResultsForComponents:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ComponentWithResults'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    Component:
+      properties:
+        alphanumeric_id:
+          type: string
+        category:
+          $ref: '#/components/schemas/ComponentCategory'
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        private:
+          type: boolean
+      type: object
+    ComponentInProjectRelation:
+      properties:
+        id:
+          format: int64
+          type: integer
+        relationship:
+          enum:
+          - hasLocation
+          - hasPart
+          - feeds
+          type: string
+        source_componentinproject_id:
+          format: int64
+          type: integer
+        target_componentinproject_id:
+          format: int64
+          type: integer
+      type: object
+    ComponentAttributeDefinition:
+      properties:
+        alphanumeric_id:
+          type: string
+        default_unit:
+          type: string
+        default_value:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        limits:
+          properties:
+            max:
+              format: float
+              type: number
+            min:
+              format: float
+              type: number
+          type: object
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        unit_type:
+          type: string
+        value_options:
+          items:
+            $ref: '#/components/schemas/EnumValue'
+          type: array
+        value_type:
+          type: string
+      type: object
+    ControlsAppVariation:
+      properties:
+        description:
+          description: Description of the controls app algorithm variation.
+          type: string
+        key:
+          description: Stable, language-independent short key for the variation, e.g., 'hero' or 'hero_dryrun'.
+          type: string
+        name:
+          description: Human-readable name of the variation, e.g., 'Dry run'.
+          type: string
+      required:
+      - key
+      - name
+      - description
+      type: object
+    AnalyticsOverviewItem:
+      properties:
+        analyses:
+          $ref: '#/components/schemas/SignalColorCountOverview'
+        component:
+          $ref: '#/components/schemas/ComponentWithContext'
+      required:
+      - component
+      - analyses
+      type: object
+    ComponentInProject:
+      properties:
+        abbreviation:
+          type: string
+        component_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    AnalysisResultsOverview:
+      properties:
+        analyses:
+          $ref: '#/components/schemas/SignalColorCountOverview'
+        components_in_project_count:
+          type: integer
+      required:
+      - components_in_project_count
+      - analyses
+      type: object
+    KPIResult:
+      properties:
+        context:
+          type: string
+        id:
+          type: integer
+        identifier:
+          type: string
+        name:
+          type: string
+        unit:
+          type: string
+        value:
+          format: float
+          type: number
+      type: object
+    Pin:
+      properties:
+        alphanumeric_id:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        location:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pin_attributes:
+          items:
+            $ref: '#/components/schemas/PinAttribute'
+          type: array
+        unit_type:
+          type: string
+      type: object
+    Success:
+      properties:
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
+      type: object
+    KPIResultShort:
+      properties:
+        end:
+          format: date-time
+          type: string
+        start:
+          format: date-time
+          type: string
+        value:
+          type: number
+      type: object
+    SummaryKPIDevelopmentResult:
+      properties:
+        arrow:
+          enum:
+          - up
+          - down
+          - right
+          type: string
+        time_reference:
+          type: string
+        unit:
+          type: string
+        value:
+          format: float
+          type: number
+      type: object
+    InstanceConfig:
+      properties:
+        config:
+          format: json
+          type: object
+        id:
+          format: int64
+          type: integer
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    KPI:
+      example:
+        component_in_project_id: 1
+        context: co2_savings
+        identifier: schedule_analysis.co2_saving
+        type: potential
+        units: kilowatt-hours
+        units_context: electrical
+        value: 214.43
+      properties:
+        analysis_function_id:
+          type: integer
+        component_in_project_id:
+          type: integer
+        context:
+          type: string
+        identifier:
+          type: string
+        type:
+          enum:
+          - actual
+          - potential
+          type: string
+        units:
+          type: string
+        units_context:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - component_in_project_id
+      - analysis_function_id
+      - identifier
+      - context
+      - type
+      - value
+      - units
+      type: object
+  parameters:
+    LanguageQueryParam:
+      description: 'Choose language in which the response should be displayed.
+
+        - ''en'' for English
+
+        - ''de'' for German
+
+        - ''fr'' for French
+
+        '
+      in: query
+      name: language
+      schema:
+        enum:
+        - en
+        - de
+        - fr
+        type: string
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info

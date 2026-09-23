@@ -1,0 +1,874 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs Task API
+  version: ''
+servers:
+- url: ''
+tags:
+- description: Creating, modifying, and accessing tasks and related resources.
+  name: Task
+paths:
+  /v2/task:
+    post:
+      description: Create a new task.
+      operationId: post_task
+      parameters:
+      - description: The id of the project in which to create the task.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTask'
+        description: The details of the task to create.
+        required: true
+        x-body-name: new_task
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: Success. The task has been created. The created task is returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details of the error are returned in the 'error' field of the repsonse.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Create a new task
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+  /v2/task/comments/{comment_id}:
+    delete:
+      description: Delete a comment belonging to a task.
+      operationId: delete_task_comment
+      parameters:
+      - description: The id of the comment.
+        in: path
+        name: comment_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          content: {}
+          description: Success. The task comment has been deleted.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete a task comment
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+    get:
+      description: Get the details of a task comment.
+      operationId: get_task_comment
+      parameters:
+      - description: The id of the comment.
+        in: path
+        name: comment_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskComment'
+          description: Success. The queried task comment is returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get a task comment
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+    put:
+      description: Update the message of a task comment.
+      operationId: put_task_comment
+      parameters:
+      - description: The id of the comment.
+        in: path
+        name: comment_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTaskComment'
+        description: The changes to the comment.
+        required: true
+        x-body-name: comment
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskComment'
+          description: Success. The task comment has been updated. The updated comment is returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Edit a task comment
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+  /v2/task/{task_id}:
+    delete:
+      description: Delete the task.
+      operationId: delete_task
+      parameters:
+      - description: The id of the task.
+        in: path
+        name: task_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '204':
+          content: {}
+          description: Success. The task has been deleted.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete a task
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+    get:
+      description: Get the details of the task.
+      operationId: get_task
+      parameters:
+      - description: The id of the task.
+        in: path
+        name: task_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: Success. The queried task is returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get a task
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+    put:
+      description: Edit one or multiple attributes of the task.
+      operationId: put_task
+      parameters:
+      - description: The id of the task.
+        in: path
+        name: task_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTask'
+        description: The changes to the task.
+        required: true
+        x-body-name: task
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: Success. The task has been updated. The updated task is returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Edit a task
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+  /v2/task/{task_id}/comments:
+    get:
+      description: Returns a paginated list of task comments.
+      operationId: get_task_comments
+      parameters:
+      - description: The id of the task.
+        in: path
+        name: task_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The page number.
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int64
+          type: integer
+      - description: Items per page. Defaults to 20, maximum limit is 100.
+        in: query
+        name: per_page
+        required: false
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskCommentList'
+          description: A paginated list of task comments.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request. Details on the error are returned in the ''error'' field of the response.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get all comments of a task
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+    post:
+      description: Create a new comment for a task given with `task_id`.
+      operationId: post_task_comment
+      parameters:
+      - description: The id of the task the comment will be created for.
+        in: path
+        name: task_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTaskComment'
+        description: The details of the comment.
+        required: true
+        x-body-name: new_comment
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskComment'
+          description: Success. The task comment has been created. The created comment is returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details of the error are returned in the 'error' field of the repsonse.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Create a new task comment
+      tags:
+      - Task
+      x-openapi-router-controller: app.controllers.task_controller
+components:
+  schemas:
+    TaskComment:
+      properties:
+        author:
+          $ref: '#/components/schemas/ShortUser'
+          description: The author of the comment.
+        created:
+          description: 'Timestamp of the comment creation.
+
+            This information is set automatically and is not editable.
+
+            '
+          format: date-time
+          type: string
+        id:
+          description: The id of the comment.
+          format: uuid
+          type: string
+        task_id:
+          description: The id of the task the comment belongs to.
+          format: uuid
+          type: string
+        text:
+          description: The text of the comment.
+          type: string
+        updated:
+          description: 'Timestamp of the latest comment modification.
+
+            This information is set automatically and is not editable.
+
+            '
+          format: date-time
+          type: string
+      required:
+      - id
+      type: object
+    NewTaskComment:
+      properties:
+        text:
+          description: The text of the comment.
+          maxLength: 32767
+          type: string
+      required:
+      - text
+      type: object
+    PlotViewResponse:
+      properties:
+        datapoints:
+          description: Datapoints of the plot view.
+          items:
+            type: string
+          type: array
+        end:
+          description: end timestamp of the datapoints
+          format: date-time
+          type: string
+        hidden_datapoints:
+          description: Hidden datapoints of the plot view.
+          items:
+            type: string
+          type: array
+        id:
+          description: id integer of the plot view.
+          format: uuid
+          type: string
+        samplerate:
+          description: sample rate of the datapoints.
+          type: string
+        start:
+          description: start timestamp of the datapoints.
+          format: date-time
+          type: string
+        zoom:
+          $ref: '#/components/schemas/PlotViewZoom'
+          description: Zoom period with start and end timestamps including timezone
+      required:
+      - id
+      - start
+      - end
+      - samplerate
+      type: object
+    PaginationMeta:
+      properties:
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
+      type: object
+    KPIResult:
+      properties:
+        context:
+          type: string
+        id:
+          type: integer
+        identifier:
+          type: string
+        name:
+          type: string
+        unit:
+          type: string
+        value:
+          format: float
+          type: number
+      type: object
+    TaskCommentList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/TaskComment'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    Task:
+      properties:
+        analytics_result:
+          description: List of analytics results related to the task.
+          items:
+            $ref: '#/components/schemas/AnalysisResultShort'
+          type: array
+        assignee:
+          $ref: '#/components/schemas/ShortUser'
+        componentinproject:
+          description: List of component instances related to the task.
+          items:
+            $ref: '#/components/schemas/ComponentInProject'
+          type: array
+        created:
+          description: 'The date and time the task was created.
+
+            This information is set automatically and is not manually editable.
+
+            '
+          format: date-time
+          type: string
+        description:
+          description: The description of the task.
+          type: string
+        end:
+          description: The planned end time for the task.
+          format: date-time
+          type: string
+        id:
+          description: The id of the task.
+          format: uuid
+          type: string
+        plot_view:
+          $ref: '#/components/schemas/PlotViewResponse'
+        priority:
+          description: The priority of the task.
+          enum:
+          - low
+          - medium
+          - high
+          type: string
+        project_id:
+          description: The id of the project the task belongs to.
+          format: int64
+          type: integer
+        reporter:
+          $ref: '#/components/schemas/ShortUser'
+        savings_potential:
+          $ref: '#/components/schemas/KPIResult'
+        start:
+          description: The planned start time for the task.
+          format: date-time
+          type: string
+        status:
+          description: The status of the task.
+          enum:
+          - open
+          - doing
+          - review
+          - done
+          - rejected
+          - failed
+          type: string
+        title:
+          description: The short task title.
+          type: string
+        updated:
+          description: 'The date and time the task was last updated.
+
+            This information is set automatically and is not manually editable.
+
+            '
+          format: date-time
+          type: string
+      type: object
+    NewTask:
+      properties:
+        analytics_result:
+          description: List of references of analytics results related to the task.
+          items:
+            format: uuid
+            type: string
+          type: array
+        assignee_user_id:
+          description: The id of the user assigned to the task.
+          format: int64
+          type: integer
+        componentinproject:
+          description: List of ids of component instances related to the task.
+          items:
+            format: int64
+            type: integer
+          type: array
+        description:
+          default: ''
+          description: The description of the task.
+          maxLength: 32727
+          type: string
+        end:
+          description: The planned end time of the task.
+          format: date-time
+          type: string
+        plot_view_id:
+          description: id of the plot view related to the task
+          format: uuid
+          type: string
+        priority:
+          default: medium
+          description: The priority of the task.
+          enum:
+          - low
+          - medium
+          - high
+          type: string
+        reporter_user_id:
+          description: 'The id of the user who reported the task.
+
+            If not given, this will be set to the user who made the API call.
+
+            '
+          format: int64
+          type: integer
+        start:
+          description: The planned start time of the task.
+          format: date-time
+          type: string
+        status:
+          default: open
+          description: The status of the task.
+          enum:
+          - open
+          - doing
+          - review
+          - done
+          - rejected
+          - failed
+          type: string
+        title:
+          description: The short title of the task.
+          maxLength: 100
+          type: string
+      required:
+      - title
+      type: object
+    PlotViewZoom:
+      description: Plot view zoom period with start and end timestamps including timezone
+      properties:
+        end:
+          description: end timestamp of the plot view zoom period including timezone
+          format: date-time
+          type:
+          - string
+          - 'null'
+        start:
+          description: start timestamp of the plot view zoom period including timezone
+          format: date-time
+          type:
+          - string
+          - 'null'
+      type: object
+    AnalysisResultShort:
+      properties:
+        function_id:
+          type: integer
+        id:
+          type: string
+        instance_id:
+          type: integer
+        interpretation:
+          type: string
+        signal_color:
+          enum:
+          - green
+          - grey
+          - yellow
+          - red
+          type: string
+      required:
+      - id
+      - instance_id
+      - function_id
+      type: object
+    UpdateTaskComment:
+      properties:
+        text:
+          description: The text of the comment.
+          maxLength: 32727
+          type: string
+      required:
+      - text
+      type: object
+    ComponentInProject:
+      properties:
+        abbreviation:
+          type: string
+        component_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    UpdateTask:
+      properties:
+        analytics_result:
+          description: 'New list of references of analytics results related to the task, fully replacing the old list.
+
+            '
+          items:
+            format: uuid
+            type: string
+          type: array
+        assignee_user_id:
+          description: The id of the new user assigned to the task.
+          format: int64
+          type: integer
+        componentinproject:
+          description: 'New list of ids of component instances related to the task, fully replacing the old list.
+
+            '
+          items:
+            format: int64
+            type: integer
+          type: array
+        description:
+          description: The updated description of the task.
+          maxLength: 32727
+          type: string
+        end:
+          description: The updated planned end time of the task.
+          format: date-time
+          type: string
+        plot_view_id:
+          description: id of the plot view related to the task
+          format: uuid
+          type: string
+        priority:
+          description: The updated priority of the task.
+          enum:
+          - low
+          - medium
+          - high
+          type: string
+        reporter_user_id:
+          description: The id of the new user who reported the task.
+          format: int64
+          type: integer
+        start:
+          description: The updated planned start time of the task.
+          format: date-time
+          type: string
+        status:
+          description: The updated status of the task.
+          enum:
+          - open
+          - doing
+          - review
+          - done
+          - rejected
+          - failed
+          type: string
+        title:
+          description: The updated title of the task.
+          maxLength: 100
+          type: string
+      required:
+      - title
+      - description
+      - status
+      - priority
+      - reporter_user_id
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    ShortUser:
+      properties:
+        avatar_url:
+          description: The url to the user's avatar.
+          type: string
+        company_id:
+          description: The id of the company the user belongs to.
+          type: integer
+        email:
+          description: The user's email address.
+          format: email
+          type: string
+        firstName:
+          description: The user's first name.
+          type: string
+        id:
+          description: The user's id.
+          type: integer
+        lastName:
+          description: The user's last name.
+          type: string
+      required:
+      - id
+      - email
+      - company_id
+      type: object
+  parameters:
+    LanguageQueryParam:
+      description: 'Choose language in which the response should be displayed.
+
+        - ''en'' for English
+
+        - ''de'' for German
+
+        - ''fr'' for French
+
+        '
+      in: query
+      name: language
+      schema:
+        enum:
+        - en
+        - de
+        - fr
+        type: string
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info

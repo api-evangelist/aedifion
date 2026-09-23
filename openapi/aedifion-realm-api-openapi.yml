@@ -1,0 +1,897 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs Realm API
+  version: ''
+servers:
+- url: ''
+tags:
+- description: Accessing realm-level resources.
+  name: Realm
+paths:
+  /v2/company/{company_id}/project:
+    post:
+      description: Creates a new project with the specified details.
+      operationId: post_company_project
+      parameters:
+      - description: The id of the company to create the project for.
+        in: path
+        name: company_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProject'
+        description: 'The details of the project to create
+
+          - **name** is mandatory
+
+          - **description** is optional (default = \"\")
+
+          - **units_system** is optional, the preferred system of units for the project
+
+          - **currency_system** is optional, the preferred currency system for the project
+
+          '
+        required: true
+        x-body-name: project
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyProjectResponse'
+          description: 'Successful operation. The created project is returned under
+
+            ''resource.project'' and its auto-created admin role under ''resource.role''.
+
+            The project is created **unprovisioned**: it has no handle, no load
+
+            balancing group and no slug, and cannot ingest or serve data until the
+
+            provisioning step is done.
+
+            '
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Bad request.
+
+            Invalid input data.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            The error is returned in the ''error'' field.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Project creation is temporarily disabled.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The company or a referenced manager was not found.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Create a new project
+      tags:
+      - Realm
+      x-openapi-router-controller: app.controllers.realm_controller
+  /v2/company/{company_id}/project/{project_id}/setup:
+    post:
+      description: 'Provisions the backend resources for an existing project: it auto-assigns a load
+
+        balancing group, then creates the backing storage and messaging resources with their
+
+        credentials and topic authorizations. The project handle is derived from the given
+
+        slug. This is a one-shot operation and cannot be re-run for a project that already
+
+        has a slug, handle or load balancing group set.'
+      operationId: post_project_setup
+      parameters:
+      - description: The id of the company that owns the project.
+        in: path
+        name: company_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The id of the project to provision.
+        in: path
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The project slug from which the handle is derived.
+        in: query
+        name: slug
+        required: true
+        schema:
+          maxLength: 126
+          minLength: 3
+          pattern: ^[a-z0-9_-]+$
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectSetupResponse'
+          description: 'Success.
+
+            The project has been provisioned and the created resources are returned.
+
+            The returned credentials are shown only once and cannot be retrieved later.
+
+            Store them before discarding the response.
+
+            '
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Bad request.
+
+            The slug is invalid or the project is missing prerequisites.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response.
+
+            '
+          headers:
+            WWW-Authenticate:
+              schema:
+                type: string
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Not found.
+
+            The project was not found.
+
+            '
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Conflict.
+
+            The project is already provisioned or the slug/handle is already in use.
+
+            '
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Provisioning unavailable.
+
+            An external resource failed, or no load balancing group is configured.
+
+            '
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Provision the backend resources for a project
+      tags:
+      - Realm
+      x-openapi-router-controller: app.controllers.realm_controller
+  /v2/realm/companies:
+    get:
+      description: Get list of the companies.
+      operationId: get_companies
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CompanyWithContext'
+                type: array
+          description: Success. List of all companies returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get all companies
+      tags:
+      - Realm
+      x-openapi-router-controller: app.controllers.realm_controller
+  /v2/realm/project_journey_sync:
+    post:
+      description: Synchronizes project journey data for each project in the given project_ids list.
+      operationId: post_project_journey_sync
+      parameters:
+      - description: The list of project ids to synchronize project journey data.
+        in: query
+        name: project_ids
+        required: true
+        schema:
+          items:
+            format: int64
+            type: integer
+          type: array
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Success'
+                - properties:
+                    resource:
+                      $ref: '#/components/schemas/ProjectJourneySyncResponse'
+                  type: object
+          description: A success message in case the request was posted successfully.
+          headers:
+            WWW-Authenticate:
+              schema:
+                type: string
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: "Unauthorized request. \nDetails on the error are returned in the 'error' field of the response.\n"
+          headers:
+            WWW-Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Post a project journey synchronization request
+      tags:
+      - Realm
+      x-openapi-router-controller: app.controllers.realm_controller
+  /v2/realm/role/user/{user_id}:
+    delete:
+      description: Delete the associated realm role from a user.
+      operationId: delete_user_realm_role
+      parameters:
+      - description: The id of the user.
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Success. The realm role has been deleted from user.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete the realm role from a user
+      tags:
+      - Realm
+      x-openapi-router-controller: app.controllers.realm_controller
+  /v2/realm/role/{role_id}/user/{user_id}:
+    post:
+      description: Assign or change the realm role to the user.
+      operationId: post_user_realm_role
+      parameters:
+      - description: The id of the realm role.
+        in: path
+        name: role_id
+        required: true
+        schema:
+          type: integer
+      - description: The id of the user.
+        in: path
+        name: user_id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Success. The realm role has been assigned to the user. The updated user is returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Assign a new realm role to the user
+      tags:
+      - Realm
+      x-openapi-router-controller: app.controllers.realm_controller
+  /v2/realm/roles:
+    get:
+      description: Get list of all realm roles.
+      operationId: get_realm_roles
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/RealmRole'
+                type: array
+          description: Success. List of all available realm roles returned in the response.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get all available realm roles
+      tags:
+      - Realm
+      x-openapi-router-controller: app.controllers.realm_controller
+components:
+  schemas:
+    RealmRole:
+      properties:
+        endpoints:
+          items:
+            type: integer
+          type: array
+        id:
+          description: id of the realm role.
+          type: integer
+        name:
+          description: name of the realm role.
+          type: string
+      type: object
+    TagAuth:
+      properties:
+        key:
+          type: string
+        read:
+          type: boolean
+        value:
+          type: string
+        write:
+          type: boolean
+      type: object
+    CompanyProjectResponse:
+      properties:
+        project:
+          $ref: '#/components/schemas/Project'
+        role:
+          $ref: '#/components/schemas/Role'
+      required:
+      - project
+      - role
+      type: object
+    ProjectSetupCredential:
+      properties:
+        password:
+          description: The generated password of the provisioned credential.
+          type: string
+        username:
+          description: The username of the provisioned credential.
+          type: string
+      required:
+      - username
+      - password
+      type: object
+    NewProject:
+      properties:
+        account_manager_id:
+          description: ID of the account manager user
+          format: int64
+          type: integer
+        address:
+          type: string
+        asset_manager_id:
+          format: int64
+          type: integer
+        currency_system:
+          type: string
+        description:
+          type: string
+        latitude:
+          type: string
+        longitude:
+          type: string
+        name:
+          maxLength: 254
+          minLength: 1
+          type: string
+        project_engineer_id:
+          description: ID of the project engineer user
+          format: int64
+          type: integer
+        start:
+          format: date-time
+          type: string
+        status_report:
+          type: string
+        units_system:
+          type: string
+      required:
+      - name
+      type: object
+    Project:
+      properties:
+        account_manager:
+          $ref: '#/components/schemas/ShortUser'
+          description: Account manager assigned to this project
+        address:
+          type: string
+        asset_manager:
+          $ref: '#/components/schemas/ShortUser'
+          description: Asset manager assigned to this project
+        avatar_url:
+          type: string
+        company_id:
+          format: int64
+          type: integer
+        currency_system:
+          type: string
+        custom_pages:
+          items:
+            $ref: '#/components/schemas/CustomPage'
+          type: array
+        description:
+          type: string
+        handle:
+          type: string
+        hidden_native_pages:
+          items:
+            $ref: '#/components/schemas/HiddenNativePage'
+          type: array
+        id:
+          type: integer
+        latitude:
+          type: string
+        links:
+          items:
+            $ref: '#/components/schemas/ProjectLink'
+          type: array
+        load_balancing_group:
+          type: string
+        longitude:
+          type: string
+        name:
+          type: string
+        project_engineer:
+          $ref: '#/components/schemas/ShortUser'
+          description: Project engineer assigned to this project
+        start:
+          format: date-time
+          type: string
+        status_report:
+          type: string
+        status_report_updated_at:
+          format: date-time
+          type: string
+        units_system:
+          type: string
+      required:
+      - company_id
+      - name
+      type: object
+    CompanyWithContext:
+      properties:
+        company:
+          $ref: '#/components/schemas/Company'
+        projects:
+          items:
+            properties:
+              account_manager:
+                $ref: '#/components/schemas/ShortUser'
+                description: Account manager assigned to this project
+              address:
+                type: string
+              asset_manager:
+                $ref: '#/components/schemas/ShortUser'
+                description: Asset manager assigned to this project
+              avatar_url:
+                type: string
+              description:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+              project_engineer:
+                $ref: '#/components/schemas/ShortUser'
+                description: Project engineer assigned to this project
+              roles:
+                items:
+                  properties:
+                    description:
+                      type: string
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                  type: object
+                type: array
+              start:
+                format: date-time
+                type: string
+              status_report:
+                type: string
+              status_report_updated_at:
+                format: date-time
+                type: string
+            required:
+            - name
+            type: object
+          type: array
+        users:
+          items:
+            properties:
+              avatar_url:
+                type: string
+              company_id:
+                type: integer
+              company_roles:
+                items:
+                  type: integer
+                type: array
+              email:
+                format: email
+                type: string
+              firstName:
+                type: string
+              id:
+                type: integer
+              lastName:
+                type: string
+              phone:
+                type: string
+              project_roles:
+                items:
+                  type: integer
+                type: array
+            type: object
+          type: array
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    ProjectLink:
+      properties:
+        before:
+          type: string
+        icon:
+          type: string
+        parent:
+          type: string
+        title:
+          type: string
+        titleDE:
+          type: string
+        titleEN:
+          type: string
+        url:
+          type: string
+        urlDE:
+          type: string
+        urlEN:
+          type: string
+      required:
+      - title
+      - titleDE
+      - titleEN
+      - url
+      - urlDE
+      - urlEN
+      type: object
+    User:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        company_id:
+          type: integer
+        currency_system:
+          type: string
+        email:
+          format: email
+          type: string
+        firstName:
+          type: string
+        id:
+          type: integer
+        lastName:
+          type: string
+        locale:
+          type: string
+        phone:
+          type: string
+        realm_role:
+          type: string
+        units_system:
+          type: string
+      type: object
+    Role:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        authed_tags:
+          items:
+            $ref: '#/components/schemas/TagAuth'
+          type: array
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    ProjectSetupResource:
+      properties:
+        credentials:
+          description: The credentials created for this resource.
+          items:
+            $ref: '#/components/schemas/ProjectSetupCredential'
+          type: array
+        topics:
+          description: The topics created for this resource, if any.
+          items:
+            $ref: '#/components/schemas/ProjectSetupTopic'
+          type: array
+        type:
+          description: The resource type.
+          type: string
+      required:
+      - type
+      - credentials
+      type: object
+    ProjectJourneySyncResponse:
+      properties:
+        project_ids:
+          description: List of project IDs that were found and processed.
+          items:
+            format: int64
+            type: integer
+          type: array
+        project_ids_not_found:
+          description: List of project IDs that were not found.
+          items:
+            format: int64
+            type: integer
+          type: array
+      type: object
+    ProjectSetupResponse:
+      properties:
+        project:
+          $ref: '#/components/schemas/Project'
+        resources:
+          description: The provisioned resources.
+          items:
+            $ref: '#/components/schemas/ProjectSetupResource'
+          type: array
+      required:
+      - project
+      - resources
+      type: object
+    ShortUser:
+      properties:
+        avatar_url:
+          description: The url to the user's avatar.
+          type: string
+        company_id:
+          description: The id of the company the user belongs to.
+          type: integer
+        email:
+          description: The user's email address.
+          format: email
+          type: string
+        firstName:
+          description: The user's first name.
+          type: string
+        id:
+          description: The user's id.
+          type: integer
+        lastName:
+          description: The user's last name.
+          type: string
+      required:
+      - id
+      - email
+      - company_id
+      type: object
+    Company:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        roles:
+          items:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+            type: object
+          type: array
+        whitelabel:
+          type: boolean
+      required:
+      - name
+      type: object
+    CustomPage:
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        url:
+          type: string
+      type: object
+    HiddenNativePage:
+      properties:
+        title:
+          description: Identifier of the native page to hide or unhide.
+          minLength: 1
+          type: string
+      required:
+      - title
+      type: object
+    Success:
+      properties:
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
+      type: object
+    ProjectSetupTopic:
+      properties:
+        name:
+          description: The logical name of the topic.
+          type: string
+        topic:
+          description: The topic pattern.
+          type: string
+      required:
+      - name
+      - topic
+      type: object
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info

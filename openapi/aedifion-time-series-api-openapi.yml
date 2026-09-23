@@ -1,0 +1,471 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs Timeseries API
+  version: ''
+servers:
+- url: ''
+tags:
+- name: Time Series
+paths:
+  /v2/datapoint/timeseries:
+    get:
+      description: 'Returns the measured time series data for the specified data point
+
+        referenced by its name/dataPointID for the time interval specified by **start**
+
+        and **end**.
+
+        Returns the last (or respectively next) **max** observations, if either **start** nor **end** are provided.'
+      operationId: get_datapoint_timeseries
+      parameters:
+      - description: The id of the project from which to query observations for a data point
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: Name/ID of the data point, e.g., *bacnet100-4120-CO2*
+        in: query
+        name: dataPointID
+        required: true
+        schema:
+          type: string
+      - description: 'Return only observations *after* this date-time"
+
+
+          If **start** is provided without **end**, the first **max** elements *after* **start** are returned.
+
+          '
+        in: query
+        name: start
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: 'Return only observations *before* this date-time".
+
+
+          If **end** is provided without **start**, the last **max** elements *before* **end** are returned.
+
+          '
+        in: query
+        name: end
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: 'Maximum number of observations to return.
+
+          - This option is ignored when both **start** and **end** are provided.
+
+          - Setting **max** = 0 returns *all* available data points.
+
+          '
+        in: query
+        name: max
+        required: false
+        schema:
+          default: 1
+          format: int64
+          type: integer
+      - description: "Desired sampling rate.\nThe returned observations are sampled down to the specified interval. The down sampling will be done by calculating the arithmetic average on all observations made within an interval. The timestamp will represent the beginning of the interval the resampling average is estimated for.\nAllowed intervals are integers combined with durations, like seconds (s), minutes (m), hours (h), and days (d), e.g.\n - \"10s\" specifies a sampling rate of \"once every 10 seconds\",\n - \"1h\" specifies a sampling rate of \"once every (1) hour\",\n - \"0s\", \"0m\", \"0h\", ... specify highest sampling rate available\n - \"auto\" specifies an automatic sampling rate\n"
+        in: query
+        name: samplerate
+        schema:
+          type: string
+      - description: "Desired interpolation method.\nThis option is to be used while resampling. While resampling, the specified method will be used to interpolate missing data.\nDefault method: \"previous\"\nAvailable options:\n - \"previous\" Reports the value from the previous time interval for time intervals with no data.\n - \"linear\" Reports the results of linear interpolation for time intervals with no data.\n - \"null\" Reports null for time intervals with no data but returns a timestamp. This is the same as the default behavior.\n - \"none\"  Reports no timestamp and no value for time intervals with no data.\n"
+        in: query
+        name: interpolation
+        schema:
+          default: previous
+          enum:
+          - previous
+          - linear
+          - 'null'
+          - none
+          type: string
+      - description: "Desired aggregation method to be used while interpolating over a timeframe.\nDefault method: \"mean\"\nAvailable options:\n - \"mean\"\n - \"min\"\n - \"max\"\n - \"mode\"\n - \"median\"\n - \"distinct\"\n - \"count\"\n"
+        in: query
+        name: aggregation
+        required: false
+        schema:
+          default: mean
+          enum:
+          - mean
+          - min
+          - max
+          - mode
+          - median
+          - distinct
+          - count
+          type: string
+      - description: "Return only list of timeseries data format, i.e.\n - without tags\n - compressed timeseries format, i.e. [(time1, val1), ..., (timen, valn)]\n"
+        in: query
+        name: short
+        schema:
+          default: false
+          type: boolean
+      - description: 'Returns the last recorded value on the requested start and end timestamp if there does not exist an observation at this precise time.
+
+          '
+        in: query
+        name: closed_interval
+        schema:
+          default: false
+          type: boolean
+      - description: 'The optional system of units in which the timeseries data should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the timeseries data should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      - description: 'The optional units in which the timeseries data should be returned.
+
+          This overrides the **units_system** and **currency_system** parameters.
+
+          '
+        in: query
+        name: units
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeseriesWithContext'
+          description: Successful operation. A list of observations for the specified data point is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to ''get''.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'At least one datapoint could not be converted, e.g., due to the missing `units` tag or the requested unit conversion is not supported.
+
+            '
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get the time series data of a data point
+      tags:
+      - Time Series
+      x-openapi-router-controller: app.controllers.datapoint_controller
+  /v2/project/{project_id}/timeseries:
+    get:
+      description: 'Returns the measured time series data for the specified data points
+
+        referenced by its name/dataPointID for the time interval specified by **start**
+
+        and **end**.
+
+        Returns the last (or respectively next) **max** observations, if either **start** nor **end** are provided.
+
+
+        The unauthorized data points are ignored in the request.'
+      operationId: get_project_timeseries
+      parameters:
+      - description: The id of the project
+        in: path
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: Name/ID of the data point, each dataPointID is separated by a new line.
+        in: query
+        name: dataPointIDs
+        required: true
+        schema:
+          items:
+            type: string
+          type: array
+      - description: 'Return only observations *after* this date-time"
+
+
+          If **start** is provided without **end**, the first **max** elements *after* **start** are returned.
+
+          '
+        in: query
+        name: start
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: 'Return only observations *before* this date-time".
+
+
+          If **end** is provided without **start**, the last **max** elements *before* **end** are returned.
+
+          '
+        in: query
+        name: end
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: 'Maximum number of observations to return.
+
+          - This option is ignored when both **start** and **end** are provided.
+
+          - Setting **max** = 0 returns *all* available data points
+
+          '
+        in: query
+        name: max
+        required: false
+        schema:
+          default: 1
+          format: int64
+          type: integer
+      - description: "Desired sampling rate.\nThe returned observations are sampled down to the specified interval. The down sampling will be done by calculating the arithmetic average on all observations made within an interval. The timestamp will represent the beginning of the interval the resampling average is estimated for.\nAllowed intervals are integers combined with durations, like seconds (s), minutes (m), hours (h), and days (d), e.g.\n - \"10s\" specifies a sampling rate of \"once every 10 seconds\",\n - \"1h\" specifies a sampling rate of \"once every (1) hour\",\n - \"0s\", \"0m\", \"0h\", ... specify highest sampling rate available\n - \"auto\" specifies an automatic sampling rate\n"
+        in: query
+        name: samplerate
+        schema:
+          type: string
+      - description: "Desired interpolation method.\nThis option is to be used while resampling. While resampling, the specified method will be used to interpolate missing data.\nDefault method: \"previous\"\nAvailable options:\n - \"previous\" Reports the value from the previous time interval for time intervals with no data.\n - \"linear\" Reports the results of linear interpolation for time intervals with no data.\n - \"null\" Reports null for time intervals with no data but returns a timestamp. This is the same as the default behavior.\n - \"none\"  Reports no timestamp and no value for time intervals with no data.\n"
+        in: query
+        name: interpolation
+        schema:
+          default: previous
+          enum:
+          - previous
+          - linear
+          - 'null'
+          - none
+          type: string
+      - description: "Desired aggregation method to be used while interpolating over a timeframe.\nDefault method: \"mean\"\nAvailable options:\n - \"mean\"\n - \"min\"\n - \"max\"\n - \"mode\"\n - \"median\"\n - \"distinct\"\n - \"count\"\n"
+        in: query
+        name: aggregation
+        required: false
+        schema:
+          default: mean
+          enum:
+          - mean
+          - min
+          - max
+          - mode
+          - median
+          - distinct
+          - count
+          type: string
+      - description: "Return only list of timeseries data format, i.e.\n - without tags\n - compressed timeseries format, i.e. [(time1, val1), ..., (timen, valn)]\n"
+        in: query
+        name: short
+        schema:
+          default: false
+          type: boolean
+      - description: 'Returns the last recorded value on the requested start and end timestamp if there does not exist an observation at this precise time.
+
+          '
+        in: query
+        name: closed_interval
+        schema:
+          default: false
+          type: boolean
+      - description: 'The optional system of units in which the timeseries data should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the timeseries data should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      - description: 'The optional units for datapoints in which their timeseries data should be returned.
+
+          The order of the units must correspond to the **dataPointIDs**'' order.
+
+          '
+        in: query
+        name: units
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/TimeseriesWithContext'
+                type: array
+          description: 'Successful operation.
+
+            A list of observations for the specified data point is returned, along with any datapoints that encountered unit conversion errors and their corresponding error messages.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to ''get''.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'At least one datapoint could not be converted, e.g., due to the missing `units` tag or the requested unit conversion is not supported.
+
+            '
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get the time series data of a list of data points
+      tags:
+      - Time Series
+      x-openapi-router-controller: app.controllers.project_controller
+components:
+  schemas:
+    Timeseries:
+      items:
+        $ref: '#/components/schemas/Observation'
+      type: array
+    Tag:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - key
+      type: object
+    Observation:
+      properties:
+        time:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - time
+      - value
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    TimeseriesWithContext:
+      properties:
+        data:
+          $ref: '#/components/schemas/Timeseries'
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        error:
+          description: 'Optional error message describing why the data could not be loaded or processed, for example due to a unit conversion failure or missing units tag.
+
+            '
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/TagAssociation'
+          type: array
+        units:
+          type: string
+    TagAssociation:
+      allOf:
+      - $ref: '#/components/schemas/Tag'
+      - properties:
+          confirmed:
+            type: boolean
+          probability:
+            type: number
+          protected:
+            type: boolean
+          source:
+            type: string
+        type: object
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info

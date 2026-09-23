@@ -1,0 +1,52 @@
+{
+  "provider": "aedifion",
+  "sources": [
+    "_original/aedifion-openapi.json"
+  ],
+  "outputs": [
+    "aedifion-ai-api-openapi.yml",
+    "aedifion-alert-api-openapi.yml",
+    "aedifion-analytics-api-openapi.yml",
+    "aedifion-company-api-openapi.yml",
+    "aedifion-component-api-openapi.yml",
+    "aedifion-controls-api-openapi.yml",
+    "aedifion-datapoint-api-openapi.yml",
+    "aedifion-meta-api-openapi.yml",
+    "aedifion-project-api-openapi.yml",
+    "aedifion-realm-api-openapi.yml",
+    "aedifion-task-api-openapi.yml",
+    "aedifion-timeseries-api-openapi.yml",
+    "aedifion-user-api-openapi.yml"
+  ],
+  "archived": [
+    "deleted 1 superseded output(s) from the previous generation"
+  ],
+  "errors": [],
+  "warnings": [
+    "aedifion-openapi.json: info.version missing"
+  ],
+  "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "aedifion-openapi.json: upgraded openapi 3.0.1 -> OpenAPI 3.2.0",
+    "aedifion-openapi.json: declared missing tag: Timeseries",
+    "superseded outputs removed: aedifion-time-series-api-openapi.yml",
+    "apis.yml register: written (+1 apis, 14 total)"
+  ],
+  "skipped": [
+    "_original/aedifion-openapi.yml: archived document superseded by a larger archived document",
+    "aedifion-ai-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-alert-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-analytics-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-company-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-component-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-controls-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-datapoint-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-meta-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-project-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-realm-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-task-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-time-series-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aedifion-user-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

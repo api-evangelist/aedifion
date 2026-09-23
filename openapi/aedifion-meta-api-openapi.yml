@@ -1,0 +1,254 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs Meta API
+  version: ''
+servers:
+- url: ''
+tags:
+- description: Meta management resources.
+  name: Meta
+paths:
+  /ping:
+    get:
+      description: Ping api server.
+      operationId: ping
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: boolean
+          description: Successful operation. Returns a boolean 'true'.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to get.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      summary: Ping api server
+      tags:
+      - Meta
+      x-openapi-router-controller: app.controllers.meta_controller
+  /v2/labels/definitions:
+    get:
+      description: Get labels definitions.
+      operationId: get_labels_definitions
+      parameters:
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Successful operation.
+      summary: Get labels definitions
+      tags:
+      - Meta
+      x-openapi-router-controller: app.controllers.meta_controller
+  /v2/labels/systems:
+    get:
+      description: Get available labels systems.
+      operationId: get_labels_systems
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabelsSystems'
+          description: 'Successful operation. A list of available `currency_systems`, `units_systems`, `locales` and a `labels_checksum` will be returned.
+
+            '
+      summary: Get available labels systems
+      tags:
+      - Meta
+      x-openapi-router-controller: app.controllers.meta_controller
+  /v2/meta/api_version:
+    get:
+      description: Returns api version and some helpful details.
+      operationId: get_api_version
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDetails'
+          description: Successful operation. Returns api version and uptime of the api.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to get.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      summary: Get api version
+      tags:
+      - Meta
+      x-openapi-router-controller: app.controllers.meta_controller
+  /v2/meta/endpoints:
+    get:
+      description: Returns a list of available endpoint IDs and their names.
+      operationId: get_endpoints
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfEndpoints'
+          description: Successful operation. A list of all available endpoint IDs and their names is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to get.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      summary: Get a list of available endpoints
+      tags:
+      - Meta
+      x-openapi-router-controller: app.controllers.meta_controller
+  /v2/meta/ready:
+    get:
+      description: Checks readiness of API by verifying external dependencies (database, etc.).
+      operationId: get_api_readiness
+      responses:
+        '200':
+          content: {}
+          description: All readiness checks passed. API is ready to serve requests.
+        '503':
+          content: {}
+          description: One or more readiness checks failed. API is not ready.
+      summary: Check API readiness by verifying external dependencies
+      tags:
+      - Meta
+      x-openapi-router-controller: app.controllers.meta_controller
+components:
+  parameters:
+    LanguageQueryParam:
+      description: 'Choose language in which the response should be displayed.
+
+        - ''en'' for English
+
+        - ''de'' for German
+
+        - ''fr'' for French
+
+        '
+      in: query
+      name: language
+      schema:
+        enum:
+        - en
+        - de
+        - fr
+        type: string
+  schemas:
+    LabelsSystems:
+      properties:
+        currency_systems:
+          items:
+            type: string
+          type: array
+        labels_checksum:
+          type: string
+        locales:
+          items:
+            type: string
+          type: array
+        units_systems:
+          items:
+            type: string
+          type: array
+      type: object
+    Endpoint:
+      properties:
+        id:
+          format: int64
+          type: integer
+        path:
+          type: string
+        request_method:
+          type: string
+        summary:
+          type: string
+    ApiDetails:
+      properties:
+        api_version:
+          type: string
+        uptime:
+          type: string
+      type: object
+    ListOfEndpoints:
+      items:
+        $ref: '#/components/schemas/Endpoint'
+      type: array
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info

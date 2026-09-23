@@ -1,0 +1,1038 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs User API
+  version: ''
+servers:
+- url: ''
+tags:
+- description: Creating, modifying, and accessing users and related resources.
+  name: User
+paths:
+  /v2/user:
+    delete:
+      description: Deletes the logged in user and all his/her resources - DANGER to suspend important accounts!
+      operationId: delete_user
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: 'Successful operation.
+
+            The deleted user is returned within the ''resource'' field and ''operation'' will indicate a DELETE operation.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized access.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: 'CAUTION: Deletes logged in user'
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+    get:
+      description: Returns the details of the logged in user.
+      operationId: get_user
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWithContext'
+          description: Success
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get logged in user's details
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+    put:
+      description: Updates the details of the specified user (specification by authentication credentials).
+      operationId: put_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+        description: "The details of the updated user:\n  - **firstName** is optional, the new first name of the updated user\n  - **lastName** is optional, the new last name of the updated user\n  - **email** is optional, the new email address of the updated user\n  - **address** is optional, the address of the updated user\n  - **phone** is optional, the phone number of the updated user\n  - **units_system** is optional, the preferred system of units of the updated user\n  - **currency_system** is optional, the preferred currency system of the updated user\n  - **locale** is optional, the locale of the updated user\n"
+        required: true
+        x-body-name: user_body
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Success
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Update the details of the logged in user
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+  /v2/user/avatar:
+    delete:
+      operationId: delete_user_avatar
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Successful operation.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Out of service.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Deletes the current profile image of the user
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+    post:
+      operationId: post_user_avatar
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadAvatarRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Successful operation.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: File is not an image file.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Out of service.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Uploads and stores an image for the current user
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+  /v2/user/favorites:
+    get:
+      description: Returns a list of data points that the user marked as his/her favorites.
+      operationId: get_user_favorites
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/DataPoint'
+                title: Favorites
+                type: array
+          description: 'Successful operation.
+
+            A list of all data points that the current user marked as favorites is returned.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to get.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get user's favorite data points
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+  /v2/user/password:
+    put:
+      description: 'Allows user to change their password.
+
+        Maximum three consecutive fail attempts within 24 hours, will lock this endpoint until the next day.'
+      operationId: put_user_password
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PutUserPasswordRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: Successful operation.
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Current password is incorrect.
+        '423':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Endpoint is locked due to too many requests.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Out of service.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Change user's password
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+  /v2/user/projects:
+    get:
+      description: Returns a list of all projects that the user is authorized for.
+      operationId: get_user_projects
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ProjectWithContext'
+                type: array
+          description: Successful operation. A list of projects that the user is authorized to access is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to get.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get user's projects
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+  /v2/user/projects/hidden_native_page:
+    delete:
+      description: 'Removes a native page from the list of hidden pages for all projects the user has access to.
+
+        Only accessible to company admins and realm admins.'
+      operationId: delete_user_projects_hidden_native_page
+      parameters:
+      - description: The title of the native page to unhide.
+        in: query
+        name: title
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: 'Success.
+
+            The native page has been removed from the list of hidden pages for all user projects.
+
+            The updated projects are returned in the ''resource'' field."
+
+            '
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request. Parameter title is missing or invalid.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden request. Details on the error are returned in the 'error' field of the response.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Unhide a native page for all user projects
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+    post:
+      description: 'Adds a native page to the list of hidden pages for all projects the user has access to.
+
+        Only accessible to company admins and realm admins.'
+      operationId: post_user_projects_hidden_native_page
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HiddenNativePage'
+        required: true
+        x-body-name: hidden_native_page
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: 'Success.
+
+            The native page has been added to the list of hidden pages for all user projects.
+
+            The updated projects are returned in the ''resource'' field."
+
+            '
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Bad request. Parameter title is missing or invalid.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized.
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden request. Details on the error are returned in the 'error' field of the response.
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Internal server error.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Hide a native page for all user projects
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+  /v2/user/projects/portfolio:
+    get:
+      description: 'Returns aggregated portfolio data for every project the user is authorized for, one
+
+        `ProjectPortfolio` entry per project. Each entry bundles base metadata (name, avatar,
+
+        data ingress date), the current project journey phase, controls status, task statistics,
+
+        savings and analysis-result statistics. Entries are sorted by project name (Z to A).'
+      operationId: get_user_projects_portfolio
+      parameters:
+      - description: 'The optional system of units in which the savings should be returned (Example: **metric**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available units systems.
+
+          '
+        in: query
+        name: units_system
+        schema:
+          type: string
+      - description: 'The optional currency system in which the savings should be returned (Example: **EUR**).
+
+          Request the **GET /v2/labels/systems** endpoint to fetch available currency systems.
+
+          '
+        in: query
+        name: currency_system
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProjectsPortfolio'
+          description: 'Successful operation.
+
+            The user''s project portfolio is returned.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response and ''operation'' is set to get.
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: The requested units_system or currency_system is invalid or not supported.
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get the user's project portfolio
+      tags:
+      - User
+      x-openapi-router-controller: app.controllers.user_controller
+components:
+  schemas:
+    TotalSavings:
+      properties:
+        kpi_identifier:
+          description: Identifier of the savings KPI category.
+          type: string
+        open_savings:
+          description: Open savings value.
+          type:
+          - number
+          - 'null'
+        potential_savings:
+          description: Potential savings value.
+          type:
+          - number
+          - 'null'
+        realized_savings:
+          description: Realized savings value.
+          type:
+          - number
+          - 'null'
+        units:
+          description: Unit of the savings values.
+          type: string
+      required:
+      - units
+      type: object
+    TagAuth:
+      properties:
+        key:
+          type: string
+        read:
+          type: boolean
+        value:
+          type: string
+        write:
+          type: boolean
+      type: object
+    UploadAvatarRequest:
+      properties:
+        avatar:
+          description: The image file thats going to be stored
+          format: binary
+          type: string
+      required:
+      - avatar
+      type: object
+    CompanyReference:
+      properties:
+        id:
+          format: int64
+          type: integer
+      required:
+      - id
+      type: object
+    CompanyRole:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        company_id:
+          format: int64
+          type: integer
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      type: object
+    ControlsStatistics:
+      properties:
+        status:
+          description: The controls status of the project.
+          enum:
+          - active
+          - inactive
+          - potential
+          - not available
+          - unknown
+          type: string
+      required:
+      - status
+      type: object
+    Project:
+      properties:
+        account_manager:
+          $ref: '#/components/schemas/ShortUser'
+          description: Account manager assigned to this project
+        address:
+          type: string
+        asset_manager:
+          $ref: '#/components/schemas/ShortUser'
+          description: Asset manager assigned to this project
+        avatar_url:
+          type: string
+        company_id:
+          format: int64
+          type: integer
+        currency_system:
+          type: string
+        custom_pages:
+          items:
+            $ref: '#/components/schemas/CustomPage'
+          type: array
+        description:
+          type: string
+        handle:
+          type: string
+        hidden_native_pages:
+          items:
+            $ref: '#/components/schemas/HiddenNativePage'
+          type: array
+        id:
+          type: integer
+        latitude:
+          type: string
+        links:
+          items:
+            $ref: '#/components/schemas/ProjectLink'
+          type: array
+        load_balancing_group:
+          type: string
+        longitude:
+          type: string
+        name:
+          type: string
+        project_engineer:
+          $ref: '#/components/schemas/ShortUser'
+          description: Project engineer assigned to this project
+        start:
+          format: date-time
+          type: string
+        status_report:
+          type: string
+        status_report_updated_at:
+          format: date-time
+          type: string
+        units_system:
+          type: string
+      required:
+      - company_id
+      - name
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    ProjectLink:
+      properties:
+        before:
+          type: string
+        icon:
+          type: string
+        parent:
+          type: string
+        title:
+          type: string
+        titleDE:
+          type: string
+        titleEN:
+          type: string
+        url:
+          type: string
+        urlDE:
+          type: string
+        urlEN:
+          type: string
+      required:
+      - title
+      - titleDE
+      - titleEN
+      - url
+      - urlDE
+      - urlEN
+      type: object
+    User:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        company_id:
+          type: integer
+        currency_system:
+          type: string
+        email:
+          format: email
+          type: string
+        firstName:
+          type: string
+        id:
+          type: integer
+        lastName:
+          type: string
+        locale:
+          type: string
+        phone:
+          type: string
+        realm_role:
+          type: string
+        units_system:
+          type: string
+      type: object
+    DataPointKey:
+      properties:
+        description:
+          type: string
+        id:
+          type: integer
+        name:
+          type: string
+        project_id:
+          type: integer
+      type: object
+    Role:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        authed_tags:
+          items:
+            $ref: '#/components/schemas/TagAuth'
+          type: array
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    DataPoint:
+      properties:
+        dataPointID:
+          type: string
+        hash_id:
+          type: string
+        id:
+          type: integer
+        project_id:
+          format: int64
+          type: integer
+        setpoint_max_value:
+          type: number
+        setpoint_min_value:
+          type: number
+        writable:
+          type: boolean
+      required:
+      - dataPointID
+      - project_id
+      type: object
+    ProjectPortfolio:
+      properties:
+        analysis_result_statistics:
+          description: Analysis result counts grouped by signal color.
+          items:
+            $ref: '#/components/schemas/AnalysisResultStatistics'
+          type:
+          - array
+          - 'null'
+        company:
+          $ref: '#/components/schemas/CompanyReference'
+        controls_statistics:
+          $ref: '#/components/schemas/ControlsStatistics'
+        groups:
+          description: 'List of groups that the project belongs to.
+
+            Empty list when the project is not in any group.
+
+            '
+          items:
+            $ref: '#/components/schemas/ProjectGroup'
+          type: array
+        project_avatar_url:
+          description: Public URL of the project avatar, if set.
+          type:
+          - string
+          - 'null'
+        project_data_ingress_date:
+          description: The start of the project, if known.
+          example: '2024-03-15T08:30:00+00:00'
+          format: date-time
+          type:
+          - string
+          - 'null'
+        project_id:
+          description: The ID of the project.
+          format: int64
+          type: integer
+        project_journey_overview:
+          $ref: '#/components/schemas/ProjectJourneyOverview'
+        project_name:
+          description: The name of the project.
+          type: string
+        savings_statistics:
+          description: Latest yearly savings KPIs grouped by savings category.
+          items:
+            $ref: '#/components/schemas/TotalSavings'
+          type:
+          - array
+          - 'null'
+        task_statistics:
+          description: Task counts grouped by status.
+          items:
+            $ref: '#/components/schemas/TaskStatistics'
+          type:
+          - array
+          - 'null'
+      required:
+      - project_id
+      - project_name
+      - controls_statistics
+      - company
+      type: object
+    AnalysisResultStatistics:
+      properties:
+        count:
+          description: Number of analysis results with this signal color.
+          type: integer
+        signal_color:
+          description: The signal color of the analysis results.
+          type: string
+      type: object
+    TaskStatistics:
+      properties:
+        count:
+          description: Number of tasks with this status.
+          type: integer
+        status:
+          description: The task status.
+          type: string
+      required:
+      - status
+      - count
+      type: object
+    PutUserPasswordRequest:
+      properties:
+        current_password:
+          description: The user's current password.
+          format: password
+          type: string
+        new_password:
+          description: The user's new password.
+          format: password
+          type: string
+      required:
+      - current_password
+      - new_password
+      type: object
+    ProjectWithContext:
+      properties:
+        company:
+          $ref: '#/components/schemas/Company'
+        dataPointKeys:
+          items:
+            $ref: '#/components/schemas/DataPointKey'
+          type: array
+        project:
+          $ref: '#/components/schemas/Project'
+      type: object
+    ShortUser:
+      properties:
+        avatar_url:
+          description: The url to the user's avatar.
+          type: string
+        company_id:
+          description: The id of the company the user belongs to.
+          type: integer
+        email:
+          description: The user's email address.
+          format: email
+          type: string
+        firstName:
+          description: The user's first name.
+          type: string
+        id:
+          description: The user's id.
+          type: integer
+        lastName:
+          description: The user's last name.
+          type: string
+      required:
+      - id
+      - email
+      - company_id
+      type: object
+    UserWithContext:
+      properties:
+        ai_enabled:
+          description: Whether the user has AI access enabled
+          type: boolean
+        company:
+          $ref: '#/components/schemas/Company'
+        companyroles:
+          items:
+            $ref: '#/components/schemas/CompanyRole'
+          type: array
+        password_locked_until:
+          format: datetime
+          type: string
+        roles:
+          items:
+            $ref: '#/components/schemas/Role'
+          type: array
+        user:
+          $ref: '#/components/schemas/User'
+      type: object
+    ProjectGroup:
+      properties:
+        company:
+          $ref: '#/components/schemas/CompanyReference'
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
+      - company
+      type: object
+    Company:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        roles:
+          items:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+            type: object
+          type: array
+        whitelabel:
+          type: boolean
+      required:
+      - name
+      type: object
+    CustomPage:
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        url:
+          type: string
+      type: object
+    HiddenNativePage:
+      properties:
+        title:
+          description: Identifier of the native page to hide or unhide.
+          minLength: 1
+          type: string
+      required:
+      - title
+      type: object
+    UserProjectsPortfolio:
+      properties:
+        projects_portfolio:
+          description: Per-project portfolio entries, sorted by project name (Z to A).
+          items:
+            $ref: '#/components/schemas/ProjectPortfolio'
+          type: array
+      type: object
+    Success:
+      properties:
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
+      type: object
+    ProjectJourneyOverview:
+      properties:
+        phase_key:
+          description: Key of the project's current journey phase.
+          type:
+          - string
+          - 'null'
+      type: object
+    UpdateUser:
+      properties:
+        address:
+          type: string
+        currency_system:
+          type: string
+        email:
+          format: email
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        locale:
+          type: string
+        phone:
+          type: string
+        units_system:
+          type: string
+      type: object
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info

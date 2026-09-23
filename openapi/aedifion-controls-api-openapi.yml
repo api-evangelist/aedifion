@@ -1,0 +1,1269 @@
+openapi: 3.2.0
+info:
+  description: 'Welcome to the interactive user interface (UI) for the aedifion REST API.
+
+
+    This UI allows you to
+
+
+    - browse documentation of all endpoints
+
+    - explore schemas and examples of request parameters and responses
+
+    - call endpoints and view responses
+
+
+    Further documentation as well as extensive guides and tutorials are available in the official documentation.'
+  title: Docs Controls API
+  version: ''
+servers:
+- url: ''
+tags:
+- description: Creating, modifying, and accessing controls apps and related resources.
+  name: Controls
+paths:
+  /v2/controls/algorithms_by_component:
+    get:
+      description: Get a list of controls algorithms and their variations for abstract components with pin and attribute details.
+      operationId: get_controls_algorithms_by_component
+      parameters:
+      - description: Filter controls algorithm by component alphanumeric ids.
+        in: query
+        name: component_alphanumeric_ids
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      - description: Filter controls algorithm by algorithm identifier.
+        in: query
+        name: algorithms
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                example:
+                  COMPONENT_ALPHANUMERIC_ID:
+                    algorithm:
+                      default:
+                        attributes:
+                        - attribute_alphanumeric_id: ATTRIBUTE_ALPHANUMERIC_ID_1
+                          default_value: 1.0
+                          required: true
+                        pins:
+                          input:
+                          - pin_alphanumeric_id: PIN_ALPHANUMERIC_ID_1
+                            required: true
+                          output:
+                          - pin_alphanumeric_id: PIN_ALPHANUMERIC_ID_SP_2
+                            required: true
+                      variation1:
+                        attributes:
+                        - attribute_alphanumeric_id: ATTRIBUTE_ALPHANUMERIC_ID_2
+                          default_value: 10
+                          required: false
+                        pins:
+                          input:
+                          - pin_alphanumeric_id: PIN_ALPHANUMERIC_ID_3
+                            required: true
+                          output:
+                          - pin_alphanumeric_id: PIN_ALPHANUMERIC_ID_SP_4
+                            required: true
+                type: object
+          description: An object with the available controls algorithms for the components.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get a list of controls algorithms and their variations with details grouped by…
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/app:
+    delete:
+      description: Deletes a controls app in the project.
+      operationId: delete_controls_app
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The id of the controls app.
+        in: query
+        name: controls_app_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlsAppShort'
+          description: The controls app marked for deletion is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Delete a controls app in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+    post:
+      description: Requests to create a controls app in the project with given componentinproject_id and algorithm.
+      operationId: post_controls_app
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The unique numeric identifier of the component in project.
+        in: query
+        name: componentinproject_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: Algorithm of the controls app.
+        in: query
+        name: algorithm
+        required: true
+        schema:
+          enum:
+          - ant
+          - bee
+          - puma
+          - frog
+          - heating_curve
+          - hero
+          - orc
+          - schedule
+          - sloth
+          - spot
+          - wasp
+          type: string
+      - description: Variation of the controls algorithm.
+        in: query
+        name: variation
+        schema:
+          type: string
+      - description: Name of the controls app.
+        in: query
+        name: name
+        schema:
+          type: string
+      - description: Description of the controls app.
+        in: query
+        name: description
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostControlsAppRequest'
+        description: 'Setpoint writing config for the controls app.
+
+          All setpoints written by the controls app can be configure under the key "setpoint_writing_params".
+
+          The keys for each setpoint are the alphanumeric ids of the component pins.
+
+          For more information see aedifion docs.
+
+          '
+        required: false
+        x-body-name: config
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: 'Successful operation.
+
+            Created controls app is returned in the ''resource'' field of the response.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response."
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Create a controls app in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/app/custom:
+    post:
+      description: Requests to create a custom controls app in the project with given componentinproject_id and algorithm.
+      operationId: post_controls_app_custom
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: 'The unique numeric identifier of the component in project.
+
+          If the app is used on multiple components, please use the dominant or most relevant component.
+
+          '
+        in: query
+        name: componentinproject_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: Name of the controls app.
+        in: query
+        name: name
+        schema:
+          type: string
+      - description: Description of the controls app.
+        in: query
+        name: description
+        schema:
+          type: string
+      - description: 'A parameter that determines how long the connection to the Edge Device can be lost before the controls app is reset.
+
+          Note: The alive timeout value is in seconds.
+
+          Default: 900 seconds.
+
+          '
+        in: query
+        name: alive_timeout
+        required: false
+        schema:
+          default: 900
+          format: int64
+          type: integer
+      - description: 'A parameter that determines whether a controls app should be automatically restarted after a loss of communication to the Edge Device."
+
+          Default: true.
+
+          '
+        in: query
+        name: auto_recovery
+        required: false
+        schema:
+          default: true
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCustomControlsApp'
+        description: 'The event stream configs that describe the controls app.
+
+          '
+        required: true
+        x-body-name: config
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+          description: 'Successful operation.
+
+            Created controls app is returned in the ''resource'' field of the response.
+
+            '
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: 'Unauthorized request.
+
+            Details on the error are returned in the ''error'' field of the response."
+
+            '
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Create a custom controls app in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/app/{controls_app_id}:
+    get:
+      description: 'Gets a controls app in the project.
+
+
+        **Note** that the logs attribute of the response is deprecated.
+
+        Please use the dedicated logs endpoint `GET /v2/controls/app/{controls_app_id}/logs` to get a list of logs of a ControlsApp in a project.'
+      operationId: get_controls_app
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The id of the controls app.
+        in: path
+        name: controls_app_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlsApp'
+          description: A controls app is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get a controls app in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/app/{controls_app_id}/logs:
+    get:
+      description: Gets logs of a controls app in the project.
+      operationId: get_controls_app_logs
+      parameters:
+      - description: The id of the controls app.
+        in: path
+        name: controls_app_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The minimal log level of the logs. Defaults to **info**.
+        in: query
+        name: log_level
+        required: false
+        schema:
+          default: info
+          enum:
+          - info
+          - warning
+          - error
+          type: string
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      - description: Optional parameter, sort order based on the `created_at` timestamps of the logs, descending by default
+        in: query
+        name: sort_order
+        required: false
+        schema:
+          default: desc
+          enum:
+          - asc
+          - desc
+          type: string
+      - description: 'Return all logs *after* this date-time.
+
+          If **start** is provided without **end**, all logs *after* **start** are returned.
+
+          '
+        in: query
+        name: start
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: 'Return all logs *before* this date-time.
+
+          If **end** is provided without **start**, all logs *before* **end** are returned.
+
+          '
+        in: query
+        name: end
+        required: false
+        schema:
+          format: date-time
+          type: string
+      - description: Page number.
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int64
+          type: integer
+      - description: Items per page. Defaults to 20, maximum limit is 100.
+        in: query
+        name: per_page
+        required: false
+        schema:
+          format: int64
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityLogList'
+          description: A list of controls app logs is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get logs of a controls app in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/app/{controls_app_id}/run:
+    post:
+      description: Requests to run or stop a controls app in the project.
+      operationId: post_controls_app_run
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: The id of the controls app.
+        in: path
+        name: controls_app_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - description: Desired state of the controls app.
+        in: query
+        name: run
+        required: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlsAppUpdateResult'
+          description: Run action result is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Request to run or stop a controls app in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/apps:
+    get:
+      description: Gets a list of controls apps in the project.
+      operationId: get_controls_apps
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: Search controls apps. All controls apps with names matching the search string will be returned.
+        in: query
+        name: search
+        schema:
+          type: string
+      - description: 'Results can be filtered by keys: status_code, algorithm, and component_in_project_id.
+
+          Format must be in the form of key=value.
+
+          Multiple filters can be applied, separated by a '';'' like: key=value; key2=value
+
+          Filters with same key will be processed as ''Or'' and ''And'' across different keys.
+
+          '
+        in: query
+        name: filter
+        required: false
+        schema:
+          type: string
+      - description: Page number.
+        in: query
+        name: page
+        schema:
+          format: int64
+          type: integer
+      - description: Items per page. Defaults to 20, maximum limit is 100.
+        in: query
+        name: per_page
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlsAppList'
+          description: A list of controls apps are returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get a list of controls apps in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/apps/run:
+    post:
+      description: Requests to run or stop multiple controls apps in the project.
+      operationId: post_controls_apps_run
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: 'The list of controls app ids to run or stop.
+
+          All controls apps of the project will be affected if no ids are given.
+
+          '
+        in: query
+        name: controls_app_ids
+        schema:
+          items:
+            format: uuid
+            type: string
+          type: array
+      - description: Desired state of the controls apps.
+        in: query
+        name: run
+        required: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ControlsAppUpdateResult'
+                type: array
+          description: A list of run action result is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Request to run or stop multiple controls apps in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/apps/summary:
+    get:
+      description: Returns all available algorithms with their translated name and description, and the count of active and inactive apps per algorithm in the project.
+      operationId: get_controls_apps_summary
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - $ref: '#/components/parameters/LanguageQueryParam'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlsAppsSummary'
+          description: A summary of controls apps grouped by algorithm is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Get a summary of controls apps grouped by algorithm for a project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+  /v2/controls/apps/update:
+    post:
+      description: Request to update multiple controls apps in the project.
+      operationId: post_controls_apps_update
+      parameters:
+      - description: The id of the project.
+        in: query
+        name: project_id
+        required: true
+        schema:
+          format: int64
+          type: integer
+      - description: 'The list of controls app ids to update.
+
+          All controls apps of the project will be affected if no ids are given.
+
+          '
+        in: query
+        name: controls_app_ids
+        schema:
+          items:
+            format: uuid
+            type: string
+          type: array
+      - description: Option to update controls apps by force.
+        in: query
+        name: force
+        schema:
+          default: false
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ControlsAppUpdateResult'
+                type: array
+          description: A list of update action result is returned.
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unauthorized request. Details on the error are returned in the 'error' field of the response.
+          headers:
+            WWW_Authenticate:
+              schema:
+                type: string
+      security:
+      - basicAuth: []
+      - openIDConnect: []
+      summary: Request to update multiple controls apps in the project
+      tags:
+      - Controls
+      x-openapi-router-controller: app.controllers.controls_controller
+components:
+  schemas:
+    ControlsAlgorithm:
+      properties:
+        counts:
+          $ref: '#/components/schemas/ControlsAlgorithmCounts'
+        description:
+          description: Translated description of the controls algorithm.
+          type: string
+        key:
+          description: The key identifier of the controls algorithm.
+          type: string
+        labels:
+          items:
+            $ref: '#/components/schemas/ControlsAlgorithmLabel'
+          type: array
+        name:
+          description: Translated name of the controls algorithm.
+          type: string
+        short_code:
+          description: Short abbreviated name of the controls algorithm.
+          type: string
+      required:
+      - key
+      - name
+      - description
+      - short_code
+      - counts
+      - labels
+      type: object
+    EntityLog:
+      properties:
+        created_at:
+          type: string
+        id:
+          type: string
+        log_level:
+          type: string
+        log_message:
+          type: string
+      required:
+      - id
+      - created_at
+      - log_message
+      - log_level
+      type: object
+    ControlsAlgorithmCounts:
+      properties:
+        active:
+          description: Number of active apps in the project with the grouped algorithm.
+          type: integer
+        inactive:
+          description: Number of inactive apps in the project with the grouped algorithm.
+          type: integer
+      required:
+      - active
+      - inactive
+      type: object
+    ControlsAppStatus:
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        name:
+          description: Stable, language-independent short key for the status, e.g. 'running' or 'died'.
+          type: string
+        type:
+          description: Classification of the status.
+          enum:
+          - normal
+          - error
+          - pending
+          - ready
+          type: string
+      required:
+      - code
+      - message
+      type: object
+    ControlsAppUpdateResult:
+      properties:
+        affected:
+          type: boolean
+        controls_app_id:
+          format: uuid
+          type: string
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+      required:
+      - controls_app_id
+      - status
+      - affected
+      type: object
+    PaginationMeta:
+      properties:
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
+      type: object
+    ControlsAppsSummary:
+      properties:
+        controls_algorithms:
+          description: List of controls algorithms.
+          items:
+            $ref: '#/components/schemas/ControlsAlgorithm'
+          type: array
+      required:
+      - controls_algorithms
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    EventStreamOutputDatapoint:
+      properties:
+        calculated_unit:
+          type: string
+        dataPointID:
+          type: string
+      required:
+      - dataPointID
+      type: object
+    NewCustomControlsApp:
+      example:
+        event_streams:
+        - emit_always: false
+          event_type: ObservationEvent
+          output:
+            dataPointID: my_schedule_datapoint_id
+          parameters:
+            pytz_timezone: Europe/Berlin
+            regular_schedule:
+              Fri:
+              - time: 06:00
+                value: 1.0
+              - time: '14:00'
+                value: 0.0
+              Mon:
+              - time: 06:00
+                value: 0.5
+              - time: 09:00
+                value: 1.0
+              - time: '18:00'
+                value: 0.0
+              Thu:
+              - time: 06:00
+                value: 1.0
+              - time: '18:00'
+                value: 0.0
+              Tue:
+              - time: 06:00
+                value: 1.0
+              - time: '18:00'
+                value: 0.0
+              Wed:
+              - time: 06:00
+                value: 1.0
+              - time: '18:00'
+                value: 0.0
+          type: schedule
+        - emit_always: false
+          event_type: SetpointEvent
+          output:
+            dataPointID: my_setpoint_datapoint
+          parameters:
+            formula: if(schedule==0 AND room_temperature_ok==1, 0, null);
+            priority: 13
+            reset_value: 22
+          pins:
+            room_temperature_ok:
+              aggregate: mean
+              dataPointID: room_temperature_checker
+              data_range:
+                time: 1h
+              expected_unit: degrees-celsius
+              trigger: 2m
+            schedule:
+              dataPointID: my_schedule_datapoint_id
+              expected_unit: generic
+          type: formula
+      properties:
+        event_streams:
+          items:
+            $ref: '#/components/schemas/ControlsAppEventStream'
+          type: array
+      required:
+      - event_streams
+      type: object
+    ControlsAppEventStream:
+      properties:
+        add_initializer:
+          default: true
+          type: boolean
+        emit_always:
+          default: false
+          type: boolean
+        emit_on_start_up:
+          default: false
+          type: boolean
+        event_type:
+          default: ObservationEvent
+          enum:
+          - ObservationEvent
+          - SetpointEvent
+          type: string
+        output:
+          $ref: '#/components/schemas/EventStreamOutputDatapoint'
+        parameters:
+          type: object
+        pins:
+          type: object
+        start_up_delay:
+          format: float
+          type: number
+        timestamp:
+          default: create
+          enum:
+          - create
+          - consume
+          - ingest
+          - now
+          - untimed
+          type: string
+        type:
+          enum:
+          - absolute_air_humidity
+          - ara
+          - bee
+          - counter
+          - deviation
+          - formula
+          - frog_mode
+          - frog_supply_air_temperature
+          - gradient
+          - heating_curve
+          - hero
+          - orc
+          - schedule
+          - sequence
+          type: string
+      required:
+      - type
+      - output
+      type: object
+    PostControlsAppRequest:
+      example:
+        setpoint_writing_params:
+          PIN_ALPHANUMERIC_ID_SP_1:
+            keep_out_of_service: false
+            priority: 13
+            reset_value: 'null'
+          PIN_ALPHANUMERIC_ID_SP_2:
+            keep_out_of_service: true
+            priority: 8
+            reset_value: 25.0
+      properties:
+        setpoint_writing_params:
+          type: object
+      type: object
+    ControlsAppPin:
+      properties:
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pin_alphanumeric_id:
+          type: string
+      type: object
+    ControlsAppList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ControlsAppShort'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+      - items
+      - meta
+      type: object
+    ControlsAppVariation:
+      properties:
+        description:
+          description: Description of the controls app algorithm variation.
+          type: string
+        key:
+          description: Stable, language-independent short key for the variation, e.g., 'hero' or 'hero_dryrun'.
+          type: string
+        name:
+          description: Human-readable name of the variation, e.g., 'Dry run'.
+          type: string
+      required:
+      - key
+      - name
+      - description
+      type: object
+    ControlsAppShort:
+      properties:
+        algorithm:
+          type: string
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProject'
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        revision:
+          type: string
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+        update_available:
+          type: boolean
+        variation:
+          deprecated: true
+          description: 'Deprecated: use ''variation_meta.key'' instead.'
+          type: string
+        variation_meta:
+          $ref: '#/components/schemas/ControlsAppVariation'
+      required:
+      - id
+      - algorithm
+      - status
+      - name
+      - update_available
+      type: object
+    ControlsAlgorithmLabel:
+      properties:
+        id:
+          description: Label identifier.
+          enum:
+          - dynamics
+          type: string
+        name:
+          description: Translated label name.
+          type: string
+      required:
+      - id
+      - name
+      type: object
+    EntityLogList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/EntityLog'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+      - items
+      - meta
+      type: object
+    ComponentInProject:
+      properties:
+        abbreviation:
+          type: string
+        component_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    ControlsApp:
+      properties:
+        algorithm:
+          type: string
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProject'
+        config:
+          type: object
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        logs:
+          items:
+            type: object
+          type: array
+        name:
+          type: string
+        pins:
+          properties:
+            input:
+              items:
+                $ref: '#/components/schemas/ControlsAppPin'
+              type: array
+            output:
+              items:
+                $ref: '#/components/schemas/ControlsAppPin'
+              type: array
+          type: object
+        revision:
+          type: string
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+        update_available:
+          type: boolean
+        variation:
+          deprecated: true
+          description: 'Deprecated: use ''variation_meta.key'' instead.'
+          type: string
+        variation_meta:
+          $ref: '#/components/schemas/ControlsAppVariation'
+      required:
+      - id
+      - algorithm
+      - status
+      - name
+      - description
+      - update_available
+      - logs
+      type: object
+    Success:
+      properties:
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
+      type: object
+  parameters:
+    LanguageQueryParam:
+      description: 'Choose language in which the response should be displayed.
+
+        - ''en'' for English
+
+        - ''de'' for German
+
+        - ''fr'' for French
+
+        '
+      in: query
+      name: language
+      schema:
+        enum:
+        - en
+        - de
+        - fr
+        type: string
+  securitySchemes:
+    basicAuth:
+      scheme: basic
+      type: http
+      x-basicInfoFunc: app.controllers.auth.connexion_basic_auth
+    openIDConnect:
+      flows:
+        implicit:
+          authorizationUrl: https://auth.aedifion.io/realms/aedifion/protocol/openid-connect/auth
+          scopes:
+            openid: Use OpenID Connect (required)
+      type: oauth2
+      x-tokenInfoFunc: app.controllers.auth.connexion_token_info
