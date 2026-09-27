@@ -380,29 +380,6 @@ components:
       items:
         $ref: '#/components/schemas/Observation'
       type: array
-    Tag:
-      properties:
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        value:
-          type: string
-      required:
-      - id
-      - key
-      type: object
-    Observation:
-      properties:
-        time:
-          type: string
-        value:
-          format: float
-          type: number
-      required:
-      - time
-      - value
     Error:
       properties:
         details:
@@ -443,6 +420,29 @@ components:
           type: array
         units:
           type: string
+    Observation:
+      properties:
+        time:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - time
+      - value
+    Tag:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - key
+      type: object
     TagAssociation:
       allOf:
       - $ref: '#/components/schemas/Tag'

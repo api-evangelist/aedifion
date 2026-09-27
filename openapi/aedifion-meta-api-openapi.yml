@@ -159,25 +159,6 @@ paths:
       - Meta
       x-openapi-router-controller: app.controllers.meta_controller
 components:
-  parameters:
-    LanguageQueryParam:
-      description: 'Choose language in which the response should be displayed.
-
-        - ''en'' for English
-
-        - ''de'' for German
-
-        - ''fr'' for French
-
-        '
-      in: query
-      name: language
-      schema:
-        enum:
-        - en
-        - de
-        - fr
-        type: string
   schemas:
     LabelsSystems:
       properties:
@@ -207,17 +188,6 @@ components:
           type: string
         summary:
           type: string
-    ApiDetails:
-      properties:
-        api_version:
-          type: string
-        uptime:
-          type: string
-      type: object
-    ListOfEndpoints:
-      items:
-        $ref: '#/components/schemas/Endpoint'
-      type: array
     Error:
       properties:
         details:
@@ -239,6 +209,36 @@ components:
       required:
       - error
       type: object
+    ApiDetails:
+      properties:
+        api_version:
+          type: string
+        uptime:
+          type: string
+      type: object
+    ListOfEndpoints:
+      items:
+        $ref: '#/components/schemas/Endpoint'
+      type: array
+  parameters:
+    LanguageQueryParam:
+      description: 'Choose language in which the response should be displayed.
+
+        - ''en'' for English
+
+        - ''de'' for German
+
+        - ''fr'' for French
+
+        '
+      in: query
+      name: language
+      schema:
+        enum:
+        - en
+        - de
+        - fr
+        type: string
   securitySchemes:
     basicAuth:
       scheme: basic

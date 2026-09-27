@@ -409,39 +409,14 @@ paths:
       x-openapi-router-controller: app.controllers.realm_controller
 components:
   schemas:
-    RealmRole:
+    HiddenNativePage:
       properties:
-        endpoints:
-          items:
-            type: integer
-          type: array
-        id:
-          description: id of the realm role.
-          type: integer
-        name:
-          description: name of the realm role.
+        title:
+          description: Identifier of the native page to hide or unhide.
+          minLength: 1
           type: string
-      type: object
-    TagAuth:
-      properties:
-        key:
-          type: string
-        read:
-          type: boolean
-        value:
-          type: string
-        write:
-          type: boolean
-      type: object
-    CompanyProjectResponse:
-      properties:
-        project:
-          $ref: '#/components/schemas/Project'
-        role:
-          $ref: '#/components/schemas/Role'
       required:
-      - project
-      - role
+      - title
       type: object
     ProjectSetupCredential:
       properties:
@@ -491,6 +466,185 @@ components:
           type: string
       required:
       - name
+      type: object
+    RealmRole:
+      properties:
+        endpoints:
+          items:
+            type: integer
+          type: array
+        id:
+          description: id of the realm role.
+          type: integer
+        name:
+          description: name of the realm role.
+          type: string
+      type: object
+    CustomPage:
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        url:
+          type: string
+      type: object
+    ProjectSetupTopic:
+      properties:
+        name:
+          description: The logical name of the topic.
+          type: string
+        topic:
+          description: The topic pattern.
+          type: string
+      required:
+      - name
+      - topic
+      type: object
+    ProjectLink:
+      properties:
+        before:
+          type: string
+        icon:
+          type: string
+        parent:
+          type: string
+        title:
+          type: string
+        titleDE:
+          type: string
+        titleEN:
+          type: string
+        url:
+          type: string
+        urlDE:
+          type: string
+        urlEN:
+          type: string
+      required:
+      - title
+      - titleDE
+      - titleEN
+      - url
+      - urlDE
+      - urlEN
+      type: object
+    ProjectJourneySyncResponse:
+      properties:
+        project_ids:
+          description: List of project IDs that were found and processed.
+          items:
+            format: int64
+            type: integer
+          type: array
+        project_ids_not_found:
+          description: List of project IDs that were not found.
+          items:
+            format: int64
+            type: integer
+          type: array
+      type: object
+    User:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        company_id:
+          type: integer
+        currency_system:
+          type: string
+        email:
+          format: email
+          type: string
+        firstName:
+          type: string
+        id:
+          type: integer
+        lastName:
+          type: string
+        locale:
+          type: string
+        phone:
+          type: string
+        realm_role:
+          type: string
+        units_system:
+          type: string
+      type: object
+    Company:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        roles:
+          items:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+            type: object
+          type: array
+        whitelabel:
+          type: boolean
+      required:
+      - name
+      type: object
+    Success:
+      properties:
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
+      type: object
+    ProjectSetupResponse:
+      properties:
+        project:
+          $ref: '#/components/schemas/Project'
+        resources:
+          description: The provisioned resources.
+          items:
+            $ref: '#/components/schemas/ProjectSetupResource'
+          type: array
+      required:
+      - project
+      - resources
+      type: object
+    TagAuth:
+      properties:
+        key:
+          type: string
+        read:
+          type: boolean
+        value:
+          type: string
+        write:
+          type: boolean
       type: object
     Project:
       properties:
@@ -551,6 +705,68 @@ components:
       required:
       - company_id
       - name
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    ProjectSetupResource:
+      properties:
+        credentials:
+          description: The credentials created for this resource.
+          items:
+            $ref: '#/components/schemas/ProjectSetupCredential'
+          type: array
+        topics:
+          description: The topics created for this resource, if any.
+          items:
+            $ref: '#/components/schemas/ProjectSetupTopic'
+          type: array
+        type:
+          description: The resource type.
+          type: string
+      required:
+      - type
+      - credentials
+      type: object
+    Role:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        authed_tags:
+          items:
+            $ref: '#/components/schemas/TagAuth'
+          type: array
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        project_id:
+          format: int64
+          type: integer
       type: object
     CompanyWithContext:
       properties:
@@ -630,151 +846,15 @@ components:
             type: object
           type: array
       type: object
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    ProjectLink:
-      properties:
-        before:
-          type: string
-        icon:
-          type: string
-        parent:
-          type: string
-        title:
-          type: string
-        titleDE:
-          type: string
-        titleEN:
-          type: string
-        url:
-          type: string
-        urlDE:
-          type: string
-        urlEN:
-          type: string
-      required:
-      - title
-      - titleDE
-      - titleEN
-      - url
-      - urlDE
-      - urlEN
-      type: object
-    User:
-      properties:
-        address:
-          type: string
-        avatar_url:
-          type: string
-        company_id:
-          type: integer
-        currency_system:
-          type: string
-        email:
-          format: email
-          type: string
-        firstName:
-          type: string
-        id:
-          type: integer
-        lastName:
-          type: string
-        locale:
-          type: string
-        phone:
-          type: string
-        realm_role:
-          type: string
-        units_system:
-          type: string
-      type: object
-    Role:
-      properties:
-        authed_endpoints:
-          items:
-            format: int64
-            type: integer
-          type: array
-        authed_tags:
-          items:
-            $ref: '#/components/schemas/TagAuth'
-          type: array
-        description:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        project_id:
-          format: int64
-          type: integer
-      type: object
-    ProjectSetupResource:
-      properties:
-        credentials:
-          description: The credentials created for this resource.
-          items:
-            $ref: '#/components/schemas/ProjectSetupCredential'
-          type: array
-        topics:
-          description: The topics created for this resource, if any.
-          items:
-            $ref: '#/components/schemas/ProjectSetupTopic'
-          type: array
-        type:
-          description: The resource type.
-          type: string
-      required:
-      - type
-      - credentials
-      type: object
-    ProjectJourneySyncResponse:
-      properties:
-        project_ids:
-          description: List of project IDs that were found and processed.
-          items:
-            format: int64
-            type: integer
-          type: array
-        project_ids_not_found:
-          description: List of project IDs that were not found.
-          items:
-            format: int64
-            type: integer
-          type: array
-      type: object
-    ProjectSetupResponse:
+    CompanyProjectResponse:
       properties:
         project:
           $ref: '#/components/schemas/Project'
-        resources:
-          description: The provisioned resources.
-          items:
-            $ref: '#/components/schemas/ProjectSetupResource'
-          type: array
+        role:
+          $ref: '#/components/schemas/Role'
       required:
       - project
-      - resources
+      - role
       type: object
     ShortUser:
       properties:
@@ -801,86 +881,6 @@ components:
       - id
       - email
       - company_id
-      type: object
-    Company:
-      properties:
-        address:
-          type: string
-        avatar_url:
-          type: string
-        description:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        phone:
-          type: string
-        roles:
-          items:
-            properties:
-              description:
-                type: string
-              id:
-                type: integer
-              name:
-                type: string
-            type: object
-          type: array
-        whitelabel:
-          type: boolean
-      required:
-      - name
-      type: object
-    CustomPage:
-      properties:
-        id:
-          type: integer
-        title:
-          type: string
-        url:
-          type: string
-      type: object
-    HiddenNativePage:
-      properties:
-        title:
-          description: Identifier of the native page to hide or unhide.
-          minLength: 1
-          type: string
-      required:
-      - title
-      type: object
-    Success:
-      properties:
-        message:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        resource:
-          properties: {}
-          type: object
-        success:
-          default: true
-          type: boolean
-      type: object
-    ProjectSetupTopic:
-      properties:
-        name:
-          description: The logical name of the topic.
-          type: string
-        topic:
-          description: The topic pattern.
-          type: string
-      required:
-      - name
-      - topic
       type: object
   securitySchemes:
     basicAuth:

@@ -210,25 +210,64 @@ paths:
       x-openapi-router-controller: app.controllers.ai_controller
 components:
   schemas:
-    ChatPrompt:
+    ChatHistory:
       properties:
-        context:
-          description: The user context.
-          type:
-          - string
-          - 'null'
-        message:
-          description: The user's prompt
-          type: string
-        metadata:
-          additionalProperties:
-            type: string
-          description: Key-value metadata providing structured context.
-          type:
-          - object
-          - 'null'
+        chats:
+          description: The list of chats in a thread
+          items:
+            $ref: '#/components/schemas/Chat'
+          type: array
       required:
-      - message
+      - chats
+      type: object
+    PaginationMeta:
+      properties:
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
+      type: object
+    Source:
+      properties:
+        name:
+          description: The name of the source.
+          type: string
+        parameters:
+          description: A set of named parameters.
+          type: object
+      required:
+      - name
+      - parameters
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
       type: object
     AIConversationThreads:
       properties:
@@ -262,21 +301,18 @@ components:
       - message
       - metadata
       type: object
-    PaginationMeta:
+    AIConversationThread:
       properties:
-        current_page:
-          type: integer
-        items_per_page:
-          type: integer
-        total_items:
-          type: integer
-        total_pages:
-          type: integer
-      required:
-      - total_items
-      - items_per_page
-      - current_page
-      - total_pages
+        summary:
+          description: Summary of the first prompt.
+          type: string
+        thread_id:
+          description: Unique id of conversation thread.
+          type: string
+        updated_at:
+          description: The last updated date of the conversation thread.
+          format: date-time
+          type: string
       type: object
     ChatResponse:
       properties:
@@ -296,37 +332,6 @@ components:
       - message
       - sources
       type: object
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    ChatHistory:
-      properties:
-        chats:
-          description: The list of chats in a thread
-          items:
-            $ref: '#/components/schemas/Chat'
-          type: array
-      required:
-      - chats
-      type: object
     Chat:
       properties:
         prompt:
@@ -338,30 +343,25 @@ components:
       required:
       - prompt
       type: object
-    Source:
+    ChatPrompt:
       properties:
-        name:
-          description: The name of the source.
+        context:
+          description: The user context.
+          type:
+          - string
+          - 'null'
+        message:
+          description: The user's prompt
           type: string
-        parameters:
-          description: A set of named parameters.
-          type: object
+        metadata:
+          additionalProperties:
+            type: string
+          description: Key-value metadata providing structured context.
+          type:
+          - object
+          - 'null'
       required:
-      - name
-      - parameters
-      type: object
-    AIConversationThread:
-      properties:
-        summary:
-          description: Summary of the first prompt.
-          type: string
-        thread_id:
-          description: Unique id of conversation thread.
-          type: string
-        updated_at:
-          description: The last updated date of the conversation thread.
-          format: date-time
-          type: string
+      - message
       type: object
   securitySchemes:
     basicAuth:

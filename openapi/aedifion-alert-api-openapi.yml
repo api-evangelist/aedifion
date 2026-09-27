@@ -434,6 +434,22 @@ components:
         telegram:
           $ref: '#/components/schemas/TelegramNotificationPoint'
       type: object
+    EmailNotificationPoint:
+      additionalProperties: false
+      properties:
+        recipients:
+          items:
+            type: string
+          type: array
+      type: object
+    MSTeamsNotificationPoint:
+      additionalProperties: false
+      properties:
+        webhook_urls:
+          items:
+            type: string
+          type: array
+      type: object
     TelegramNotificationPoint:
       additionalProperties: false
       properties:
@@ -442,6 +458,191 @@ components:
             type: string
           type: array
       type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    AlertThresholds:
+      additionalProperties: false
+      description: 'Trigger and reset thresholds per severity. At least one of ''info'', ''warn'', or ''crit'' must
+
+        be provided; omitted levels are not evaluated. The ''order'' (ascending/descending) is
+
+        inferred from the values when two or more levels are given (and validated if also supplied),
+
+        and is REQUIRED when only a single level is configured, since one value cannot determine the
+
+        direction. ''asc'' fires when the value rises to/above a level; ''desc'' fires when it falls
+
+        to/below. Reset values default to their trigger value when omitted.
+
+        '
+      properties:
+        crit:
+          type:
+          - number
+          - 'null'
+        crit_reset:
+          type:
+          - number
+          - 'null'
+        info:
+          type:
+          - number
+          - 'null'
+        info_reset:
+          type:
+          - number
+          - 'null'
+        order:
+          description: 'Alarm direction. Optional when >=2 levels are configured (inferred from the values);
+
+            required when exactly one level is configured.
+
+            '
+          enum:
+          - asc
+          - desc
+          type: string
+        warn:
+          type:
+          - number
+          - 'null'
+        warn_reset:
+          type:
+          - number
+          - 'null'
+      type: object
+    NewDiscreteAlert:
+      additionalProperties: false
+      description: "Definitions for a new discrete value alert.\n\n- The alert fires while the datapoint's value is one of the values in 'values', and clears as\n  soon as the value is no longer one of them. Use it for enumerated signals — status, mode or\n  fault codes — where the interesting values are not a contiguous range and therefore cannot be\n  expressed as thresholds. A single value is the binary/equality case.\n- Set 'negate' to fire on the inverse: while the value is NOT one of the given values.\n- The alert fires at exactly one severity, chosen with 'level'. There is no ordering\n  (ascending/descending) and no reset value: membership is exact, so the alert clears\n  immediately when the value leaves the set.\n"
+      example:
+        attributes:
+          category: fault
+          team: Operations
+        dataPointID: Chiller_01_StatusCode
+        description: 'Alert while the chiller reports one of the fault codes 2, 5 or 7.
+
+          Codes 3, 4 and 6 are informational and must not raise an alarm, which is why this cannot
+
+          be expressed with thresholds.
+
+          '
+        level: crit
+        name: Chiller fault code
+        negate: false
+        notification:
+          email:
+            recipients:
+            - john.smith@example.com
+        repeat: 2h
+        values:
+        - 2
+        - 5
+        - 7
+      properties:
+        attributes:
+          additionalProperties:
+            type: string
+          description: Attributes/tags to assign to the alert (key=value).
+          type: object
+        dataPointID:
+          description: The datapoint whose values are to check.
+          type: string
+        delay:
+          description: 'Optional debounce. The membership condition must hold continuously for this duration
+
+            (e.g. ''5m'') before the alarm fires; if the value leaves the set sooner, nothing is sent.
+
+            Omit for the default (fire as soon as the value enters the set).
+
+            '
+          example: 5m
+          pattern: ^\d+[wdhms]{1}$
+          type: string
+        description:
+          description: Free text description of the alert.
+          type: string
+        disabled:
+          default: false
+          description: 'Create the alert in a paused (disabled) state: its task is created disabled and does not
+
+            fire until the alert is enabled via the enable endpoint. Defaults to false (created enabled).
+
+            '
+          type: boolean
+        level:
+          default: crit
+          description: The severity the alert fires at while the value matches.
+          enum:
+          - info
+          - warn
+          - crit
+          type: string
+        name:
+          description: The name of the alert.
+          type: string
+        negate:
+          default: false
+          description: 'Fire while the value is NOT one of ''values'' instead of while it is.
+
+            Defaults to false.
+
+            '
+          type: boolean
+        notification:
+          $ref: '#/components/schemas/AlertNotification'
+        repeat:
+          default: 1h
+          description: 'Minimum interval after which an unchanged alert is re-notified (in addition to
+
+            notifying on every level change). Use a duration like ''2h'' to re-notify periodically;
+
+            ''0s'' or the keyword ''never'' disables re-notification (notify only on level changes).
+
+            '
+          example: 2d
+          pattern: ^(\d+[wdhms]|never)$
+          type: string
+        timezone:
+          description: 'Optional IANA timezone (e.g. ''Europe/Berlin'') used to render alert timestamps in
+
+            notifications. Defaults to the project''s building timezone on create; falls back to ''UTC''
+
+            when the building timezone is unresolved.
+
+            '
+          example: Europe/Berlin
+          type: string
+        values:
+          description: The discrete values to alert on, e.g. the fault codes [2, 5, 7].
+          items:
+            type: number
+          maxItems: 50
+          minItems: 1
+          type: array
+          uniqueItems: true
+      required:
+      - name
+      - dataPointID
+      - values
     NewThresholdAlert:
       additionalProperties: false
       description: "Definitions for a new threshold alert\n\n- When the alert stays on the same level, it is re-notified only after the 'repeat' duration; a 'repeat' of '0s' or 'never' disables re-notification, so you are notified only when the alert level changes.\n- The order of the alert (ascending or descending) is inferred from the thresholds when two or more levels are configured, and must be supplied explicitly (via the thresholds `order` field) when only a single level is configured.\n  - info < warn < crit makes an ascending alert that gets more critical as values get bigger.\n  - info > warn > crit makes a descending alert that gets more critical as values get smaller.\n"
@@ -649,302 +850,6 @@ components:
       - alert_type
       - status
       type: object
-    EmailNotificationPoint:
-      additionalProperties: false
-      properties:
-        recipients:
-          items:
-            type: string
-          type: array
-      type: object
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    AlertThresholds:
-      additionalProperties: false
-      description: 'Trigger and reset thresholds per severity. At least one of ''info'', ''warn'', or ''crit'' must
-
-        be provided; omitted levels are not evaluated. The ''order'' (ascending/descending) is
-
-        inferred from the values when two or more levels are given (and validated if also supplied),
-
-        and is REQUIRED when only a single level is configured, since one value cannot determine the
-
-        direction. ''asc'' fires when the value rises to/above a level; ''desc'' fires when it falls
-
-        to/below. Reset values default to their trigger value when omitted.
-
-        '
-      properties:
-        crit:
-          type:
-          - number
-          - 'null'
-        crit_reset:
-          type:
-          - number
-          - 'null'
-        info:
-          type:
-          - number
-          - 'null'
-        info_reset:
-          type:
-          - number
-          - 'null'
-        order:
-          description: 'Alarm direction. Optional when >=2 levels are configured (inferred from the values);
-
-            required when exactly one level is configured.
-
-            '
-          enum:
-          - asc
-          - desc
-          type: string
-        warn:
-          type:
-          - number
-          - 'null'
-        warn_reset:
-          type:
-          - number
-          - 'null'
-      type: object
-    NewThroughputAlert:
-      additionalProperties: false
-      description: "Definitions for a new throughput alert.\n\n- When the alert stays on the same level, new events are emitted only after the 'repeat' duration.\n- Throughput is measured as the number of values received during each 'period', and all provided thresholds are interpreted as *values per 'period'*.\n- Throughput is measured over 'period' before an alert is triggered. Thus, use a longer 'period' for more stable alerts that tolerate temporary drops/highs in throughput and use a shorter 'period' for more reactive alerts that also trigger on short temporary changes in throughput.\nA 'repeat' of '0s' or 'never' disables re-notification, so you are notified only when the alert level changes.\n- The order of the alert (ascending or descending) is inferred from the thresholds when two or more levels are configured, and must be supplied explicitly (via the thresholds `order` field) when only a single level is configured.\n    - info < warn < crit makes an ascending alert that gets more critical as throughput grows.\n    - info > warn > crit makes a descending alert that gets more critical as throughput drops.\n"
-      example:
-        attributes:
-          category: network
-          team: IT
-        description: 'Alert on project ingress measured over a 10-minute period.
-
-          During normal operation, we expect well beyond 50 values per period (INFO).
-
-          If data ingress drops below 20 values per period, this could indicate connection problems or partial equipment failure (WARNING).
-
-          If ingress goes to 0, this indicates connection loss or complete equipment failure (CRITICAL).
-
-          '
-        name: Ingress Alert
-        notification:
-          dashboard:
-            enabled: false
-          email:
-            recipients:
-            - john.smith@example.com
-            - john.doe@example.com
-          ms_teams:
-            webhook_urls:
-            - https://example.webhook.office.com/webhookb2/00000000-0000-0000-0000-000000000000@11111111-1111-1111-1111-111111111111/IncomingWebhook/0123456789abcdef0123456789abcdef/22222222-2222-2222-2222-222222222222
-          telegram:
-            chat_ids:
-            - '-12345'
-            - '56789'
-        period: 10m
-        repeat: 1d
-        thresholds:
-          crit: 0
-          crit_reset: 2
-          info: 50
-          info_reset: 60
-          warn: 20
-          warn_reset: 25
-      properties:
-        attributes:
-          additionalProperties:
-            type: string
-          description: Attributes/tags to assign to the alert (key=value).
-          type: object
-        dataPointID:
-          description: The datapoint to check throughtput for. If not provided, throughput of the whole project is checked.
-          type: string
-        description:
-          description: Free text description of the alert.
-          type: string
-        disabled:
-          default: false
-          description: 'Create the alert in a paused (disabled) state: its task is created disabled and does not
-
-            fire until the alert is enabled via the enable endpoint. Defaults to false (created enabled).
-
-            '
-          type: boolean
-        name:
-          description: The name of the alert.
-          type: string
-        notification:
-          $ref: '#/components/schemas/AlertNotification'
-        period:
-          description: Time period over which to measure throughput.
-          pattern: ^\d+[wdhms]{1}$
-          type: string
-        repeat:
-          default: 1d
-          description: 'Minimum interval after which an unchanged alert is re-notified (in addition to
-
-            notifying on every level change). Use a duration like ''2h'' to re-notify periodically;
-
-            ''0s'' or the keyword ''never'' disables re-notification (notify only on level changes).
-
-            '
-          example: 2d, 0.5h, 2.5m, 110s
-          pattern: ^(\d+[wdhms]|never)$
-          type: string
-        thresholds:
-          $ref: '#/components/schemas/AlertThresholds'
-        timezone:
-          description: 'Optional IANA timezone (e.g. ''Europe/Berlin'') used to render alert timestamps in
-
-            notifications. Defaults to the project''s building timezone on create; falls back to ''UTC''
-
-            when the building timezone is unresolved.
-
-            '
-          example: Europe/Berlin
-          type: string
-      required:
-      - name
-      - thresholds
-      - period
-    NewDiscreteAlert:
-      additionalProperties: false
-      description: "Definitions for a new discrete value alert.\n\n- The alert fires while the datapoint's value is one of the values in 'values', and clears as\n  soon as the value is no longer one of them. Use it for enumerated signals — status, mode or\n  fault codes — where the interesting values are not a contiguous range and therefore cannot be\n  expressed as thresholds. A single value is the binary/equality case.\n- Set 'negate' to fire on the inverse: while the value is NOT one of the given values.\n- The alert fires at exactly one severity, chosen with 'level'. There is no ordering\n  (ascending/descending) and no reset value: membership is exact, so the alert clears\n  immediately when the value leaves the set.\n"
-      example:
-        attributes:
-          category: fault
-          team: Operations
-        dataPointID: Chiller_01_StatusCode
-        description: 'Alert while the chiller reports one of the fault codes 2, 5 or 7.
-
-          Codes 3, 4 and 6 are informational and must not raise an alarm, which is why this cannot
-
-          be expressed with thresholds.
-
-          '
-        level: crit
-        name: Chiller fault code
-        negate: false
-        notification:
-          email:
-            recipients:
-            - john.smith@example.com
-        repeat: 2h
-        values:
-        - 2
-        - 5
-        - 7
-      properties:
-        attributes:
-          additionalProperties:
-            type: string
-          description: Attributes/tags to assign to the alert (key=value).
-          type: object
-        dataPointID:
-          description: The datapoint whose values are to check.
-          type: string
-        delay:
-          description: 'Optional debounce. The membership condition must hold continuously for this duration
-
-            (e.g. ''5m'') before the alarm fires; if the value leaves the set sooner, nothing is sent.
-
-            Omit for the default (fire as soon as the value enters the set).
-
-            '
-          example: 5m
-          pattern: ^\d+[wdhms]{1}$
-          type: string
-        description:
-          description: Free text description of the alert.
-          type: string
-        disabled:
-          default: false
-          description: 'Create the alert in a paused (disabled) state: its task is created disabled and does not
-
-            fire until the alert is enabled via the enable endpoint. Defaults to false (created enabled).
-
-            '
-          type: boolean
-        level:
-          default: crit
-          description: The severity the alert fires at while the value matches.
-          enum:
-          - info
-          - warn
-          - crit
-          type: string
-        name:
-          description: The name of the alert.
-          type: string
-        negate:
-          default: false
-          description: 'Fire while the value is NOT one of ''values'' instead of while it is.
-
-            Defaults to false.
-
-            '
-          type: boolean
-        notification:
-          $ref: '#/components/schemas/AlertNotification'
-        repeat:
-          default: 1h
-          description: 'Minimum interval after which an unchanged alert is re-notified (in addition to
-
-            notifying on every level change). Use a duration like ''2h'' to re-notify periodically;
-
-            ''0s'' or the keyword ''never'' disables re-notification (notify only on level changes).
-
-            '
-          example: 2d
-          pattern: ^(\d+[wdhms]|never)$
-          type: string
-        timezone:
-          description: 'Optional IANA timezone (e.g. ''Europe/Berlin'') used to render alert timestamps in
-
-            notifications. Defaults to the project''s building timezone on create; falls back to ''UTC''
-
-            when the building timezone is unresolved.
-
-            '
-          example: Europe/Berlin
-          type: string
-        values:
-          description: The discrete values to alert on, e.g. the fault codes [2, 5, 7].
-          items:
-            type: number
-          maxItems: 50
-          minItems: 1
-          type: array
-          uniqueItems: true
-      required:
-      - name
-      - dataPointID
-      - values
-    DashboardNotificationPoint:
-      additionalProperties: false
-      properties:
-        enabled:
-          type: boolean
-      type: object
     UpdateAlert:
       additionalProperties: false
       description: 'Partial update for an existing alert. Only the provided fields are changed; omitted fields
@@ -1065,13 +970,108 @@ components:
           type: array
           uniqueItems: true
       type: object
-    MSTeamsNotificationPoint:
+    NewThroughputAlert:
+      additionalProperties: false
+      description: "Definitions for a new throughput alert.\n\n- When the alert stays on the same level, new events are emitted only after the 'repeat' duration.\n- Throughput is measured as the number of values received during each 'period', and all provided thresholds are interpreted as *values per 'period'*.\n- Throughput is measured over 'period' before an alert is triggered. Thus, use a longer 'period' for more stable alerts that tolerate temporary drops/highs in throughput and use a shorter 'period' for more reactive alerts that also trigger on short temporary changes in throughput.\nA 'repeat' of '0s' or 'never' disables re-notification, so you are notified only when the alert level changes.\n- The order of the alert (ascending or descending) is inferred from the thresholds when two or more levels are configured, and must be supplied explicitly (via the thresholds `order` field) when only a single level is configured.\n    - info < warn < crit makes an ascending alert that gets more critical as throughput grows.\n    - info > warn > crit makes a descending alert that gets more critical as throughput drops.\n"
+      example:
+        attributes:
+          category: network
+          team: IT
+        description: 'Alert on project ingress measured over a 10-minute period.
+
+          During normal operation, we expect well beyond 50 values per period (INFO).
+
+          If data ingress drops below 20 values per period, this could indicate connection problems or partial equipment failure (WARNING).
+
+          If ingress goes to 0, this indicates connection loss or complete equipment failure (CRITICAL).
+
+          '
+        name: Ingress Alert
+        notification:
+          dashboard:
+            enabled: false
+          email:
+            recipients:
+            - john.smith@example.com
+            - john.doe@example.com
+          ms_teams:
+            webhook_urls:
+            - https://example.webhook.office.com/webhookb2/00000000-0000-0000-0000-000000000000@11111111-1111-1111-1111-111111111111/IncomingWebhook/0123456789abcdef0123456789abcdef/22222222-2222-2222-2222-222222222222
+          telegram:
+            chat_ids:
+            - '-12345'
+            - '56789'
+        period: 10m
+        repeat: 1d
+        thresholds:
+          crit: 0
+          crit_reset: 2
+          info: 50
+          info_reset: 60
+          warn: 20
+          warn_reset: 25
+      properties:
+        attributes:
+          additionalProperties:
+            type: string
+          description: Attributes/tags to assign to the alert (key=value).
+          type: object
+        dataPointID:
+          description: The datapoint to check throughtput for. If not provided, throughput of the whole project is checked.
+          type: string
+        description:
+          description: Free text description of the alert.
+          type: string
+        disabled:
+          default: false
+          description: 'Create the alert in a paused (disabled) state: its task is created disabled and does not
+
+            fire until the alert is enabled via the enable endpoint. Defaults to false (created enabled).
+
+            '
+          type: boolean
+        name:
+          description: The name of the alert.
+          type: string
+        notification:
+          $ref: '#/components/schemas/AlertNotification'
+        period:
+          description: Time period over which to measure throughput.
+          pattern: ^\d+[wdhms]{1}$
+          type: string
+        repeat:
+          default: 1d
+          description: 'Minimum interval after which an unchanged alert is re-notified (in addition to
+
+            notifying on every level change). Use a duration like ''2h'' to re-notify periodically;
+
+            ''0s'' or the keyword ''never'' disables re-notification (notify only on level changes).
+
+            '
+          example: 2d, 0.5h, 2.5m, 110s
+          pattern: ^(\d+[wdhms]|never)$
+          type: string
+        thresholds:
+          $ref: '#/components/schemas/AlertThresholds'
+        timezone:
+          description: 'Optional IANA timezone (e.g. ''Europe/Berlin'') used to render alert timestamps in
+
+            notifications. Defaults to the project''s building timezone on create; falls back to ''UTC''
+
+            when the building timezone is unresolved.
+
+            '
+          example: Europe/Berlin
+          type: string
+      required:
+      - name
+      - thresholds
+      - period
+    DashboardNotificationPoint:
       additionalProperties: false
       properties:
-        webhook_urls:
-          items:
-            type: string
-          type: array
+        enabled:
+          type: boolean
       type: object
   securitySchemes:
     basicAuth:

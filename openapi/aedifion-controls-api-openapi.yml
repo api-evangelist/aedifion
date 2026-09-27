@@ -754,6 +754,294 @@ paths:
       x-openapi-router-controller: app.controllers.controls_controller
 components:
   schemas:
+    PaginationMeta:
+      properties:
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
+      type: object
+    ControlsAppPin:
+      properties:
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pin_alphanumeric_id:
+          type: string
+      type: object
+    ControlsApp:
+      properties:
+        algorithm:
+          type: string
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProject'
+        config:
+          type: object
+        description:
+          type: string
+        id:
+          format: uuid
+          type: string
+        logs:
+          items:
+            type: object
+          type: array
+        name:
+          type: string
+        pins:
+          properties:
+            input:
+              items:
+                $ref: '#/components/schemas/ControlsAppPin'
+              type: array
+            output:
+              items:
+                $ref: '#/components/schemas/ControlsAppPin'
+              type: array
+          type: object
+        revision:
+          type: string
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+        update_available:
+          type: boolean
+        variation:
+          deprecated: true
+          description: 'Deprecated: use ''variation_meta.key'' instead.'
+          type: string
+        variation_meta:
+          $ref: '#/components/schemas/ControlsAppVariation'
+      required:
+      - id
+      - algorithm
+      - status
+      - name
+      - description
+      - update_available
+      - logs
+      type: object
+    ControlsAlgorithmCounts:
+      properties:
+        active:
+          description: Number of active apps in the project with the grouped algorithm.
+          type: integer
+        inactive:
+          description: Number of inactive apps in the project with the grouped algorithm.
+          type: integer
+      required:
+      - active
+      - inactive
+      type: object
+    ControlsAppUpdateResult:
+      properties:
+        affected:
+          type: boolean
+        controls_app_id:
+          format: uuid
+          type: string
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+      required:
+      - controls_app_id
+      - status
+      - affected
+      type: object
+    ComponentInProject:
+      properties:
+        abbreviation:
+          type: string
+        component_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    ControlsAppList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ControlsAppShort'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+      - items
+      - meta
+      type: object
+    ControlsAppEventStream:
+      properties:
+        add_initializer:
+          default: true
+          type: boolean
+        emit_always:
+          default: false
+          type: boolean
+        emit_on_start_up:
+          default: false
+          type: boolean
+        event_type:
+          default: ObservationEvent
+          enum:
+          - ObservationEvent
+          - SetpointEvent
+          type: string
+        output:
+          $ref: '#/components/schemas/EventStreamOutputDatapoint'
+        parameters:
+          type: object
+        pins:
+          type: object
+        start_up_delay:
+          format: float
+          type: number
+        timestamp:
+          default: create
+          enum:
+          - create
+          - consume
+          - ingest
+          - now
+          - untimed
+          type: string
+        type:
+          enum:
+          - absolute_air_humidity
+          - ara
+          - bee
+          - counter
+          - deviation
+          - formula
+          - frog_mode
+          - frog_supply_air_temperature
+          - gradient
+          - heating_curve
+          - hero
+          - orc
+          - schedule
+          - sequence
+          type: string
+      required:
+      - type
+      - output
+      type: object
+    ControlsAppShort:
+      properties:
+        algorithm:
+          type: string
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProject'
+        id:
+          format: uuid
+          type: string
+        name:
+          type: string
+        revision:
+          type: string
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+        update_available:
+          type: boolean
+        variation:
+          deprecated: true
+          description: 'Deprecated: use ''variation_meta.key'' instead.'
+          type: string
+        variation_meta:
+          $ref: '#/components/schemas/ControlsAppVariation'
+      required:
+      - id
+      - algorithm
+      - status
+      - name
+      - update_available
+      type: object
+    ControlsAppVariation:
+      properties:
+        description:
+          description: Description of the controls app algorithm variation.
+          type: string
+        key:
+          description: Stable, language-independent short key for the variation, e.g., 'hero' or 'hero_dryrun'.
+          type: string
+        name:
+          description: Human-readable name of the variation, e.g., 'Dry run'.
+          type: string
+      required:
+      - key
+      - name
+      - description
+      type: object
+    ControlsAlgorithmLabel:
+      properties:
+        id:
+          description: Label identifier.
+          enum:
+          - dynamics
+          type: string
+        name:
+          description: Translated label name.
+          type: string
+      required:
+      - id
+      - name
+      type: object
+    PostControlsAppRequest:
+      example:
+        setpoint_writing_params:
+          PIN_ALPHANUMERIC_ID_SP_1:
+            keep_out_of_service: false
+            priority: 13
+            reset_value: 'null'
+          PIN_ALPHANUMERIC_ID_SP_2:
+            keep_out_of_service: true
+            priority: 8
+            reset_value: 25.0
+      properties:
+        setpoint_writing_params:
+          type: object
+      type: object
+    EventStreamOutputDatapoint:
+      properties:
+        calculated_unit:
+          type: string
+        dataPointID:
+          type: string
+      required:
+      - dataPointID
+      type: object
     ControlsAlgorithm:
       properties:
         counts:
@@ -782,84 +1070,36 @@ components:
       - counts
       - labels
       type: object
-    EntityLog:
+    EntityLogList:
       properties:
-        created_at:
-          type: string
-        id:
-          type: string
-        log_level:
-          type: string
-        log_message:
-          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/EntityLog'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
       required:
-      - id
-      - created_at
-      - log_message
-      - log_level
+      - items
+      - meta
       type: object
-    ControlsAlgorithmCounts:
+    Success:
       properties:
-        active:
-          description: Number of active apps in the project with the grouped algorithm.
-          type: integer
-        inactive:
-          description: Number of inactive apps in the project with the grouped algorithm.
-          type: integer
-      required:
-      - active
-      - inactive
-      type: object
-    ControlsAppStatus:
-      properties:
-        code:
-          type: integer
         message:
           type: string
-        name:
-          description: Stable, language-independent short key for the status, e.g. 'running' or 'died'.
-          type: string
-        type:
-          description: Classification of the status.
+        operation:
           enum:
-          - normal
-          - error
-          - pending
-          - ready
+          - ''
+          - get
+          - create
+          - delete
+          - update
           type: string
-      required:
-      - code
-      - message
-      type: object
-    ControlsAppUpdateResult:
-      properties:
-        affected:
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
           type: boolean
-        controls_app_id:
-          format: uuid
-          type: string
-        status:
-          $ref: '#/components/schemas/ControlsAppStatus'
-      required:
-      - controls_app_id
-      - status
-      - affected
-      type: object
-    PaginationMeta:
-      properties:
-        current_page:
-          type: integer
-        items_per_page:
-          type: integer
-        total_items:
-          type: integer
-        total_pages:
-          type: integer
-      required:
-      - total_items
-      - items_per_page
-      - current_page
-      - total_pages
       type: object
     ControlsAppsSummary:
       properties:
@@ -870,36 +1110,6 @@ components:
           type: array
       required:
       - controls_algorithms
-      type: object
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    EventStreamOutputDatapoint:
-      properties:
-        calculated_unit:
-          type: string
-        dataPointID:
-          type: string
-      required:
-      - dataPointID
       type: object
     NewCustomControlsApp:
       example:
@@ -967,258 +1177,12 @@ components:
       required:
       - event_streams
       type: object
-    ControlsAppEventStream:
+    Error:
       properties:
-        add_initializer:
-          default: true
-          type: boolean
-        emit_always:
-          default: false
-          type: boolean
-        emit_on_start_up:
-          default: false
-          type: boolean
-        event_type:
-          default: ObservationEvent
-          enum:
-          - ObservationEvent
-          - SetpointEvent
-          type: string
-        output:
-          $ref: '#/components/schemas/EventStreamOutputDatapoint'
-        parameters:
+        details:
+          properties: {}
           type: object
-        pins:
-          type: object
-        start_up_delay:
-          format: float
-          type: number
-        timestamp:
-          default: create
-          enum:
-          - create
-          - consume
-          - ingest
-          - now
-          - untimed
-          type: string
-        type:
-          enum:
-          - absolute_air_humidity
-          - ara
-          - bee
-          - counter
-          - deviation
-          - formula
-          - frog_mode
-          - frog_supply_air_temperature
-          - gradient
-          - heating_curve
-          - hero
-          - orc
-          - schedule
-          - sequence
-          type: string
-      required:
-      - type
-      - output
-      type: object
-    PostControlsAppRequest:
-      example:
-        setpoint_writing_params:
-          PIN_ALPHANUMERIC_ID_SP_1:
-            keep_out_of_service: false
-            priority: 13
-            reset_value: 'null'
-          PIN_ALPHANUMERIC_ID_SP_2:
-            keep_out_of_service: true
-            priority: 8
-            reset_value: 25.0
-      properties:
-        setpoint_writing_params:
-          type: object
-      type: object
-    ControlsAppPin:
-      properties:
-        dataPointID:
-          type: string
-        datapoint_hash_id:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        pin_alphanumeric_id:
-          type: string
-      type: object
-    ControlsAppList:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/ControlsAppShort'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      required:
-      - items
-      - meta
-      type: object
-    ControlsAppVariation:
-      properties:
-        description:
-          description: Description of the controls app algorithm variation.
-          type: string
-        key:
-          description: Stable, language-independent short key for the variation, e.g., 'hero' or 'hero_dryrun'.
-          type: string
-        name:
-          description: Human-readable name of the variation, e.g., 'Dry run'.
-          type: string
-      required:
-      - key
-      - name
-      - description
-      type: object
-    ControlsAppShort:
-      properties:
-        algorithm:
-          type: string
-        component_in_project:
-          $ref: '#/components/schemas/ComponentInProject'
-        id:
-          format: uuid
-          type: string
-        name:
-          type: string
-        revision:
-          type: string
-        status:
-          $ref: '#/components/schemas/ControlsAppStatus'
-        update_available:
-          type: boolean
-        variation:
-          deprecated: true
-          description: 'Deprecated: use ''variation_meta.key'' instead.'
-          type: string
-        variation_meta:
-          $ref: '#/components/schemas/ControlsAppVariation'
-      required:
-      - id
-      - algorithm
-      - status
-      - name
-      - update_available
-      type: object
-    ControlsAlgorithmLabel:
-      properties:
-        id:
-          description: Label identifier.
-          enum:
-          - dynamics
-          type: string
-        name:
-          description: Translated label name.
-          type: string
-      required:
-      - id
-      - name
-      type: object
-    EntityLogList:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/EntityLog'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      required:
-      - items
-      - meta
-      type: object
-    ComponentInProject:
-      properties:
-        abbreviation:
-          type: string
-        component_id:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        project_id:
-          format: int64
-          type: integer
-      type: object
-    ControlsApp:
-      properties:
-        algorithm:
-          type: string
-        component_in_project:
-          $ref: '#/components/schemas/ComponentInProject'
-        config:
-          type: object
-        description:
-          type: string
-        id:
-          format: uuid
-          type: string
-        logs:
-          items:
-            type: object
-          type: array
-        name:
-          type: string
-        pins:
-          properties:
-            input:
-              items:
-                $ref: '#/components/schemas/ControlsAppPin'
-              type: array
-            output:
-              items:
-                $ref: '#/components/schemas/ControlsAppPin'
-              type: array
-          type: object
-        revision:
-          type: string
-        status:
-          $ref: '#/components/schemas/ControlsAppStatus'
-        update_available:
-          type: boolean
-        variation:
-          deprecated: true
-          description: 'Deprecated: use ''variation_meta.key'' instead.'
-          type: string
-        variation_meta:
-          $ref: '#/components/schemas/ControlsAppVariation'
-      required:
-      - id
-      - algorithm
-      - status
-      - name
-      - description
-      - update_available
-      - logs
-      type: object
-    Success:
-      properties:
-        message:
+        error:
           type: string
         operation:
           enum:
@@ -1228,12 +1192,48 @@ components:
           - delete
           - update
           type: string
-        resource:
-          properties: {}
-          type: object
         success:
-          default: true
+          default: false
           type: boolean
+      required:
+      - error
+      type: object
+    EntityLog:
+      properties:
+        created_at:
+          type: string
+        id:
+          type: string
+        log_level:
+          type: string
+        log_message:
+          type: string
+      required:
+      - id
+      - created_at
+      - log_message
+      - log_level
+      type: object
+    ControlsAppStatus:
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        name:
+          description: Stable, language-independent short key for the status, e.g. 'running' or 'died'.
+          type: string
+        type:
+          description: Classification of the status.
+          enum:
+          - normal
+          - error
+          - pending
+          - ready
+          type: string
+      required:
+      - code
+      - message
       type: object
   parameters:
     LanguageQueryParam:

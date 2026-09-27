@@ -868,10 +868,6 @@ paths:
       x-openapi-router-controller: app.controllers.datapoint_controller
 components:
   schemas:
-    Timeseries:
-      items:
-        $ref: '#/components/schemas/Observation'
-      type: array
     UpdateTagAssoc:
       properties:
         confirmed:
@@ -881,30 +877,10 @@ components:
           - unconfirmed
           type: string
       type: object
-    Tag:
-      properties:
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        value:
-          type: string
-      required:
-      - id
-      - key
-      type: object
-    Renaming:
-      properties:
-        datapointkey_id:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        renaming:
-          type: string
-      type: object
+    Timeseries:
+      items:
+        $ref: '#/components/schemas/Observation'
+      type: array
     DataPointWithContext:
       properties:
         dataPointID:
@@ -930,16 +906,15 @@ components:
         writable:
           type: boolean
       type: object
-    Observation:
+    UpdateDatapoint:
       properties:
-        time:
-          type: string
-        value:
-          format: float
+        setpoint_max_value:
           type: number
-      required:
-      - time
-      - value
+        setpoint_min_value:
+          type: number
+        writable:
+          type: boolean
+      type: object
     Error:
       properties:
         details:
@@ -961,14 +936,16 @@ components:
       required:
       - error
       type: object
-    UpdateDatapoint:
+    Renaming:
       properties:
-        setpoint_max_value:
-          type: number
-        setpoint_min_value:
-          type: number
-        writable:
-          type: boolean
+        datapointkey_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        renaming:
+          type: string
       type: object
     TimeseriesWithContext:
       properties:
@@ -989,19 +966,16 @@ components:
           type: array
         units:
           type: string
-    TagAssociation:
-      allOf:
-      - $ref: '#/components/schemas/Tag'
-      - properties:
-          confirmed:
-            type: boolean
-          probability:
-            type: number
-          protected:
-            type: boolean
-          source:
-            type: string
-        type: object
+    Observation:
+      properties:
+        time:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - time
+      - value
     Success:
       properties:
         message:
@@ -1021,6 +995,32 @@ components:
           default: true
           type: boolean
       type: object
+    Tag:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - key
+      type: object
+    TagAssociation:
+      allOf:
+      - $ref: '#/components/schemas/Tag'
+      - properties:
+          confirmed:
+            type: boolean
+          probability:
+            type: number
+          protected:
+            type: boolean
+          source:
+            type: string
+        type: object
     SetpointAck:
       properties:
         dataPointID:

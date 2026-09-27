@@ -23,7 +23,7 @@ tags:
 - Smart Buildings
 - Energy Management
 - IoT
-- Real-Estate
+- Real Estate
 - HVAC
 - Sustainability
 - Time Series
@@ -33,6 +33,7 @@ tags:
 - ESG
 - PropTech
 - Germany
+- Real-Time
 tags_raw:
 - building-automation
 - smart-buildings
@@ -48,6 +49,8 @@ tags_raw:
 - esg
 - proptech
 - germany
+- Real-Estate
+- Real-Time
 apis:
 - name: aedifion MQTT API
   description: >-

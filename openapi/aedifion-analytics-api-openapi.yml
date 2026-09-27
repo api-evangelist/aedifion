@@ -1441,107 +1441,29 @@ paths:
       x-openapi-router-controller: app.controllers.analytics_controller
 components:
   schemas:
-    PortfolioResult:
+    InstanceConfig:
       properties:
-        aggregation:
-          type: string
-        aggregation_value:
-          type: number
-        total_projects:
-          type: integer
-      required:
-      - aggregation
-      - total_projects
-      type: object
-    SignalColorCountOverview:
-      properties:
-        green:
-          type: integer
-        grey:
-          type: integer
-        red:
-          type: integer
-        yellow:
-          type: integer
-      required:
-      - red
-      - yellow
-      - green
-      - grey
-      type: object
-    UpdateInstanceConfig:
-      properties:
-        analysisfunction_id:
-          format: int64
-          type: integer
-        auto_execution:
-          type: boolean
-        componentinproject_id:
-          format: int64
-          type: integer
-        description:
-          type: string
-        enabled:
-          type: boolean
-        name:
-          type: string
-      type: object
-    ComponentWithContext:
-      properties:
-        alphanumeric_id:
-          type: string
-        components_in_project_count:
-          type: integer
+        config:
+          format: json
+          type: object
         id:
           format: int64
           type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-      required:
-      - id
-      - alphanumeric_id
-      - nameEN
-      - nameDE
-      - name
-      - components_in_project_count
-      type: object
-    ComponentWithResults:
-      properties:
-        componentinproject_id:
+        project_id:
           format: int64
           type: integer
-        display_name:
-          type: string
-        display_name_DE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''display_name'' field instead.'
-          type: string
-        signal_color:
-          type: string
       type: object
-    AnalysisResultSummary:
+    UpdateSaving:
       properties:
-        input_parameters:
-          type: object
-        interpretation:
+        open:
+          format: float
+          type: number
+        potential:
+          format: float
+          type: number
+        units:
           type: string
-        result_id:
-          type: string
-        savings_potential_kpis:
-          items:
-            $ref: '#/components/schemas/KPIResult'
-          type: array
-        signal_color:
-          type: string
-        status:
+        units_context:
           type: string
       type: object
     AnalysisSavings:
@@ -1553,27 +1475,35 @@ components:
             $ref: '#/components/schemas/Saving'
           type: array
       type: object
-    KPIAggregationItem:
+    PaginationMeta:
       properties:
-        kpi:
-          $ref: '#/components/schemas/KPIResult'
-        time_range_info:
-          $ref: '#/components/schemas/TimeRangeInfo'
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
       required:
-      - time_range_info
-      - kpi
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
       type: object
-    KPIAggregationResult:
+    EnumValue:
       properties:
-        kpi:
+        key:
           type: string
-        portfolio_result:
-          $ref: '#/components/schemas/PortfolioResult'
-        project_results:
-          items:
-            $ref: '#/components/schemas/ProjectKPIAggregationResultItem'
-          type: array
-        units:
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
           type: string
       type: object
     ProjectKPIAggregationResultItem:
@@ -1594,56 +1524,31 @@ components:
       - project
       - time_range_info
       type: object
-    NewSaving:
+    SummaryKPIResult:
       properties:
-        analysis_function_id:
-          description: The id of the analysis function that the saving is associated with.
-          type: integer
-        context:
-          description: The context of the saving.
-          enum:
-          - financial
-          - co2_emissions
-          - energy_consumption
-          type: string
-        open:
-          description: The potential that has not yet been realized as actual saving.
-          format: float
-          type: number
-        potential:
-          description: The potential value selected by the user.
-          format: float
-          type: number
-        units:
-          description: The units of the saving.
-          type: string
-        units_context:
-          description: The units context of the saving.
-          type: string
-      required:
-      - analysis_function_id
-      - context
-      - potential
-      - open
-      - units
+        current:
+          $ref: '#/components/schemas/SummaryKPICurrentResult'
+        development:
+          $ref: '#/components/schemas/SummaryKPIDevelopmentResult'
       type: object
-    AnalysisFunctionShort:
+    AnalysisResultReferences:
       properties:
-        alphanumeric_id:
+        result_ids:
+          description: List of created result reference IDs.
+          items:
+            format: uuid
+            type: string
+          type: array
+      type: object
+    KPIResult:
+      properties:
+        context:
           type: string
         id:
-          format: int64
           type: integer
-        name:
+        identifier:
           type: string
-      required:
-      - id
-      - alphanumeric_id
-      - name
-      type: object
-    SummaryKPICurrentResult:
-      properties:
-        time_reference:
+        name:
           type: string
         unit:
           type: string
@@ -1669,514 +1574,27 @@ components:
         unit:
           type: string
       type: object
-    ProjectsKPIAggregation:
+    AnalyticsOverviewItem:
       properties:
-        aggregated_value:
-          description: The aggregated KPI value across projects.
-          type: number
-        kpi_identifier:
-          description: The KPI identifier.
-          type: string
-        projects_kpi:
-          description: Per-project KPI results.
-          items:
-            $ref: '#/components/schemas/ProjectKPI'
-          type: array
-        unit:
-          description: The unit of the aggregated value.
-          type: string
-      required:
-      - aggregated_value
-      - kpi_identifier
-      - unit
-      - projects_kpi
-      type: object
-    ControlsAppStatus:
-      properties:
-        code:
-          type: integer
-        message:
-          type: string
-        name:
-          description: Stable, language-independent short key for the status, e.g. 'running' or 'died'.
-          type: string
-        type:
-          description: Classification of the status.
-          enum:
-          - normal
-          - error
-          - pending
-          - ready
-          type: string
-      required:
-      - code
-      - message
-      type: object
-    PlotsResult:
-      properties:
-        categories:
-          items:
-            type: string
-          type: array
-        data:
-          items:
-            $ref: '#/components/schemas/PlotsResultData'
-          type: array
-        extras:
-          type: object
-        identifier:
-          type: string
-        title:
-          type: string
-        type:
-          type: string
-        unit:
-          type: string
-      type: object
-    ComponentControlsApp:
-      properties:
-        algorithm:
-          type: string
-        attributes:
-          items:
-            type: string
-          type: array
-        id:
-          format: uuid
-          type: string
-        pins:
-          items:
-            type: string
-          type: array
-        status:
-          $ref: '#/components/schemas/ControlsAppStatus'
-        variation:
-          deprecated: true
-          description: 'Deprecated: use ''variation_meta.key'' instead.'
-          type: string
-        variation_meta:
-          $ref: '#/components/schemas/ControlsAppVariation'
-      required:
-      - id
-      - algorithm
-      - status
-      type: object
-    AnalyticsResultsForComponentResultIds:
-      properties:
-        alphanumeric_id:
-          type: string
-        analysis_function_id:
-          type: integer
-        analytics_version:
-          type: string
-        display_name:
-          type: string
-        end:
-          format: date-time
-          type: string
-        function_name:
-          type: string
-        instance_id:
-          format: int64
-          type: integer
-        interpretation:
-          type: string
-        result_id:
-          type: string
-        signal_color:
-          type: string
-        start:
-          format: date-time
-          type: string
-        summary_kpi:
-          $ref: '#/components/schemas/SummaryKPIResult'
-      type: object
-    PaginationMeta:
-      properties:
-        current_page:
-          type: integer
-        items_per_page:
-          type: integer
-        total_items:
-          type: integer
-        total_pages:
-          type: integer
-      required:
-      - total_items
-      - items_per_page
-      - current_page
-      - total_pages
-      type: object
-    ComponentInProjectAttribute:
-      properties:
-        alphanumeric_id:
-          type: string
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        source:
-          type: string
-        unit:
-          type: string
-        value:
-          type: string
-      type: object
-    EnumValue:
-      properties:
-        key:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-      type: object
-    AssignedPin:
-      properties:
-        alphanumeric_id:
-          type: string
-        dataPointID:
-          type: string
-        datapoint_hash_id:
-          type: string
-        description:
-          type: string
-        description_de:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        description_en:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        id:
-          format: int64
-          type: integer
-        location:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        pin_attributes:
-          items:
-            $ref: '#/components/schemas/PinAttribute'
-          type: array
-        unit_type:
-          type: string
-      type: object
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    ComponentsKPIAggregationResult:
-      properties:
-        aggregated_kpis_overview:
-          items:
-            $ref: '#/components/schemas/KPIResult'
-          type: array
-        items:
-          items:
-            $ref: '#/components/schemas/ComponentInProjectKPIAggregations'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      required:
-      - aggregated_kpis_overview
-      - items
-      - meta
-      type: object
-    NewInstanceConfig:
-      properties:
-        analysisfunction_id:
-          format: int64
-          type: integer
-        auto_execution:
-          type: boolean
-        componentinproject_id:
-          format: int64
-          type: integer
-        description:
-          type: string
-        enabled:
-          type: boolean
-        name:
-          type: string
-      required:
-      - componentinproject_id
-      - analysisfunction_id
-      type: object
-    ProjectShort:
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-      type: object
-    Tag:
-      properties:
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        value:
-          type: string
-      required:
-      - id
-      - key
-      type: object
-    PlotsResultData:
-      properties:
-        name:
-          type: string
-        values:
-          items:
-            format: float
-            type: number
-          type: array
-      type: object
-    AnalysisFunction:
-      properties:
-        alphanumeric_id:
-          type: string
-        attributes:
-          items:
-            $ref: '#/components/schemas/ComponentAttributeDefinition'
-          type: array
-        execution_schedule:
-          type: string
-        id:
-          format: int64
-          type: integer
-        kpis:
-          items:
-            type: string
-          type: array
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        pins:
-          items:
-            $ref: '#/components/schemas/Pin'
-          type: array
-      required:
-      - id
-      - alphanumeric_id
-      - nameEN
-      - nameDE
-      - kpis
-      type: object
-    Saving:
-      properties:
-        context:
-          type: string
-        id:
-          format: uuid
-          type: string
-        open:
-          format: float
-          type: number
-        potential:
-          format: float
-          type: number
-        realized:
-          format: float
-          type: number
-        units:
-          type: string
-        units_context:
-          type: string
-      type: object
-    ProjectKPI:
-      properties:
-        end_timestamp_latest_result:
-          description: The timestamp of the last KPI execution.
-          format: date-time
-          type: string
-        kpi_identifier:
-          description: The KPI identifier.
-          type: string
-        project_id:
-          description: The project ID.
-          format: int64
-          type: integer
-        unit:
-          description: The unit of the KPI value.
-          type: string
-        unit_context:
-          description: The unit context.
-          type: string
-        value:
-          description: The KPI value.
-          type: number
-      required:
-      - project_id
-      - value
-      - end_timestamp_latest_result
-      - unit
-      type: object
-    ComponentInProjectWithContext:
-      properties:
-        abbreviation:
-          type: string
-        attributes:
-          items:
-            $ref: '#/components/schemas/ComponentInProjectAttribute'
-          type: array
-        attributes_definitions:
-          items:
-            $ref: '#/components/schemas/ComponentAttributeDefinition'
-          type: array
+        analyses:
+          $ref: '#/components/schemas/SignalColorCountOverview'
         component:
-          $ref: '#/components/schemas/Component'
-        controls_apps:
-          items:
-            $ref: '#/components/schemas/ComponentControlsApp'
-          type: array
-        display_name:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        pins:
-          items:
-            $ref: '#/components/schemas/AssignedPin'
-          type: array
-        project_id:
-          format: int64
-          type: integer
-        relationships:
-          items:
-            $ref: '#/components/schemas/ComponentInProjectRelation'
-          type: array
-        tags:
-          items:
-            $ref: '#/components/schemas/Tag'
-          type: array
-      type: object
-    TimeRangeInfo:
-      properties:
-        end:
-          format: date-time
-          type: string
-        filled:
-          type: boolean
-        start:
-          format: date-time
-          type: string
-      type: object
-    SummaryKPIResult:
-      properties:
-        current:
-          $ref: '#/components/schemas/SummaryKPICurrentResult'
-        development:
-          $ref: '#/components/schemas/SummaryKPIDevelopmentResult'
-      type: object
-    ComponentCategory:
-      properties:
-        description:
-          type: string
-        description_de:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        description_en:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        key:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-      type: object
-    AnalysisResultShort:
-      properties:
-        function_id:
-          type: integer
-        id:
-          type: string
-        instance_id:
-          type: integer
-        interpretation:
-          type: string
-        signal_color:
-          enum:
-          - green
-          - grey
-          - yellow
-          - red
-          type: string
+          $ref: '#/components/schemas/ComponentWithContext'
       required:
-      - id
-      - instance_id
-      - function_id
+      - component
+      - analyses
       type: object
-    PinAttribute:
+    KPIAggregationResult:
       properties:
-        id:
-          format: int64
-          type: integer
-        key:
+        kpi:
           type: string
-        probability:
-          type: number
-        value:
+        portfolio_result:
+          $ref: '#/components/schemas/PortfolioResult'
+        project_results:
+          items:
+            $ref: '#/components/schemas/ProjectKPIAggregationResultItem'
+          type: array
+        units:
           type: string
       type: object
     AnalysisResult:
@@ -2232,6 +1650,277 @@ components:
             $ref: '#/components/schemas/TimeseriesResult'
           type: array
       type: object
+    AnalyticsOverview:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AnalyticsOverviewItem'
+          type: array
+        overview:
+          $ref: '#/components/schemas/AnalysisResultsOverview'
+      required:
+      - overview
+      - items
+      type: object
+    ComponentInProjectRelation:
+      properties:
+        id:
+          format: int64
+          type: integer
+        relationship:
+          enum:
+          - hasLocation
+          - hasPart
+          - feeds
+          type: string
+        source_componentinproject_id:
+          format: int64
+          type: integer
+        target_componentinproject_id:
+          format: int64
+          type: integer
+      type: object
+    ComponentInProject:
+      properties:
+        abbreviation:
+          type: string
+        component_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    PortfolioResult:
+      properties:
+        aggregation:
+          type: string
+        aggregation_value:
+          type: number
+        total_projects:
+          type: integer
+      required:
+      - aggregation
+      - total_projects
+      type: object
+    AnalyticsResultsForComponentResultIds:
+      properties:
+        alphanumeric_id:
+          type: string
+        analysis_function_id:
+          type: integer
+        analytics_version:
+          type: string
+        display_name:
+          type: string
+        end:
+          format: date-time
+          type: string
+        function_name:
+          type: string
+        instance_id:
+          format: int64
+          type: integer
+        interpretation:
+          type: string
+        result_id:
+          type: string
+        signal_color:
+          type: string
+        start:
+          format: date-time
+          type: string
+        summary_kpi:
+          $ref: '#/components/schemas/SummaryKPIResult'
+      type: object
+    ControlsAppVariation:
+      properties:
+        description:
+          description: Description of the controls app algorithm variation.
+          type: string
+        key:
+          description: Stable, language-independent short key for the variation, e.g., 'hero' or 'hero_dryrun'.
+          type: string
+        name:
+          description: Human-readable name of the variation, e.g., 'Dry run'.
+          type: string
+      required:
+      - key
+      - name
+      - description
+      type: object
+    AnalysisFunction:
+      properties:
+        alphanumeric_id:
+          type: string
+        attributes:
+          items:
+            $ref: '#/components/schemas/ComponentAttributeDefinition'
+          type: array
+        execution_schedule:
+          type: string
+        id:
+          format: int64
+          type: integer
+        kpis:
+          items:
+            type: string
+          type: array
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pins:
+          items:
+            $ref: '#/components/schemas/Pin'
+          type: array
+      required:
+      - id
+      - alphanumeric_id
+      - nameEN
+      - nameDE
+      - kpis
+      type: object
+    Tag:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - key
+      type: object
+    Pin:
+      properties:
+        alphanumeric_id:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        location:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pin_attributes:
+          items:
+            $ref: '#/components/schemas/PinAttribute'
+          type: array
+        unit_type:
+          type: string
+      type: object
+    AnalysisResultSummary:
+      properties:
+        input_parameters:
+          type: object
+        interpretation:
+          type: string
+        result_id:
+          type: string
+        savings_potential_kpis:
+          items:
+            $ref: '#/components/schemas/KPIResult'
+          type: array
+        signal_color:
+          type: string
+        status:
+          type: string
+      type: object
+    AnalyticsResultsForComponent:
+      properties:
+        component_in_project:
+          $ref: '#/components/schemas/ComponentInProjectWithContext'
+        result_ids:
+          items:
+            $ref: '#/components/schemas/AnalyticsResultsForComponentResultIds'
+          type: array
+        signal_color:
+          type: string
+      type: object
+    PinAttribute:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        probability:
+          type: number
+        value:
+          type: string
+      type: object
+    UpdateInstanceConfig:
+      properties:
+        analysisfunction_id:
+          format: int64
+          type: integer
+        auto_execution:
+          type: boolean
+        componentinproject_id:
+          format: int64
+          type: integer
+        description:
+          type: string
+        enabled:
+          type: boolean
+        name:
+          type: string
+      type: object
+    AnalyticsInstancesRunResponse:
+      properties:
+        instance_ids_not_found:
+          description: List of instance IDs that were not found.
+          items:
+            format: int64
+            type: integer
+          type: array
+        result_ids:
+          description: List of created result reference IDs.
+          items:
+            format: uuid
+            type: string
+          type: array
+      type: object
     SavingsPotential:
       properties:
         analysis_function:
@@ -2252,35 +1941,20 @@ components:
       - analysis_result
       - potential_kpis
       type: object
-    AnalyticsResultsForComponent:
+    Saving:
       properties:
-        component_in_project:
-          $ref: '#/components/schemas/ComponentInProjectWithContext'
-        result_ids:
-          items:
-            $ref: '#/components/schemas/AnalyticsResultsForComponentResultIds'
-          type: array
-        signal_color:
+        context:
           type: string
-      type: object
-    AnalyticsOverview:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/AnalyticsOverviewItem'
-          type: array
-        overview:
-          $ref: '#/components/schemas/AnalysisResultsOverview'
-      required:
-      - overview
-      - items
-      type: object
-    UpdateSaving:
-      properties:
+        id:
+          format: uuid
+          type: string
         open:
           format: float
           type: number
         potential:
+          format: float
+          type: number
+        realized:
           format: float
           type: number
         units:
@@ -2288,14 +1962,128 @@ components:
         units_context:
           type: string
       type: object
-    AnalysisResultReferences:
+    AnalysisResultShort:
       properties:
-        result_ids:
-          description: List of created result reference IDs.
+        function_id:
+          type: integer
+        id:
+          type: string
+        instance_id:
+          type: integer
+        interpretation:
+          type: string
+        signal_color:
+          enum:
+          - green
+          - grey
+          - yellow
+          - red
+          type: string
+      required:
+      - id
+      - instance_id
+      - function_id
+      type: object
+    AnalyticsResultsForComponents:
+      properties:
+        items:
           items:
-            format: uuid
-            type: string
+            $ref: '#/components/schemas/ComponentWithResults'
           type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    SummaryKPICurrentResult:
+      properties:
+        time_reference:
+          type: string
+        unit:
+          type: string
+        value:
+          format: float
+          type: number
+      type: object
+    SignalColorCountOverview:
+      properties:
+        green:
+          type: integer
+        grey:
+          type: integer
+        red:
+          type: integer
+        yellow:
+          type: integer
+      required:
+      - red
+      - yellow
+      - green
+      - grey
+      type: object
+    ComponentWithContext:
+      properties:
+        alphanumeric_id:
+          type: string
+        components_in_project_count:
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      required:
+      - id
+      - alphanumeric_id
+      - nameEN
+      - nameDE
+      - name
+      - components_in_project_count
+      type: object
+    KPIResultShort:
+      properties:
+        end:
+          format: date-time
+          type: string
+        start:
+          format: date-time
+          type: string
+        value:
+          type: number
+      type: object
+    ControlsAppStatus:
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        name:
+          description: Stable, language-independent short key for the status, e.g. 'running' or 'died'.
+          type: string
+        type:
+          description: Classification of the status.
+          enum:
+          - normal
+          - error
+          - pending
+          - ready
+          type: string
+      required:
+      - code
+      - message
+      type: object
+    ProjectShort:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
       type: object
     ComponentInProjectKPIAggregations:
       properties:
@@ -2309,20 +2097,348 @@ components:
       - component_in_project
       - kpi_aggregations
       type: object
-    AnalyticsInstancesRunResponse:
+    Success:
       properties:
-        instance_ids_not_found:
-          description: List of instance IDs that were not found.
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
+      type: object
+    ProjectsKPIAggregation:
+      properties:
+        aggregated_value:
+          description: The aggregated KPI value across projects.
+          type: number
+        kpi_identifier:
+          description: The KPI identifier.
+          type: string
+        projects_kpi:
+          description: Per-project KPI results.
           items:
-            format: int64
-            type: integer
+            $ref: '#/components/schemas/ProjectKPI'
           type: array
-        result_ids:
-          description: List of created result reference IDs.
+        unit:
+          description: The unit of the aggregated value.
+          type: string
+      required:
+      - aggregated_value
+      - kpi_identifier
+      - unit
+      - projects_kpi
+      type: object
+    PlotsResultData:
+      properties:
+        name:
+          type: string
+        values:
           items:
-            format: uuid
+            format: float
+            type: number
+          type: array
+      type: object
+    ComponentCategory:
+      properties:
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      type: object
+    TimeRangeInfo:
+      properties:
+        end:
+          format: date-time
+          type: string
+        filled:
+          type: boolean
+        start:
+          format: date-time
+          type: string
+      type: object
+    PlotsResult:
+      properties:
+        categories:
+          items:
             type: string
           type: array
+        data:
+          items:
+            $ref: '#/components/schemas/PlotsResultData'
+          type: array
+        extras:
+          type: object
+        identifier:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        unit:
+          type: string
+      type: object
+    ComponentInProjectWithContext:
+      properties:
+        abbreviation:
+          type: string
+        attributes:
+          items:
+            $ref: '#/components/schemas/ComponentInProjectAttribute'
+          type: array
+        attributes_definitions:
+          items:
+            $ref: '#/components/schemas/ComponentAttributeDefinition'
+          type: array
+        component:
+          $ref: '#/components/schemas/Component'
+        controls_apps:
+          items:
+            $ref: '#/components/schemas/ComponentControlsApp'
+          type: array
+        display_name:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        pins:
+          items:
+            $ref: '#/components/schemas/AssignedPin'
+          type: array
+        project_id:
+          format: int64
+          type: integer
+        relationships:
+          items:
+            $ref: '#/components/schemas/ComponentInProjectRelation'
+          type: array
+        tags:
+          items:
+            $ref: '#/components/schemas/Tag'
+          type: array
+      type: object
+    ProjectKPI:
+      properties:
+        end_timestamp_latest_result:
+          description: The timestamp of the last KPI execution.
+          format: date-time
+          type: string
+        kpi_identifier:
+          description: The KPI identifier.
+          type: string
+        project_id:
+          description: The project ID.
+          format: int64
+          type: integer
+        unit:
+          description: The unit of the KPI value.
+          type: string
+        unit_context:
+          description: The unit context.
+          type: string
+        value:
+          description: The KPI value.
+          type: number
+      required:
+      - project_id
+      - value
+      - end_timestamp_latest_result
+      - unit
+      type: object
+    ComponentWithResults:
+      properties:
+        componentinproject_id:
+          format: int64
+          type: integer
+        display_name:
+          type: string
+        display_name_DE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''display_name'' field instead.'
+          type: string
+        signal_color:
+          type: string
+      type: object
+    AnalysisResultsOverview:
+      properties:
+        analyses:
+          $ref: '#/components/schemas/SignalColorCountOverview'
+        components_in_project_count:
+          type: integer
+      required:
+      - components_in_project_count
+      - analyses
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    KPIAggregationItem:
+      properties:
+        kpi:
+          $ref: '#/components/schemas/KPIResult'
+        time_range_info:
+          $ref: '#/components/schemas/TimeRangeInfo'
+      required:
+      - time_range_info
+      - kpi
+      type: object
+    SummaryKPIDevelopmentResult:
+      properties:
+        arrow:
+          enum:
+          - up
+          - down
+          - right
+          type: string
+        time_reference:
+          type: string
+        unit:
+          type: string
+        value:
+          format: float
+          type: number
+      type: object
+    KPI:
+      example:
+        component_in_project_id: 1
+        context: co2_savings
+        identifier: schedule_analysis.co2_saving
+        type: potential
+        units: kilowatt-hours
+        units_context: electrical
+        value: 214.43
+      properties:
+        analysis_function_id:
+          type: integer
+        component_in_project_id:
+          type: integer
+        context:
+          type: string
+        identifier:
+          type: string
+        type:
+          enum:
+          - actual
+          - potential
+          type: string
+        units:
+          type: string
+        units_context:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - component_in_project_id
+      - analysis_function_id
+      - identifier
+      - context
+      - type
+      - value
+      - units
+      type: object
+    ComponentControlsApp:
+      properties:
+        algorithm:
+          type: string
+        attributes:
+          items:
+            type: string
+          type: array
+        id:
+          format: uuid
+          type: string
+        pins:
+          items:
+            type: string
+          type: array
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+        variation:
+          deprecated: true
+          description: 'Deprecated: use ''variation_meta.key'' instead.'
+          type: string
+        variation_meta:
+          $ref: '#/components/schemas/ControlsAppVariation'
+      required:
+      - id
+      - algorithm
+      - status
+      type: object
+    NewInstanceConfig:
+      properties:
+        analysisfunction_id:
+          format: int64
+          type: integer
+        auto_execution:
+          type: boolean
+        componentinproject_id:
+          format: int64
+          type: integer
+        description:
+          type: string
+        enabled:
+          type: boolean
+        name:
+          type: string
+      required:
+      - componentinproject_id
+      - analysisfunction_id
       type: object
     ComponentSavings:
       properties:
@@ -2339,24 +2455,62 @@ components:
       - component
       - analysis_savings
       type: object
-    AnalyticsResultsForComponents:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/ComponentWithResults'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    Component:
+    ComponentInProjectAttribute:
       properties:
         alphanumeric_id:
           type: string
-        category:
-          $ref: '#/components/schemas/ComponentCategory'
         id:
           format: int64
           type: integer
+        key:
+          type: string
+        source:
+          type: string
+        unit:
+          type: string
+        value:
+          type: string
+      type: object
+    ComponentsKPIAggregationResult:
+      properties:
+        aggregated_kpis_overview:
+          items:
+            $ref: '#/components/schemas/KPIResult'
+          type: array
+        items:
+          items:
+            $ref: '#/components/schemas/ComponentInProjectKPIAggregations'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+      - aggregated_kpis_overview
+      - items
+      - meta
+      type: object
+    AssignedPin:
+      properties:
+        alphanumeric_id:
+          type: string
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        location:
+          type: string
         name:
           type: string
         nameDE:
@@ -2367,26 +2521,12 @@ components:
           deprecated: true
           description: 'Deprecated: use the localized ''name'' field instead.'
           type: string
-        private:
-          type: boolean
-      type: object
-    ComponentInProjectRelation:
-      properties:
-        id:
-          format: int64
-          type: integer
-        relationship:
-          enum:
-          - hasLocation
-          - hasPart
-          - feeds
+        pin_attributes:
+          items:
+            $ref: '#/components/schemas/PinAttribute'
+          type: array
+        unit_type:
           type: string
-        source_componentinproject_id:
-          format: int64
-          type: integer
-        target_componentinproject_id:
-          format: int64
-          type: integer
       type: object
     ComponentAttributeDefinition:
       properties:
@@ -2439,101 +2579,62 @@ components:
         value_type:
           type: string
       type: object
-    ControlsAppVariation:
-      properties:
-        description:
-          description: Description of the controls app algorithm variation.
-          type: string
-        key:
-          description: Stable, language-independent short key for the variation, e.g., 'hero' or 'hero_dryrun'.
-          type: string
-        name:
-          description: Human-readable name of the variation, e.g., 'Dry run'.
-          type: string
-      required:
-      - key
-      - name
-      - description
-      type: object
-    AnalyticsOverviewItem:
-      properties:
-        analyses:
-          $ref: '#/components/schemas/SignalColorCountOverview'
-        component:
-          $ref: '#/components/schemas/ComponentWithContext'
-      required:
-      - component
-      - analyses
-      type: object
-    ComponentInProject:
-      properties:
-        abbreviation:
-          type: string
-        component_id:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        project_id:
-          format: int64
-          type: integer
-      type: object
-    AnalysisResultsOverview:
-      properties:
-        analyses:
-          $ref: '#/components/schemas/SignalColorCountOverview'
-        components_in_project_count:
-          type: integer
-      required:
-      - components_in_project_count
-      - analyses
-      type: object
-    KPIResult:
-      properties:
-        context:
-          type: string
-        id:
-          type: integer
-        identifier:
-          type: string
-        name:
-          type: string
-        unit:
-          type: string
-        value:
-          format: float
-          type: number
-      type: object
-    Pin:
+    AnalysisFunctionShort:
       properties:
         alphanumeric_id:
           type: string
-        description:
-          type: string
-        description_de:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        description_en:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
         id:
           format: int64
           type: integer
-        location:
+        name:
           type: string
+      required:
+      - id
+      - alphanumeric_id
+      - name
+      type: object
+    NewSaving:
+      properties:
+        analysis_function_id:
+          description: The id of the analysis function that the saving is associated with.
+          type: integer
+        context:
+          description: The context of the saving.
+          enum:
+          - financial
+          - co2_emissions
+          - energy_consumption
+          type: string
+        open:
+          description: The potential that has not yet been realized as actual saving.
+          format: float
+          type: number
+        potential:
+          description: The potential value selected by the user.
+          format: float
+          type: number
+        units:
+          description: The units of the saving.
+          type: string
+        units_context:
+          description: The units context of the saving.
+          type: string
+      required:
+      - analysis_function_id
+      - context
+      - potential
+      - open
+      - units
+      type: object
+    Component:
+      properties:
+        alphanumeric_id:
+          type: string
+        category:
+          $ref: '#/components/schemas/ComponentCategory'
+        id:
+          format: int64
+          type: integer
         name:
           type: string
         nameDE:
@@ -2544,109 +2645,8 @@ components:
           deprecated: true
           description: 'Deprecated: use the localized ''name'' field instead.'
           type: string
-        pin_attributes:
-          items:
-            $ref: '#/components/schemas/PinAttribute'
-          type: array
-        unit_type:
-          type: string
-      type: object
-    Success:
-      properties:
-        message:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        resource:
-          properties: {}
-          type: object
-        success:
-          default: true
+        private:
           type: boolean
-      type: object
-    KPIResultShort:
-      properties:
-        end:
-          format: date-time
-          type: string
-        start:
-          format: date-time
-          type: string
-        value:
-          type: number
-      type: object
-    SummaryKPIDevelopmentResult:
-      properties:
-        arrow:
-          enum:
-          - up
-          - down
-          - right
-          type: string
-        time_reference:
-          type: string
-        unit:
-          type: string
-        value:
-          format: float
-          type: number
-      type: object
-    InstanceConfig:
-      properties:
-        config:
-          format: json
-          type: object
-        id:
-          format: int64
-          type: integer
-        project_id:
-          format: int64
-          type: integer
-      type: object
-    KPI:
-      example:
-        component_in_project_id: 1
-        context: co2_savings
-        identifier: schedule_analysis.co2_saving
-        type: potential
-        units: kilowatt-hours
-        units_context: electrical
-        value: 214.43
-      properties:
-        analysis_function_id:
-          type: integer
-        component_in_project_id:
-          type: integer
-        context:
-          type: string
-        identifier:
-          type: string
-        type:
-          enum:
-          - actual
-          - potential
-          type: string
-        units:
-          type: string
-        units_context:
-          type: string
-        value:
-          format: float
-          type: number
-      required:
-      - component_in_project_id
-      - analysis_function_id
-      - identifier
-      - context
-      - type
-      - value
-      - units
       type: object
   parameters:
     LanguageQueryParam:
