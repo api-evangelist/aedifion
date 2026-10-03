@@ -386,14 +386,14 @@ paths:
       x-openapi-router-controller: app.controllers.task_controller
 components:
   schemas:
-    UpdateTaskComment:
+    TaskCommentList:
       properties:
-        text:
-          description: The text of the comment.
-          maxLength: 32727
-          type: string
-      required:
-      - text
+        items:
+          items:
+            $ref: '#/components/schemas/TaskComment'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
       type: object
     UpdateTask:
       properties:
@@ -465,28 +465,6 @@ components:
       - priority
       - reporter_user_id
       type: object
-    AnalysisResultShort:
-      properties:
-        function_id:
-          type: integer
-        id:
-          type: string
-        instance_id:
-          type: integer
-        interpretation:
-          type: string
-        signal_color:
-          enum:
-          - green
-          - grey
-          - yellow
-          - red
-          type: string
-      required:
-      - id
-      - instance_id
-      - function_id
-      type: object
     NewTaskComment:
       properties:
         text:
@@ -495,6 +473,57 @@ components:
           type: string
       required:
       - text
+      type: object
+    TaskComment:
+      properties:
+        author:
+          $ref: '#/components/schemas/ShortUser'
+          description: The author of the comment.
+        created:
+          description: 'Timestamp of the comment creation.
+
+            This information is set automatically and is not editable.
+
+            '
+          format: date-time
+          type: string
+        id:
+          description: The id of the comment.
+          format: uuid
+          type: string
+        task_id:
+          description: The id of the task the comment belongs to.
+          format: uuid
+          type: string
+        text:
+          description: The text of the comment.
+          type: string
+        updated:
+          description: 'Timestamp of the latest comment modification.
+
+            This information is set automatically and is not editable.
+
+            '
+          format: date-time
+          type: string
+      required:
+      - id
+      type: object
+    PlotViewZoom:
+      description: Plot view zoom period with start and end timestamps including timezone
+      properties:
+        end:
+          description: end timestamp of the plot view zoom period including timezone
+          format: date-time
+          type:
+          - string
+          - 'null'
+        start:
+          description: start timestamp of the plot view zoom period including timezone
+          format: date-time
+          type:
+          - string
+          - 'null'
       type: object
     NewTask:
       properties:
@@ -565,6 +594,15 @@ components:
       required:
       - title
       type: object
+    UpdateTaskComment:
+      properties:
+        text:
+          description: The text of the comment.
+          maxLength: 32727
+          type: string
+      required:
+      - text
+      type: object
     PaginationMeta:
       properties:
         current_page:
@@ -580,65 +618,6 @@ components:
       - items_per_page
       - current_page
       - total_pages
-      type: object
-    ComponentInProject:
-      properties:
-        abbreviation:
-          type: string
-        component_id:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        project_id:
-          format: int64
-          type: integer
-      type: object
-    TaskComment:
-      properties:
-        author:
-          $ref: '#/components/schemas/ShortUser'
-          description: The author of the comment.
-        created:
-          description: 'Timestamp of the comment creation.
-
-            This information is set automatically and is not editable.
-
-            '
-          format: date-time
-          type: string
-        id:
-          description: The id of the comment.
-          format: uuid
-          type: string
-        task_id:
-          description: The id of the task the comment belongs to.
-          format: uuid
-          type: string
-        text:
-          description: The text of the comment.
-          type: string
-        updated:
-          description: 'Timestamp of the latest comment modification.
-
-            This information is set automatically and is not editable.
-
-            '
-          format: date-time
-          type: string
-      required:
-      - id
       type: object
     Error:
       properties:
@@ -660,22 +639,6 @@ components:
           type: boolean
       required:
       - error
-      type: object
-    PlotViewZoom:
-      description: Plot view zoom period with start and end timestamps including timezone
-      properties:
-        end:
-          description: end timestamp of the plot view zoom period including timezone
-          format: date-time
-          type:
-          - string
-          - 'null'
-        start:
-          description: start timestamp of the plot view zoom period including timezone
-          format: date-time
-          type:
-          - string
-          - 'null'
       type: object
     PlotViewResponse:
       properties:
@@ -712,15 +675,6 @@ components:
       - start
       - end
       - samplerate
-      type: object
-    TaskCommentList:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/TaskComment'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
       type: object
     Task:
       properties:
@@ -797,6 +751,52 @@ components:
             '
           format: date-time
           type: string
+      type: object
+    AnalysisResultShort:
+      properties:
+        function_id:
+          type: integer
+        id:
+          type: string
+        instance_id:
+          type: integer
+        interpretation:
+          type: string
+        signal_color:
+          enum:
+          - green
+          - grey
+          - yellow
+          - red
+          type: string
+      required:
+      - id
+      - instance_id
+      - function_id
+      type: object
+    ComponentInProject:
+      properties:
+        abbreviation:
+          type: string
+        component_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        project_id:
+          format: int64
+          type: integer
       type: object
     KPIResult:
       properties:

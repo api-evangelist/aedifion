@@ -868,6 +868,34 @@ paths:
       x-openapi-router-controller: app.controllers.datapoint_controller
 components:
   schemas:
+    TimeseriesWithContext:
+      properties:
+        data:
+          $ref: '#/components/schemas/Timeseries'
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        error:
+          description: 'Optional error message describing why the data could not be loaded or processed, for example due to a unit conversion failure or missing units tag.
+
+            '
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/TagAssociation'
+          type: array
+        units:
+          type: string
+    UpdateDatapoint:
+      properties:
+        setpoint_max_value:
+          type: number
+        setpoint_min_value:
+          type: number
+        writable:
+          type: boolean
+      type: object
     UpdateTagAssoc:
       properties:
         confirmed:
@@ -876,6 +904,25 @@ components:
           - 'false'
           - unconfirmed
           type: string
+      type: object
+    Success:
+      properties:
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
       type: object
     Timeseries:
       items:
@@ -906,15 +953,16 @@ components:
         writable:
           type: boolean
       type: object
-    UpdateDatapoint:
+    Observation:
       properties:
-        setpoint_max_value:
+        time:
+          type: string
+        value:
+          format: float
           type: number
-        setpoint_min_value:
-          type: number
-        writable:
-          type: boolean
-      type: object
+      required:
+      - time
+      - value
     Error:
       properties:
         details:
@@ -936,65 +984,6 @@ components:
       required:
       - error
       type: object
-    Renaming:
-      properties:
-        datapointkey_id:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        renaming:
-          type: string
-      type: object
-    TimeseriesWithContext:
-      properties:
-        data:
-          $ref: '#/components/schemas/Timeseries'
-        dataPointID:
-          type: string
-        datapoint_hash_id:
-          type: string
-        error:
-          description: 'Optional error message describing why the data could not be loaded or processed, for example due to a unit conversion failure or missing units tag.
-
-            '
-          type: string
-        tags:
-          items:
-            $ref: '#/components/schemas/TagAssociation'
-          type: array
-        units:
-          type: string
-    Observation:
-      properties:
-        time:
-          type: string
-        value:
-          format: float
-          type: number
-      required:
-      - time
-      - value
-    Success:
-      properties:
-        message:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        resource:
-          properties: {}
-          type: object
-        success:
-          default: true
-          type: boolean
-      type: object
     Tag:
       properties:
         id:
@@ -1008,19 +997,17 @@ components:
       - id
       - key
       type: object
-    TagAssociation:
-      allOf:
-      - $ref: '#/components/schemas/Tag'
-      - properties:
-          confirmed:
-            type: boolean
-          probability:
-            type: number
-          protected:
-            type: boolean
-          source:
-            type: string
-        type: object
+    Renaming:
+      properties:
+        datapointkey_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        renaming:
+          type: string
+      type: object
     SetpointAck:
       properties:
         dataPointID:
@@ -1041,6 +1028,19 @@ components:
         value:
           type: string
       type: object
+    TagAssociation:
+      allOf:
+      - $ref: '#/components/schemas/Tag'
+      - properties:
+          confirmed:
+            type: boolean
+          probability:
+            type: number
+          protected:
+            type: boolean
+          source:
+            type: string
+        type: object
   securitySchemes:
     basicAuth:
       scheme: basic

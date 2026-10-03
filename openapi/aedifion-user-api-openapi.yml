@@ -472,6 +472,189 @@ paths:
       x-openapi-router-controller: app.controllers.user_controller
 components:
   schemas:
+    CustomPage:
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        url:
+          type: string
+      type: object
+    Project:
+      properties:
+        account_manager:
+          $ref: '#/components/schemas/ShortUser'
+          description: Account manager assigned to this project
+        address:
+          type: string
+        asset_manager:
+          $ref: '#/components/schemas/ShortUser'
+          description: Asset manager assigned to this project
+        avatar_url:
+          type: string
+        company_id:
+          format: int64
+          type: integer
+        currency_system:
+          type: string
+        custom_pages:
+          items:
+            $ref: '#/components/schemas/CustomPage'
+          type: array
+        description:
+          type: string
+        handle:
+          type: string
+        hidden_native_pages:
+          items:
+            $ref: '#/components/schemas/HiddenNativePage'
+          type: array
+        id:
+          type: integer
+        latitude:
+          type: string
+        links:
+          items:
+            $ref: '#/components/schemas/ProjectLink'
+          type: array
+        load_balancing_group:
+          type: string
+        longitude:
+          type: string
+        name:
+          type: string
+        project_engineer:
+          $ref: '#/components/schemas/ShortUser'
+          description: Project engineer assigned to this project
+        start:
+          format: date-time
+          type: string
+        status_report:
+          type: string
+        status_report_updated_at:
+          format: date-time
+          type: string
+        units_system:
+          type: string
+      required:
+      - company_id
+      - name
+      type: object
+    ProjectLink:
+      properties:
+        before:
+          type: string
+        icon:
+          type: string
+        parent:
+          type: string
+        title:
+          type: string
+        titleDE:
+          type: string
+        titleEN:
+          type: string
+        url:
+          type: string
+        urlDE:
+          type: string
+        urlEN:
+          type: string
+      required:
+      - title
+      - titleDE
+      - titleEN
+      - url
+      - urlDE
+      - urlEN
+      type: object
+    Role:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        authed_tags:
+          items:
+            $ref: '#/components/schemas/TagAuth'
+          type: array
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    Success:
+      properties:
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
+      type: object
+    PutUserPasswordRequest:
+      properties:
+        current_password:
+          description: The user's current password.
+          format: password
+          type: string
+        new_password:
+          description: The user's new password.
+          format: password
+          type: string
+      required:
+      - current_password
+      - new_password
+      type: object
+    Company:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        roles:
+          items:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+            type: object
+          type: array
+        whitelabel:
+          type: boolean
+      required:
+      - name
+      type: object
     HiddenNativePage:
       properties:
         title:
@@ -480,6 +663,51 @@ components:
           type: string
       required:
       - title
+      type: object
+    UploadAvatarRequest:
+      properties:
+        avatar:
+          description: The image file thats going to be stored
+          format: binary
+          type: string
+      required:
+      - avatar
+      type: object
+    ProjectJourneyOverview:
+      properties:
+        phase_key:
+          description: Key of the project's current journey phase.
+          type:
+          - string
+          - 'null'
+      type: object
+    User:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        company_id:
+          type: integer
+        currency_system:
+          type: string
+        email:
+          format: email
+          type: string
+        firstName:
+          type: string
+        id:
+          type: integer
+        lastName:
+          type: string
+        locale:
+          type: string
+        phone:
+          type: string
+        realm_role:
+          type: string
+        units_system:
+          type: string
       type: object
     DataPoint:
       properties:
@@ -502,6 +730,17 @@ components:
       - dataPointID
       - project_id
       type: object
+    TagAuth:
+      properties:
+        key:
+          type: string
+        read:
+          type: boolean
+        value:
+          type: string
+        write:
+          type: boolean
+      type: object
     ControlsStatistics:
       properties:
         status:
@@ -515,6 +754,104 @@ components:
           type: string
       required:
       - status
+      type: object
+    CompanyRole:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        company_id:
+          format: int64
+          type: integer
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    CompanyReference:
+      properties:
+        id:
+          format: int64
+          type: integer
+      required:
+      - id
+      type: object
+    UpdateUser:
+      properties:
+        address:
+          type: string
+        currency_system:
+          type: string
+        email:
+          format: email
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        locale:
+          type: string
+        phone:
+          type: string
+        units_system:
+          type: string
+      type: object
+    TaskStatistics:
+      properties:
+        count:
+          description: Number of tasks with this status.
+          type: integer
+        status:
+          description: The task status.
+          type: string
+      required:
+      - status
+      - count
+      type: object
+    UserProjectsPortfolio:
+      properties:
+        projects_portfolio:
+          description: Per-project portfolio entries, sorted by project name (Z to A).
+          items:
+            $ref: '#/components/schemas/ProjectPortfolio'
+          type: array
+      type: object
+    ProjectWithContext:
+      properties:
+        company:
+          $ref: '#/components/schemas/Company'
+        dataPointKeys:
+          items:
+            $ref: '#/components/schemas/DataPointKey'
+          type: array
+        project:
+          $ref: '#/components/schemas/Project'
       type: object
     ProjectPortfolio:
       properties:
@@ -579,136 +916,6 @@ components:
       - controls_statistics
       - company
       type: object
-    ProjectJourneyOverview:
-      properties:
-        phase_key:
-          description: Key of the project's current journey phase.
-          type:
-          - string
-          - 'null'
-      type: object
-    ProjectGroup:
-      properties:
-        company:
-          $ref: '#/components/schemas/CompanyReference'
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-      required:
-      - id
-      - name
-      - company
-      type: object
-    TaskStatistics:
-      properties:
-        count:
-          description: Number of tasks with this status.
-          type: integer
-        status:
-          description: The task status.
-          type: string
-      required:
-      - status
-      - count
-      type: object
-    UserWithContext:
-      properties:
-        ai_enabled:
-          description: Whether the user has AI access enabled
-          type: boolean
-        company:
-          $ref: '#/components/schemas/Company'
-        companyroles:
-          items:
-            $ref: '#/components/schemas/CompanyRole'
-          type: array
-        password_locked_until:
-          format: datetime
-          type: string
-        roles:
-          items:
-            $ref: '#/components/schemas/Role'
-          type: array
-        user:
-          $ref: '#/components/schemas/User'
-      type: object
-    UpdateUser:
-      properties:
-        address:
-          type: string
-        currency_system:
-          type: string
-        email:
-          format: email
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        locale:
-          type: string
-        phone:
-          type: string
-        units_system:
-          type: string
-      type: object
-    CustomPage:
-      properties:
-        id:
-          type: integer
-        title:
-          type: string
-        url:
-          type: string
-      type: object
-    CompanyRole:
-      properties:
-        authed_endpoints:
-          items:
-            format: int64
-            type: integer
-          type: array
-        company_id:
-          format: int64
-          type: integer
-        description:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-      type: object
-    ProjectLink:
-      properties:
-        before:
-          type: string
-        icon:
-          type: string
-        parent:
-          type: string
-        title:
-          type: string
-        titleDE:
-          type: string
-        titleEN:
-          type: string
-        url:
-          type: string
-        urlDE:
-          type: string
-        urlEN:
-          type: string
-      required:
-      - title
-      - titleDE
-      - titleEN
-      - url
-      - urlDE
-      - urlEN
-      type: object
     TotalSavings:
       properties:
         kpi_identifier:
@@ -735,13 +942,40 @@ components:
       required:
       - units
       type: object
-    UserProjectsPortfolio:
+    ProjectGroup:
       properties:
-        projects_portfolio:
-          description: Per-project portfolio entries, sorted by project name (Z to A).
+        company:
+          $ref: '#/components/schemas/CompanyReference'
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
+      - company
+      type: object
+    UserWithContext:
+      properties:
+        ai_enabled:
+          description: Whether the user has AI access enabled
+          type: boolean
+        company:
+          $ref: '#/components/schemas/Company'
+        companyroles:
           items:
-            $ref: '#/components/schemas/ProjectPortfolio'
+            $ref: '#/components/schemas/CompanyRole'
           type: array
+        password_locked_until:
+          format: datetime
+          type: string
+        roles:
+          items:
+            $ref: '#/components/schemas/Role'
+          type: array
+        user:
+          $ref: '#/components/schemas/User'
       type: object
     AnalysisResultStatistics:
       properties:
@@ -752,20 +986,6 @@ components:
           description: The signal color of the analysis results.
           type: string
       type: object
-    PutUserPasswordRequest:
-      properties:
-        current_password:
-          description: The user's current password.
-          format: password
-          type: string
-        new_password:
-          description: The user's new password.
-          format: password
-          type: string
-      required:
-      - current_password
-      - new_password
-      type: object
     DataPointKey:
       properties:
         description:
@@ -775,226 +995,6 @@ components:
         name:
           type: string
         project_id:
-          type: integer
-      type: object
-    User:
-      properties:
-        address:
-          type: string
-        avatar_url:
-          type: string
-        company_id:
-          type: integer
-        currency_system:
-          type: string
-        email:
-          format: email
-          type: string
-        firstName:
-          type: string
-        id:
-          type: integer
-        lastName:
-          type: string
-        locale:
-          type: string
-        phone:
-          type: string
-        realm_role:
-          type: string
-        units_system:
-          type: string
-      type: object
-    Company:
-      properties:
-        address:
-          type: string
-        avatar_url:
-          type: string
-        description:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        phone:
-          type: string
-        roles:
-          items:
-            properties:
-              description:
-                type: string
-              id:
-                type: integer
-              name:
-                type: string
-            type: object
-          type: array
-        whitelabel:
-          type: boolean
-      required:
-      - name
-      type: object
-    Success:
-      properties:
-        message:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        resource:
-          properties: {}
-          type: object
-        success:
-          default: true
-          type: boolean
-      type: object
-    ProjectWithContext:
-      properties:
-        company:
-          $ref: '#/components/schemas/Company'
-        dataPointKeys:
-          items:
-            $ref: '#/components/schemas/DataPointKey'
-          type: array
-        project:
-          $ref: '#/components/schemas/Project'
-      type: object
-    TagAuth:
-      properties:
-        key:
-          type: string
-        read:
-          type: boolean
-        value:
-          type: string
-        write:
-          type: boolean
-      type: object
-    Project:
-      properties:
-        account_manager:
-          $ref: '#/components/schemas/ShortUser'
-          description: Account manager assigned to this project
-        address:
-          type: string
-        asset_manager:
-          $ref: '#/components/schemas/ShortUser'
-          description: Asset manager assigned to this project
-        avatar_url:
-          type: string
-        company_id:
-          format: int64
-          type: integer
-        currency_system:
-          type: string
-        custom_pages:
-          items:
-            $ref: '#/components/schemas/CustomPage'
-          type: array
-        description:
-          type: string
-        handle:
-          type: string
-        hidden_native_pages:
-          items:
-            $ref: '#/components/schemas/HiddenNativePage'
-          type: array
-        id:
-          type: integer
-        latitude:
-          type: string
-        links:
-          items:
-            $ref: '#/components/schemas/ProjectLink'
-          type: array
-        load_balancing_group:
-          type: string
-        longitude:
-          type: string
-        name:
-          type: string
-        project_engineer:
-          $ref: '#/components/schemas/ShortUser'
-          description: Project engineer assigned to this project
-        start:
-          format: date-time
-          type: string
-        status_report:
-          type: string
-        status_report_updated_at:
-          format: date-time
-          type: string
-        units_system:
-          type: string
-      required:
-      - company_id
-      - name
-      type: object
-    UploadAvatarRequest:
-      properties:
-        avatar:
-          description: The image file thats going to be stored
-          format: binary
-          type: string
-      required:
-      - avatar
-      type: object
-    CompanyReference:
-      properties:
-        id:
-          format: int64
-          type: integer
-      required:
-      - id
-      type: object
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    Role:
-      properties:
-        authed_endpoints:
-          items:
-            format: int64
-            type: integer
-          type: array
-        authed_tags:
-          items:
-            $ref: '#/components/schemas/TagAuth'
-          type: array
-        description:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        project_id:
-          format: int64
           type: integer
       type: object
     ShortUser:

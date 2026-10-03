@@ -376,10 +376,39 @@ paths:
       x-openapi-router-controller: app.controllers.project_controller
 components:
   schemas:
+    TimeseriesWithContext:
+      properties:
+        data:
+          $ref: '#/components/schemas/Timeseries'
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        error:
+          description: 'Optional error message describing why the data could not be loaded or processed, for example due to a unit conversion failure or missing units tag.
+
+            '
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/TagAssociation'
+          type: array
+        units:
+          type: string
     Timeseries:
       items:
         $ref: '#/components/schemas/Observation'
       type: array
+    Observation:
+      properties:
+        time:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - time
+      - value
     Error:
       properties:
         details:
@@ -401,35 +430,6 @@ components:
       required:
       - error
       type: object
-    TimeseriesWithContext:
-      properties:
-        data:
-          $ref: '#/components/schemas/Timeseries'
-        dataPointID:
-          type: string
-        datapoint_hash_id:
-          type: string
-        error:
-          description: 'Optional error message describing why the data could not be loaded or processed, for example due to a unit conversion failure or missing units tag.
-
-            '
-          type: string
-        tags:
-          items:
-            $ref: '#/components/schemas/TagAssociation'
-          type: array
-        units:
-          type: string
-    Observation:
-      properties:
-        time:
-          type: string
-        value:
-          format: float
-          type: number
-      required:
-      - time
-      - value
     Tag:
       properties:
         id:

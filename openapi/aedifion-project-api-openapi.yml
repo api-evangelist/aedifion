@@ -5269,73 +5269,58 @@ paths:
       x-openapi-router-controller: app.controllers.project_controller
 components:
   schemas:
-    ProjectJourneyAction:
+    ProjectLink:
       properties:
-        key:
+        before:
           type: string
-        restricted:
-          type: boolean
-      required:
-      - key
-      - restricted
-      type: object
-    PaginationMeta:
-      properties:
-        current_page:
-          type: integer
-        items_per_page:
-          type: integer
-        total_items:
-          type: integer
-        total_pages:
-          type: integer
-      required:
-      - total_items
-      - items_per_page
-      - current_page
-      - total_pages
-      type: object
-    ShortUserList:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/ShortUser'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    NewCustomPage:
-      properties:
+        icon:
+          type: string
+        parent:
+          type: string
         title:
-          maxLength: 50
-          minLength: 1
+          type: string
+        titleDE:
+          type: string
+        titleEN:
           type: string
         url:
           type: string
-      required:
-      - title
-      - url
-      type: object
-    UploadFileRequest:
-      properties:
-        file:
-          description: The file to upload.
-          format: binary
+        urlDE:
+          type: string
+        urlEN:
           type: string
       required:
-      - file
+      - title
+      - titleDE
+      - titleEN
+      - url
+      - urlDE
+      - urlEN
       type: object
-    JobLogList:
+    VirtualDatapointShort:
       properties:
-        items:
-          items:
-            $ref: '#/components/schemas/EntityLog'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      required:
-      - items
-      - meta
+        dataPointID:
+          type: string
+        status:
+          $ref: '#/components/schemas/VirtualDatapointStatus'
+      type: object
+    File:
+      properties:
+        download_link:
+          type: string
+        last_modified:
+          format: date-time
+          type: string
+        path:
+          type: string
+        preview_link:
+          type: string
+        size_bytes:
+          type: integer
+        tags:
+          type: object
+        valid_until:
+          type: string
       type: object
     ComponentSchedule:
       properties:
@@ -5356,50 +5341,307 @@ components:
             $ref: '#/components/schemas/Schedule'
           type: array
       type: object
-    PostProjectVirtualDatapointRequest:
-      example:
-        parameters:
-          formula: P1;
-        pins:
-          P1:
-            aggregate: mean
-            dataPointID: Dev1_Temperature_AI1
-            data_range:
-              time: 1d
+    ProjectCommentList:
       properties:
-        parameters:
-          type: object
-        pins:
-          type: object
-      required:
-      - pins
-      - parameters
-    DeviceMinimal:
-      properties:
-        child_devices:
+        items:
           items:
-            $ref: '#/components/schemas/DeviceMinimal'
+            $ref: '#/components/schemas/ProjectComment'
           type: array
-        id:
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    ObjectReportStatus:
+      properties:
+        latest_report_generation:
+          $ref: '#/components/schemas/LatestReportGeneration'
+        latest_successful_report:
+          $ref: '#/components/schemas/LatestSuccessfulReport'
+        quota_remaining_today:
+          minimum: 0
           type: integer
+      required:
+      - quota_remaining_today
+      type: object
+    UpdateCompanyRole:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        description:
+          type: string
         name:
           type: string
       type: object
-    ControlsAppVariation:
+    UploadAvatarRequest:
       properties:
-        description:
-          description: Description of the controls app algorithm variation.
-          type: string
-        key:
-          description: Stable, language-independent short key for the variation, e.g., 'hero' or 'hero_dryrun'.
-          type: string
-        name:
-          description: Human-readable name of the variation, e.g., 'Dry run'.
+        avatar:
+          description: The image file thats going to be stored
+          format: binary
           type: string
       required:
-      - key
-      - name
-      - description
+      - avatar
+      type: object
+    ComponentCategory:
+      properties:
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    Component:
+      properties:
+        alphanumeric_id:
+          type: string
+        category:
+          $ref: '#/components/schemas/ComponentCategory'
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        private:
+          type: boolean
+      type: object
+    UpdateProjectComment:
+      properties:
+        text:
+          description: The text of the comment.
+          maxLength: 32767
+          type: string
+      required:
+      - text
+      type: object
+    SetpointReference:
+      properties:
+        dataPointID:
+          type: string
+        dryrun:
+          type: boolean
+        priority:
+          type: integer
+        reference:
+          type: string
+        status:
+          type: string
+        time:
+          format: date-time
+          type: string
+        user:
+          type: string
+        value:
+          type: string
+      type: object
+    PlotViewZoom:
+      description: Plot view zoom period with start and end timestamps including timezone
+      properties:
+        end:
+          description: end timestamp of the plot view zoom period including timezone
+          format: date-time
+          type:
+          - string
+          - 'null'
+        start:
+          description: start timestamp of the plot view zoom period including timezone
+          format: date-time
+          type:
+          - string
+          - 'null'
+      type: object
+    PlotView:
+      properties:
+        datapoints:
+          description: Datapoints of the plot view.
+          items:
+            type: string
+          type: array
+        end:
+          description: end timestamp of the datapoints
+          format: date-time
+          type: string
+        hidden_datapoints:
+          description: Hidden datapoints of the plot view.
+          items:
+            type: string
+          type: array
+        samplerate:
+          description: sample rate of the datapoints.
+          example: 1s
+          type: string
+        start:
+          description: start timestamp of the datapoints.
+          format: date-time
+          type: string
+        zoom:
+          $ref: '#/components/schemas/PlotViewZoom'
+          description: Zoom period with start and end timestamps including timezone
+      required:
+      - start
+      - end
+      - samplerate
+      - datapoints
+      type: object
+    ProjectComment:
+      properties:
+        author:
+          $ref: '#/components/schemas/ShortUser'
+          description: The author of the comment.
+        created:
+          description: 'Timestamp of the comment creation.
+
+            This information is set automatically and is not editable.
+
+            '
+          format: date-time
+          type: string
+        id:
+          description: The id of the comment.
+          format: uuid
+          type: string
+        project_id:
+          description: The id of the project the comment belongs to.
+          type: integer
+        text:
+          description: The text of the comment.
+          type: string
+        updated:
+          description: 'Timestamp of the latest comment modification.
+
+            This information is set automatically and is not editable.
+
+            '
+          format: date-time
+          type: string
+      required:
+      - id
+      type: object
+    Holiday:
+      properties:
+        holiday_date:
+          format: date
+          type: string
+        holiday_name:
+          type: string
+      required:
+      - holiday_name
+      - holiday_date
+      type: object
+    ComponentAttributeDefinition:
+      properties:
+        alphanumeric_id:
+          type: string
+        default_unit:
+          type: string
+        default_value:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        limits:
+          properties:
+            max:
+              format: float
+              type: number
+            min:
+              format: float
+              type: number
+          type: object
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        unit_type:
+          type: string
+        value_options:
+          items:
+            $ref: '#/components/schemas/EnumValue'
+          type: array
+        value_type:
+          type: string
+      type: object
+    PinRecommendation:
+      properties:
+        idMappings:
+          items:
+            properties:
+              hash_id:
+                type: string
+              id:
+                type: integer
+            type: object
+          type: array
+        items:
+          items:
+            $ref: '#/components/schemas/DatapointWithScore'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
       type: object
     NewTag:
       properties:
@@ -5410,58 +5652,12 @@ components:
       required:
       - key
       type: object
-    NewProjectComment:
+    VirtualDatapointStatus:
       properties:
-        text:
-          description: The text of the comment.
-          maxLength: 32767
-          type: string
-      required:
-      - text
-      type: object
-    AnalysisResultShort:
-      properties:
-        function_id:
+        code:
           type: integer
-        id:
+        message:
           type: string
-        instance_id:
-          type: integer
-        interpretation:
-          type: string
-        signal_color:
-          enum:
-          - green
-          - grey
-          - yellow
-          - red
-          type: string
-      required:
-      - id
-      - instance_id
-      - function_id
-      type: object
-    ListOfDataPoints:
-      properties:
-        dataPointIDs:
-          items:
-            type: string
-          type: array
-        favorites:
-          items:
-            type: string
-          type: array
-        idMappings:
-          items:
-            properties:
-              hash_id:
-                type: string
-              id:
-                type: integer
-            type: object
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
       type: object
     Quota:
       properties:
@@ -5478,6 +5674,27 @@ components:
           type: object
         quota_used:
           type: object
+      type: object
+    ControlsAppStatus:
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        name:
+          description: Stable, language-independent short key for the status, e.g. 'running' or 'died'.
+          type: string
+        type:
+          description: Classification of the status.
+          enum:
+          - normal
+          - error
+          - pending
+          - ready
+          type: string
+      required:
+      - code
+      - message
       type: object
     Job:
       properties:
@@ -5512,42 +5729,84 @@ components:
           format: date-time
           type: string
       type: object
-    Company:
+    ComponentInProject:
       properties:
-        address:
+        abbreviation:
           type: string
-        avatar_url:
-          type: string
-        description:
-          type: string
+        component_id:
+          format: int64
+          type: integer
         id:
           format: int64
           type: integer
         name:
           type: string
-        phone:
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
           type: string
-        roles:
-          items:
-            properties:
-              description:
-                type: string
-              id:
-                type: integer
-              name:
-                type: string
-            type: object
-          type: array
-        whitelabel:
-          type: boolean
-      required:
-      - name
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        project_id:
+          format: int64
+          type: integer
       type: object
-    TaskList:
+    AssignedPin:
+      properties:
+        alphanumeric_id:
+          type: string
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        location:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pin_attributes:
+          items:
+            $ref: '#/components/schemas/PinAttribute'
+          type: array
+        unit_type:
+          type: string
+      type: object
+    CustomPage:
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        url:
+          type: string
+      type: object
+    VirtualDatapointList:
       properties:
         items:
           items:
-            $ref: '#/components/schemas/Task'
+            $ref: '#/components/schemas/VirtualDatapointShort'
           type: array
         meta:
           $ref: '#/components/schemas/PaginationMeta'
@@ -5576,6 +5835,293 @@ components:
           description: The value of the schedule.
           type: number
       type: object
+    ListOfAlerts:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Alert'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    Success:
+      properties:
+        message:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        resource:
+          properties: {}
+          type: object
+        success:
+          default: true
+          type: boolean
+      type: object
+    NewComponentInProjectRelation:
+      properties:
+        relationship:
+          enum:
+          - hasLocation
+          - hasPart
+          - feeds
+          type: string
+        source_componentinproject_id:
+          format: int64
+          type: integer
+        target_componentinproject_id:
+          format: int64
+          type: integer
+      required:
+      - source_componentinproject_id
+      - target_componentinproject_id
+      - relationship
+      type: object
+    HiddenNativePage:
+      properties:
+        title:
+          description: Identifier of the native page to hide or unhide.
+          minLength: 1
+          type: string
+      required:
+      - title
+      type: object
+    UpdateProject:
+      properties:
+        account_manager_id:
+          description: ID of the account manager user
+          type:
+          - integer
+          - 'null'
+        address:
+          type: string
+        asset_manager_id:
+          format: int64
+          type:
+          - integer
+          - 'null'
+        currency_system:
+          type: string
+        description:
+          type: string
+        latitude:
+          type: string
+        longitude:
+          type: string
+        name:
+          type: string
+        project_engineer_id:
+          description: ID of the project engineer user
+          type:
+          - integer
+          - 'null'
+        start:
+          format: date-time
+          type: string
+        status_report:
+          type: string
+        units_system:
+          type: string
+      type: object
+    PostProjectTimeseriesRequest:
+      additionalProperties:
+        items:
+          $ref: '#/components/schemas/Observation'
+        type: array
+      example:
+        dataPointID1:
+        - time: '2023-01-01T12:00:00Z'
+          value: 1
+        - time: '2023-01-01T13:00:00Z'
+          value: 2
+        dataPointID2:
+        - time: '2023-01-01T12:00:00Z'
+          value: 3
+      type: object
+    ImportDigitalTwinRequest:
+      properties:
+        filename:
+          description: The name the file is stored under, including its extension.
+          minLength: 1
+          type: string
+        path:
+          description: The target folder within the project where the file is placed.
+          minLength: 1
+          type: string
+      required:
+      - filename
+      - path
+      type: object
+    ComponentControlsApp:
+      properties:
+        algorithm:
+          type: string
+        attributes:
+          items:
+            type: string
+          type: array
+        id:
+          format: uuid
+          type: string
+        pins:
+          items:
+            type: string
+          type: array
+        status:
+          $ref: '#/components/schemas/ControlsAppStatus'
+        variation:
+          deprecated: true
+          description: 'Deprecated: use ''variation_meta.key'' instead.'
+          type: string
+        variation_meta:
+          $ref: '#/components/schemas/ControlsAppVariation'
+      required:
+      - id
+      - algorithm
+      - status
+      type: object
+    Quotas:
+      properties:
+        ai:
+          $ref: '#/components/schemas/Quota'
+        files:
+          $ref: '#/components/schemas/Quota'
+        virtual_datapoints:
+          $ref: '#/components/schemas/Quota'
+      type: object
+    Device:
+      properties:
+        child_devices:
+          items:
+            $ref: '#/components/schemas/Device'
+          type: array
+        datapoints:
+          items:
+            type: string
+          type: array
+        id:
+          type: integer
+        name:
+          type: string
+        project_id:
+          format: int64
+          type: integer
+        tags:
+          items:
+            $ref: '#/components/schemas/TagAssociation'
+          type: array
+      type: object
+    Observation:
+      properties:
+        time:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - time
+      - value
+    DeleteProjectDatapointsRequest:
+      example:
+      - dataPointID1
+      - dataPointID2
+      items:
+        type: string
+      type: array
+    TaskList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Task'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    UpdateTag:
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+      type: object
+    PostProjectImportTimeseriesRequest:
+      properties:
+        import_file:
+          description: "A file containing timeseries in csv format as follows:\n\n  `datapointID,value,date-time,tagkey1=tagvalue1,...,tagkeyN=tagvalueN`\n\n- tag key and value pair MUST be separated by a \"=\"\n- tag key and value must not themselves contain \"=\"\n- to escape delimiter characters, use double qoutes\n"
+          format: binary
+          type: string
+      required:
+      - import_file
+      type: object
+    LatestReportGeneration:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        status:
+          description: Status of the latest generation attempt.
+          type: string
+      required:
+      - status
+      - created_at
+      type: object
+    ListOfDataPoints:
+      properties:
+        dataPointIDs:
+          items:
+            type: string
+          type: array
+        favorites:
+          items:
+            type: string
+          type: array
+        idMappings:
+          items:
+            properties:
+              hash_id:
+                type: string
+              id:
+                type: integer
+            type: object
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    NewProjectComment:
+      properties:
+        text:
+          description: The text of the comment.
+          maxLength: 32767
+          type: string
+      required:
+      - text
+      type: object
+    JobLogList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/EntityLog'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+      - items
+      - meta
+      type: object
+    UpdateRole:
+      allOf:
+      - $ref: '#/components/schemas/UpdateCompanyRole'
+      - properties:
+          authed_tags:
+            items:
+              $ref: '#/components/schemas/TagAuth'
+            type: array
+        type: object
     Project:
       properties:
         account_manager:
@@ -5636,118 +6182,10 @@ components:
       - company_id
       - name
       type: object
-    VirtualDatapointList:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/VirtualDatapointShort'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    UploadAvatarRequest:
-      properties:
-        avatar:
-          description: The image file thats going to be stored
-          format: binary
-          type: string
-      required:
-      - avatar
-      type: object
-    LatestSuccessfulReport:
-      properties:
-        created_at:
-          format: date-time
-          type: string
-        file_path:
-          description: Path of the generated file. Usable directly with get_project_file.
-          type: string
-      required:
-      - file_path
-      - created_at
-      type: object
-    FilesList:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/File'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    ComponentAttributeDefinition:
-      properties:
-        alphanumeric_id:
-          type: string
-        default_unit:
-          type: string
-        default_value:
-          type: string
-        description:
-          type: string
-        description_de:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        description_en:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        limits:
-          properties:
-            max:
-              format: float
-              type: number
-            min:
-              format: float
-              type: number
-          type: object
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        unit_type:
-          type: string
-        value_options:
-          items:
-            $ref: '#/components/schemas/EnumValue'
-          type: array
-        value_type:
-          type: string
-      type: object
-    Component:
-      properties:
-        alphanumeric_id:
-          type: string
-        category:
-          $ref: '#/components/schemas/ComponentCategory'
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        private:
-          type: boolean
-      type: object
+    ListOfRoles:
+      items:
+        $ref: '#/components/schemas/Role'
+      type: array
     PatchAttributesSuccess:
       properties:
         patched_attributes:
@@ -5767,1213 +6205,36 @@ components:
       - status
       - patched_attributes
       type: object
-    HiddenNativePage:
+    Company:
       properties:
-        title:
-          description: Identifier of the native page to hide or unhide.
-          minLength: 1
+        address:
           type: string
-      required:
-      - title
-      type: object
-    LatestReportGeneration:
-      properties:
-        created_at:
-          format: date-time
-          type: string
-        status:
-          description: Status of the latest generation attempt.
-          type: string
-      required:
-      - status
-      - created_at
-      type: object
-    PostProjectComponentAttributeRequest:
-      properties:
-        key:
-          type: string
-        unit:
-          type: string
-        value:
-          type: string
-      required:
-      - key
-      - value
-    EnumValue:
-      properties:
-        key:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-      type: object
-    ImportDigitalTwinRequest:
-      properties:
-        filename:
-          description: The name the file is stored under, including its extension.
-          minLength: 1
-          type: string
-        path:
-          description: The target folder within the project where the file is placed.
-          minLength: 1
-          type: string
-      required:
-      - filename
-      - path
-      type: object
-    UpdateRole:
-      allOf:
-      - $ref: '#/components/schemas/UpdateCompanyRole'
-      - properties:
-          authed_tags:
-            items:
-              $ref: '#/components/schemas/TagAuth'
-            type: array
-        type: object
-    ObjectReportStatus:
-      properties:
-        latest_report_generation:
-          $ref: '#/components/schemas/LatestReportGeneration'
-        latest_successful_report:
-          $ref: '#/components/schemas/LatestSuccessfulReport'
-        quota_remaining_today:
-          minimum: 0
-          type: integer
-      required:
-      - quota_remaining_today
-      type: object
-    VirtualDatapoint:
-      properties:
-        dataPointID:
+        avatar_url:
           type: string
         description:
-          type: string
-        logs:
-          items:
-            type: object
-          type: array
-        parameters:
-          type: object
-        pins:
-          type: object
-        status:
-          $ref: '#/components/schemas/VirtualDatapointStatus'
-        vdp_type:
-          type: string
-      type: object
-    Observation:
-      properties:
-        time:
-          type: string
-        value:
-          format: float
-          type: number
-      required:
-      - time
-      - value
-    VirtualDatapointShort:
-      properties:
-        dataPointID:
-          type: string
-        status:
-          $ref: '#/components/schemas/VirtualDatapointStatus'
-      type: object
-    ProjectJourneyPhase:
-      properties:
-        key:
-          type: string
-        milestones:
-          items:
-            $ref: '#/components/schemas/ProjectJourneyMilestone'
-          type: array
-      type: object
-    DataPointWithTags:
-      properties:
-        dataPointID:
-          type: string
-        tags:
-          items:
-            $ref: '#/components/schemas/TagAssociation'
-          type: array
-      type: object
-    NewComponentInProjectRelation:
-      properties:
-        relationship:
-          enum:
-          - hasLocation
-          - hasPart
-          - feeds
-          type: string
-        source_componentinproject_id:
-          format: int64
-          type: integer
-        target_componentinproject_id:
-          format: int64
-          type: integer
-      required:
-      - source_componentinproject_id
-      - target_componentinproject_id
-      - relationship
-      type: object
-    ComponentCategory:
-      properties:
-        description:
-          type: string
-        description_de:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        description_en:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        key:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-      type: object
-    ProjectWithContext:
-      properties:
-        company:
-          $ref: '#/components/schemas/Company'
-        dataPointKeys:
-          items:
-            $ref: '#/components/schemas/DataPointKey'
-          type: array
-        project:
-          $ref: '#/components/schemas/Project'
-      type: object
-    ComponentInProjectHolidays:
-      properties:
-        component:
-          $ref: '#/components/schemas/ComponentInProject'
-        holidays:
-          $ref: '#/components/schemas/Holiday'
-      required:
-      - component
-      type: object
-    Timeseries:
-      items:
-        $ref: '#/components/schemas/Observation'
-      type: array
-    SetpointReference:
-      properties:
-        dataPointID:
-          type: string
-        dryrun:
-          type: boolean
-        priority:
-          type: integer
-        reference:
-          type: string
-        status:
-          type: string
-        time:
-          format: date-time
-          type: string
-        user:
-          type: string
-        value:
-          type: string
-      type: object
-    VirtualDatapointStatus:
-      properties:
-        code:
-          type: integer
-        message:
-          type: string
-      type: object
-    PlotViewZoom:
-      description: Plot view zoom period with start and end timestamps including timezone
-      properties:
-        end:
-          description: end timestamp of the plot view zoom period including timezone
-          format: date-time
-          type:
-          - string
-          - 'null'
-        start:
-          description: start timestamp of the plot view zoom period including timezone
-          format: date-time
-          type:
-          - string
-          - 'null'
-      type: object
-    ProjectJourneyMilestone:
-      properties:
-        key:
-          type: string
-        state:
-          enum:
-          - open
-          - in_progress
-          - done
-          type: string
-        substages:
-          items:
-            $ref: '#/components/schemas/ProjectJourneySubstage'
-          type: array
-        updated_at:
-          format: date-time
-          type: string
-      type: object
-    Task:
-      properties:
-        analytics_result:
-          description: List of analytics results related to the task.
-          items:
-            $ref: '#/components/schemas/AnalysisResultShort'
-          type: array
-        assignee:
-          $ref: '#/components/schemas/ShortUser'
-        componentinproject:
-          description: List of component instances related to the task.
-          items:
-            $ref: '#/components/schemas/ComponentInProject'
-          type: array
-        created:
-          description: 'The date and time the task was created.
-
-            This information is set automatically and is not manually editable.
-
-            '
-          format: date-time
-          type: string
-        description:
-          description: The description of the task.
-          type: string
-        end:
-          description: The planned end time for the task.
-          format: date-time
           type: string
         id:
-          description: The id of the task.
-          format: uuid
-          type: string
-        plot_view:
-          $ref: '#/components/schemas/PlotViewResponse'
-        priority:
-          description: The priority of the task.
-          enum:
-          - low
-          - medium
-          - high
-          type: string
-        project_id:
-          description: The id of the project the task belongs to.
           format: int64
           type: integer
-        reporter:
-          $ref: '#/components/schemas/ShortUser'
-        savings_potential:
-          $ref: '#/components/schemas/KPIResult'
-        start:
-          description: The planned start time for the task.
-          format: date-time
-          type: string
-        status:
-          description: The status of the task.
-          enum:
-          - open
-          - doing
-          - review
-          - done
-          - rejected
-          - failed
-          type: string
-        title:
-          description: The short task title.
-          type: string
-        updated:
-          description: 'The date and time the task was last updated.
-
-            This information is set automatically and is not manually editable.
-
-            '
-          format: date-time
-          type: string
-      type: object
-    KPIResult:
-      properties:
-        context:
-          type: string
-        id:
-          type: integer
-        identifier:
-          type: string
         name:
           type: string
-        unit:
+        phone:
           type: string
-        value:
-          format: float
-          type: number
-      type: object
-    PutProjectVirtualDatapointRequest:
-      properties:
-        description:
-          type: string
-    PinRecommendation:
-      properties:
-        idMappings:
+        roles:
           items:
             properties:
-              hash_id:
+              description:
                 type: string
               id:
                 type: integer
+              name:
+                type: string
             type: object
           type: array
-        items:
-          items:
-            $ref: '#/components/schemas/DatapointWithScore'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    PlotView:
-      properties:
-        datapoints:
-          description: Datapoints of the plot view.
-          items:
-            type: string
-          type: array
-        end:
-          description: end timestamp of the datapoints
-          format: date-time
-          type: string
-        hidden_datapoints:
-          description: Hidden datapoints of the plot view.
-          items:
-            type: string
-          type: array
-        samplerate:
-          description: sample rate of the datapoints.
-          example: 1s
-          type: string
-        start:
-          description: start timestamp of the datapoints.
-          format: date-time
-          type: string
-        zoom:
-          $ref: '#/components/schemas/PlotViewZoom'
-          description: Zoom period with start and end timestamps including timezone
-      required:
-      - start
-      - end
-      - samplerate
-      - datapoints
-      type: object
-    ComponentInProject:
-      properties:
-        abbreviation:
-          type: string
-        component_id:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        project_id:
-          format: int64
-          type: integer
-      type: object
-    UpdateMqttUser:
-      properties:
-        description:
-          type: string
-        password:
-          type: string
-        rights:
-          enum:
-          - read
-          - write
-          type: string
-        validity:
-          format: int64
-          type: integer
-      type: object
-    PlotViewResponse:
-      properties:
-        datapoints:
-          description: Datapoints of the plot view.
-          items:
-            type: string
-          type: array
-        end:
-          description: end timestamp of the datapoints
-          format: date-time
-          type: string
-        hidden_datapoints:
-          description: Hidden datapoints of the plot view.
-          items:
-            type: string
-          type: array
-        id:
-          description: id integer of the plot view.
-          format: uuid
-          type: string
-        samplerate:
-          description: sample rate of the datapoints.
-          type: string
-        start:
-          description: start timestamp of the datapoints.
-          format: date-time
-          type: string
-        zoom:
-          $ref: '#/components/schemas/PlotViewZoom'
-          description: Zoom period with start and end timestamps including timezone
-      required:
-      - id
-      - start
-      - end
-      - samplerate
-      type: object
-    JobList:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/Job'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    ProjectLink:
-      properties:
-        before:
-          type: string
-        icon:
-          type: string
-        parent:
-          type: string
-        title:
-          type: string
-        titleDE:
-          type: string
-        titleEN:
-          type: string
-        url:
-          type: string
-        urlDE:
-          type: string
-        urlEN:
-          type: string
-      required:
-      - title
-      - titleDE
-      - titleEN
-      - url
-      - urlDE
-      - urlEN
-      type: object
-    Tag:
-      properties:
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        value:
-          type: string
-      required:
-      - id
-      - key
-      type: object
-    Device:
-      properties:
-        child_devices:
-          items:
-            $ref: '#/components/schemas/Device'
-          type: array
-        datapoints:
-          items:
-            type: string
-          type: array
-        id:
-          type: integer
-        name:
-          type: string
-        project_id:
-          format: int64
-          type: integer
-        tags:
-          items:
-            $ref: '#/components/schemas/TagAssociation'
-          type: array
-      type: object
-    UpdateTag:
-      properties:
-        key:
-          type: string
-        value:
-          type: string
-      type: object
-    PinAttribute:
-      properties:
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        probability:
-          type: number
-        value:
-          type: string
-      type: object
-    UpdateProject:
-      properties:
-        account_manager_id:
-          description: ID of the account manager user
-          type:
-          - integer
-          - 'null'
-        address:
-          type: string
-        asset_manager_id:
-          format: int64
-          type:
-          - integer
-          - 'null'
-        currency_system:
-          type: string
-        description:
-          type: string
-        latitude:
-          type: string
-        longitude:
-          type: string
-        name:
-          type: string
-        project_engineer_id:
-          description: ID of the project engineer user
-          type:
-          - integer
-          - 'null'
-        start:
-          format: date-time
-          type: string
-        status_report:
-          type: string
-        units_system:
-          type: string
-      type: object
-    ListOfRoles:
-      items:
-        $ref: '#/components/schemas/Role'
-      type: array
-    ComponentInProjectWithContext:
-      properties:
-        abbreviation:
-          type: string
-        attributes:
-          items:
-            $ref: '#/components/schemas/ComponentInProjectAttribute'
-          type: array
-        attributes_definitions:
-          items:
-            $ref: '#/components/schemas/ComponentAttributeDefinition'
-          type: array
-        component:
-          $ref: '#/components/schemas/Component'
-        controls_apps:
-          items:
-            $ref: '#/components/schemas/ComponentControlsApp'
-          type: array
-        display_name:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        pins:
-          items:
-            $ref: '#/components/schemas/AssignedPin'
-          type: array
-        project_id:
-          format: int64
-          type: integer
-        relationships:
-          items:
-            $ref: '#/components/schemas/ComponentInProjectRelation'
-          type: array
-        tags:
-          items:
-            $ref: '#/components/schemas/Tag'
-          type: array
-      type: object
-    TagAuth:
-      properties:
-        key:
-          type: string
-        read:
+        whitelabel:
           type: boolean
-        value:
-          type: string
-        write:
-          type: boolean
-      type: object
-    ImportDigitalTwinResponse:
-      properties:
-        expires_at:
-          description: The date and time the presigned upload URL expires.
-          format: date-time
-          type: string
-        file_id:
-          description: The id the file is registered under.
-          format: uuid
-          type: string
-        job_id:
-          description: The id of the job tracking the mapping.
-          format: uuid
-          type: string
-        upload_url:
-          description: The presigned URL the file's content must be uploaded to.
-          type: string
-      type: object
-    NewCompanyRole:
-      properties:
-        authed_endpoints:
-          items:
-            format: int64
-            type: integer
-          type: array
-        description:
-          type: string
-        name:
-          type: string
       required:
       - name
-      - authed_endpoints
-      type: object
-    Role:
-      properties:
-        authed_endpoints:
-          items:
-            format: int64
-            type: integer
-          type: array
-        authed_tags:
-          items:
-            $ref: '#/components/schemas/TagAuth'
-          type: array
-        description:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        project_id:
-          format: int64
-          type: integer
-      type: object
-    SetpointReferences:
-      properties:
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-        setpoints:
-          items:
-            $ref: '#/components/schemas/SetpointReference'
-          type: array
-      type: object
-    DeleteProjectDatapointsRequest:
-      example:
-      - dataPointID1
-      - dataPointID2
-      items:
-        type: string
-      type: array
-    ComponentControlsApp:
-      properties:
-        algorithm:
-          type: string
-        attributes:
-          items:
-            type: string
-          type: array
-        id:
-          format: uuid
-          type: string
-        pins:
-          items:
-            type: string
-          type: array
-        status:
-          $ref: '#/components/schemas/ControlsAppStatus'
-        variation:
-          deprecated: true
-          description: 'Deprecated: use ''variation_meta.key'' instead.'
-          type: string
-        variation_meta:
-          $ref: '#/components/schemas/ControlsAppVariation'
-      required:
-      - id
-      - algorithm
-      - status
-      type: object
-    ComponentInProjectAttribute:
-      properties:
-        alphanumeric_id:
-          type: string
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        source:
-          type: string
-        unit:
-          type: string
-        value:
-          type: string
-      type: object
-    EntityLog:
-      properties:
-        created_at:
-          type: string
-        id:
-          type: string
-        log_level:
-          type: string
-        log_message:
-          type: string
-      required:
-      - id
-      - created_at
-      - log_message
-      - log_level
-      type: object
-    AssignedPin:
-      properties:
-        alphanumeric_id:
-          type: string
-        dataPointID:
-          type: string
-        datapoint_hash_id:
-          type: string
-        description:
-          type: string
-        description_de:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        description_en:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        id:
-          format: int64
-          type: integer
-        location:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        pin_attributes:
-          items:
-            $ref: '#/components/schemas/PinAttribute'
-          type: array
-        unit_type:
-          type: string
-      type: object
-    UpdateCompanyRole:
-      properties:
-        authed_endpoints:
-          items:
-            format: int64
-            type: integer
-          type: array
-        description:
-          type: string
-        name:
-          type: string
-      type: object
-    ComponentsInProject:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/ComponentInProject'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    PostProjectImportTimeseriesRequest:
-      properties:
-        import_file:
-          description: "A file containing timeseries in csv format as follows:\n\n  `datapointID,value,date-time,tagkey1=tagvalue1,...,tagkeyN=tagvalueN`\n\n- tag key and value pair MUST be separated by a \"=\"\n- tag key and value must not themselves contain \"=\"\n- to escape delimiter characters, use double qoutes\n"
-          format: binary
-          type: string
-      required:
-      - import_file
-      type: object
-    Quotas:
-      properties:
-        ai:
-          $ref: '#/components/schemas/Quota'
-        files:
-          $ref: '#/components/schemas/Quota'
-        virtual_datapoints:
-          $ref: '#/components/schemas/Quota'
-      type: object
-    PostProjectTimeseriesRequest:
-      additionalProperties:
-        items:
-          $ref: '#/components/schemas/Observation'
-        type: array
-      example:
-        dataPointID1:
-        - time: '2023-01-01T12:00:00Z'
-          value: 1
-        - time: '2023-01-01T13:00:00Z'
-          value: 2
-        dataPointID2:
-        - time: '2023-01-01T12:00:00Z'
-          value: 3
-      type: object
-    PatchedAttribute:
-      properties:
-        attribute:
-          $ref: '#/components/schemas/ComponentInProjectAttribute'
-        operation:
-          enum:
-          - updated
-          - created
-          - deleted
-          type: string
-      type: object
-    NewRole:
-      allOf:
-      - $ref: '#/components/schemas/NewCompanyRole'
-      - properties:
-          authed_tags:
-            items:
-              $ref: '#/components/schemas/TagAuth'
-            type: array
-        type: object
-      required:
-      - name
-      - authed_endpoints
-      - authed_tags
-    PatchProjectComponentAttributesRequest:
-      items:
-        properties:
-          key:
-            type: string
-          unit:
-            type: string
-          value:
-            type: string
-        required:
-        - key
-        type: object
-      type: array
-    ComponentInProjectRelation:
-      properties:
-        id:
-          format: int64
-          type: integer
-        relationship:
-          enum:
-          - hasLocation
-          - hasPart
-          - feeds
-          type: string
-        source_componentinproject_id:
-          format: int64
-          type: integer
-        target_componentinproject_id:
-          format: int64
-          type: integer
-      type: object
-    CustomPage:
-      properties:
-        id:
-          type: integer
-        title:
-          type: string
-        url:
-          type: string
-      type: object
-    ProjectJourney:
-      properties:
-        current_substage_key:
-          type: string
-        phases:
-          items:
-            $ref: '#/components/schemas/ProjectJourneyPhase'
-          type: array
-      type: object
-    TimeseriesWithContext:
-      properties:
-        data:
-          $ref: '#/components/schemas/Timeseries'
-        dataPointID:
-          type: string
-        datapoint_hash_id:
-          type: string
-        error:
-          description: 'Optional error message describing why the data could not be loaded or processed, for example due to a unit conversion failure or missing units tag.
-
-            '
-          type: string
-        tags:
-          items:
-            $ref: '#/components/schemas/TagAssociation'
-          type: array
-        units:
-          type: string
-    TagAssociation:
-      allOf:
-      - $ref: '#/components/schemas/Tag'
-      - properties:
-          confirmed:
-            type: boolean
-          probability:
-            type: number
-          protected:
-            type: boolean
-          source:
-            type: string
-        type: object
-    ProjectComment:
-      properties:
-        author:
-          $ref: '#/components/schemas/ShortUser'
-          description: The author of the comment.
-        created:
-          description: 'Timestamp of the comment creation.
-
-            This information is set automatically and is not editable.
-
-            '
-          format: date-time
-          type: string
-        id:
-          description: The id of the comment.
-          format: uuid
-          type: string
-        project_id:
-          description: The id of the project the comment belongs to.
-          type: integer
-        text:
-          description: The text of the comment.
-          type: string
-        updated:
-          description: 'Timestamp of the latest comment modification.
-
-            This information is set automatically and is not editable.
-
-            '
-          format: date-time
-          type: string
-      required:
-      - id
-      type: object
-    UpdateProjectComment:
-      properties:
-        text:
-          description: The text of the comment.
-          maxLength: 32767
-          type: string
-      required:
-      - text
-      type: object
-    ListOfDevices:
-      properties:
-        devices:
-          items:
-            $ref: '#/components/schemas/DeviceMinimal'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-        project_id:
-          format: int64
-          type: integer
-      type: object
-    ProjectJourneySubstage:
-      properties:
-        action:
-          $ref: '#/components/schemas/ProjectJourneyAction'
-        end_date:
-          format: date
-          type: string
-        key:
-          type: string
-        progression_type:
-          enum:
-          - linear
-          - looped
-          type: string
-        start_date:
-          format: date
-          type: string
-        state:
-          enum:
-          - open
-          - in_progress
-          - done
-          type: string
-      type: object
-    DataPointKey:
-      properties:
-        description:
-          type: string
-        id:
-          type: integer
-        name:
-          type: string
-        project_id:
-          type: integer
-      type: object
-    Success:
-      properties:
-        message:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        resource:
-          properties: {}
-          type: object
-        success:
-          default: true
-          type: boolean
-      type: object
-    NewComponentInProject:
-      properties:
-        abbreviation:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use ''name'' instead.'
-          type: string
-      type: object
-    DatapointWithScore:
-      properties:
-        dataPointID:
-          type: string
-        score:
-          type: number
-      type: object
-    File:
-      properties:
-        download_link:
-          type: string
-        last_modified:
-          format: date-time
-          type: string
-        path:
-          type: string
-        preview_link:
-          type: string
-        size_bytes:
-          type: integer
-        tags:
-          type: object
-        valid_until:
-          type: string
-      type: object
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    ProjectCommentList:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/ProjectComment'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    ListOfAlerts:
-      properties:
-        items:
-          items:
-            $ref: '#/components/schemas/Alert'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
-      type: object
-    Holiday:
-      properties:
-        holiday_date:
-          format: date
-          type: string
-        holiday_name:
-          type: string
-      required:
-      - holiday_name
-      - holiday_date
       type: object
     Alert:
       properties:
@@ -7076,6 +6337,615 @@ components:
       - alert_type
       - status
       type: object
+    Task:
+      properties:
+        analytics_result:
+          description: List of analytics results related to the task.
+          items:
+            $ref: '#/components/schemas/AnalysisResultShort'
+          type: array
+        assignee:
+          $ref: '#/components/schemas/ShortUser'
+        componentinproject:
+          description: List of component instances related to the task.
+          items:
+            $ref: '#/components/schemas/ComponentInProject'
+          type: array
+        created:
+          description: 'The date and time the task was created.
+
+            This information is set automatically and is not manually editable.
+
+            '
+          format: date-time
+          type: string
+        description:
+          description: The description of the task.
+          type: string
+        end:
+          description: The planned end time for the task.
+          format: date-time
+          type: string
+        id:
+          description: The id of the task.
+          format: uuid
+          type: string
+        plot_view:
+          $ref: '#/components/schemas/PlotViewResponse'
+        priority:
+          description: The priority of the task.
+          enum:
+          - low
+          - medium
+          - high
+          type: string
+        project_id:
+          description: The id of the project the task belongs to.
+          format: int64
+          type: integer
+        reporter:
+          $ref: '#/components/schemas/ShortUser'
+        savings_potential:
+          $ref: '#/components/schemas/KPIResult'
+        start:
+          description: The planned start time for the task.
+          format: date-time
+          type: string
+        status:
+          description: The status of the task.
+          enum:
+          - open
+          - doing
+          - review
+          - done
+          - rejected
+          - failed
+          type: string
+        title:
+          description: The short task title.
+          type: string
+        updated:
+          description: 'The date and time the task was last updated.
+
+            This information is set automatically and is not manually editable.
+
+            '
+          format: date-time
+          type: string
+      type: object
+    ImportDigitalTwinResponse:
+      properties:
+        expires_at:
+          description: The date and time the presigned upload URL expires.
+          format: date-time
+          type: string
+        file_id:
+          description: The id the file is registered under.
+          format: uuid
+          type: string
+        job_id:
+          description: The id of the job tracking the mapping.
+          format: uuid
+          type: string
+        upload_url:
+          description: The presigned URL the file's content must be uploaded to.
+          type: string
+      type: object
+    TagAuth:
+      properties:
+        key:
+          type: string
+        read:
+          type: boolean
+        value:
+          type: string
+        write:
+          type: boolean
+      type: object
+    PutProjectVirtualDatapointRequest:
+      properties:
+        description:
+          type: string
+    PinAttribute:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        probability:
+          type: number
+        value:
+          type: string
+      type: object
+    PostProjectComponentAttributeRequest:
+      properties:
+        key:
+          type: string
+        unit:
+          type: string
+        value:
+          type: string
+      required:
+      - key
+      - value
+    ComponentInProjectRelation:
+      properties:
+        id:
+          format: int64
+          type: integer
+        relationship:
+          enum:
+          - hasLocation
+          - hasPart
+          - feeds
+          type: string
+        source_componentinproject_id:
+          format: int64
+          type: integer
+        target_componentinproject_id:
+          format: int64
+          type: integer
+      type: object
+    ComponentInProjectWithContext:
+      properties:
+        abbreviation:
+          type: string
+        attributes:
+          items:
+            $ref: '#/components/schemas/ComponentInProjectAttribute'
+          type: array
+        attributes_definitions:
+          items:
+            $ref: '#/components/schemas/ComponentAttributeDefinition'
+          type: array
+        component:
+          $ref: '#/components/schemas/Component'
+        controls_apps:
+          items:
+            $ref: '#/components/schemas/ComponentControlsApp'
+          type: array
+        display_name:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        pins:
+          items:
+            $ref: '#/components/schemas/AssignedPin'
+          type: array
+        project_id:
+          format: int64
+          type: integer
+        relationships:
+          items:
+            $ref: '#/components/schemas/ComponentInProjectRelation'
+          type: array
+        tags:
+          items:
+            $ref: '#/components/schemas/Tag'
+          type: array
+      type: object
+    ProjectJourneyPhase:
+      properties:
+        key:
+          type: string
+        milestones:
+          items:
+            $ref: '#/components/schemas/ProjectJourneyMilestone'
+          type: array
+      type: object
+    ProjectWithContext:
+      properties:
+        company:
+          $ref: '#/components/schemas/Company'
+        dataPointKeys:
+          items:
+            $ref: '#/components/schemas/DataPointKey'
+          type: array
+        project:
+          $ref: '#/components/schemas/Project'
+      type: object
+    ComponentInProjectAttribute:
+      properties:
+        alphanumeric_id:
+          type: string
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        source:
+          type: string
+        unit:
+          type: string
+        value:
+          type: string
+      type: object
+    ControlsAppVariation:
+      properties:
+        description:
+          description: Description of the controls app algorithm variation.
+          type: string
+        key:
+          description: Stable, language-independent short key for the variation, e.g., 'hero' or 'hero_dryrun'.
+          type: string
+        name:
+          description: Human-readable name of the variation, e.g., 'Dry run'.
+          type: string
+      required:
+      - key
+      - name
+      - description
+      type: object
+    AnalysisResultShort:
+      properties:
+        function_id:
+          type: integer
+        id:
+          type: string
+        instance_id:
+          type: integer
+        interpretation:
+          type: string
+        signal_color:
+          enum:
+          - green
+          - grey
+          - yellow
+          - red
+          type: string
+      required:
+      - id
+      - instance_id
+      - function_id
+      type: object
+    EntityLog:
+      properties:
+        created_at:
+          type: string
+        id:
+          type: string
+        log_level:
+          type: string
+        log_message:
+          type: string
+      required:
+      - id
+      - created_at
+      - log_message
+      - log_level
+      type: object
+    ShortUserList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ShortUser'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    ComponentsInProject:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/ComponentInProject'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    NewComponentInProject:
+      properties:
+        abbreviation:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use ''name'' instead.'
+          type: string
+      type: object
+    UpdateMqttUser:
+      properties:
+        description:
+          type: string
+        password:
+          type: string
+        rights:
+          enum:
+          - read
+          - write
+          type: string
+        validity:
+          format: int64
+          type: integer
+      type: object
+    NewCustomPage:
+      properties:
+        title:
+          maxLength: 50
+          minLength: 1
+          type: string
+        url:
+          type: string
+      required:
+      - title
+      - url
+      type: object
+    DataPointKey:
+      properties:
+        description:
+          type: string
+        id:
+          type: integer
+        name:
+          type: string
+        project_id:
+          type: integer
+      type: object
+    Tag:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - key
+      type: object
+    DataPointWithTags:
+      properties:
+        dataPointID:
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/TagAssociation'
+          type: array
+      type: object
+    ComponentInProjectHolidays:
+      properties:
+        component:
+          $ref: '#/components/schemas/ComponentInProject'
+        holidays:
+          $ref: '#/components/schemas/Holiday'
+      required:
+      - component
+      type: object
+    KPIResult:
+      properties:
+        context:
+          type: string
+        id:
+          type: integer
+        identifier:
+          type: string
+        name:
+          type: string
+        unit:
+          type: string
+        value:
+          format: float
+          type: number
+      type: object
+    LatestSuccessfulReport:
+      properties:
+        created_at:
+          format: date-time
+          type: string
+        file_path:
+          description: Path of the generated file. Usable directly with get_project_file.
+          type: string
+      required:
+      - file_path
+      - created_at
+      type: object
+    JobList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/Job'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    Role:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        authed_tags:
+          items:
+            $ref: '#/components/schemas/TagAuth'
+          type: array
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    PostProjectVirtualDatapointRequest:
+      example:
+        parameters:
+          formula: P1;
+        pins:
+          P1:
+            aggregate: mean
+            dataPointID: Dev1_Temperature_AI1
+            data_range:
+              time: 1d
+      properties:
+        parameters:
+          type: object
+        pins:
+          type: object
+      required:
+      - pins
+      - parameters
+    PatchedAttribute:
+      properties:
+        attribute:
+          $ref: '#/components/schemas/ComponentInProjectAttribute'
+        operation:
+          enum:
+          - updated
+          - created
+          - deleted
+          type: string
+      type: object
+    DeviceMinimal:
+      properties:
+        child_devices:
+          items:
+            $ref: '#/components/schemas/DeviceMinimal'
+          type: array
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
+    NewCompanyRole:
+      properties:
+        authed_endpoints:
+          items:
+            format: int64
+            type: integer
+          type: array
+        description:
+          type: string
+        name:
+          type: string
+      required:
+      - name
+      - authed_endpoints
+      type: object
+    ListOfDevices:
+      properties:
+        devices:
+          items:
+            $ref: '#/components/schemas/DeviceMinimal'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        project_id:
+          format: int64
+          type: integer
+      type: object
+    PaginationMeta:
+      properties:
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
+      type: object
+    DatapointWithScore:
+      properties:
+        dataPointID:
+          type: string
+        score:
+          type: number
+      type: object
+    ProjectJourneySubstage:
+      properties:
+        action:
+          $ref: '#/components/schemas/ProjectJourneyAction'
+        end_date:
+          format: date
+          type: string
+        key:
+          type: string
+        progression_type:
+          enum:
+          - linear
+          - looped
+          type: string
+        start_date:
+          format: date
+          type: string
+        state:
+          enum:
+          - open
+          - in_progress
+          - done
+          type: string
+      type: object
+    ProjectJourneyMilestone:
+      properties:
+        key:
+          type: string
+        state:
+          enum:
+          - open
+          - in_progress
+          - done
+          type: string
+        substages:
+          items:
+            $ref: '#/components/schemas/ProjectJourneySubstage'
+          type: array
+        updated_at:
+          format: date-time
+          type: string
+      type: object
+    Timeseries:
+      items:
+        $ref: '#/components/schemas/Observation'
+      type: array
+    NewRole:
+      allOf:
+      - $ref: '#/components/schemas/NewCompanyRole'
+      - properties:
+          authed_tags:
+            items:
+              $ref: '#/components/schemas/TagAuth'
+            type: array
+        type: object
+      required:
+      - name
+      - authed_endpoints
+      - authed_tags
+    ProjectJourneyAction:
+      properties:
+        key:
+          type: string
+        restricted:
+          type: boolean
+      required:
+      - key
+      - restricted
+      type: object
     NewMqttUser:
       properties:
         description:
@@ -7096,26 +6966,156 @@ components:
       - username
       - password
       type: object
-    ControlsAppStatus:
+    EnumValue:
       properties:
-        code:
-          type: integer
-        message:
+        key:
           type: string
         name:
-          description: Stable, language-independent short key for the status, e.g. 'running' or 'died'.
           type: string
-        type:
-          description: Classification of the status.
-          enum:
-          - normal
-          - error
-          - pending
-          - ready
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      type: object
+    VirtualDatapoint:
+      properties:
+        dataPointID:
+          type: string
+        description:
+          type: string
+        logs:
+          items:
+            type: object
+          type: array
+        parameters:
+          type: object
+        pins:
+          type: object
+        status:
+          $ref: '#/components/schemas/VirtualDatapointStatus'
+        vdp_type:
+          type: string
+      type: object
+    TagAssociation:
+      allOf:
+      - $ref: '#/components/schemas/Tag'
+      - properties:
+          confirmed:
+            type: boolean
+          probability:
+            type: number
+          protected:
+            type: boolean
+          source:
+            type: string
+        type: object
+    TimeseriesWithContext:
+      properties:
+        data:
+          $ref: '#/components/schemas/Timeseries'
+        dataPointID:
+          type: string
+        datapoint_hash_id:
+          type: string
+        error:
+          description: 'Optional error message describing why the data could not be loaded or processed, for example due to a unit conversion failure or missing units tag.
+
+            '
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/TagAssociation'
+          type: array
+        units:
+          type: string
+    FilesList:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/File'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      type: object
+    PatchProjectComponentAttributesRequest:
+      items:
+        properties:
+          key:
+            type: string
+          unit:
+            type: string
+          value:
+            type: string
+        required:
+        - key
+        type: object
+      type: array
+    ProjectJourney:
+      properties:
+        current_substage_key:
+          type: string
+        phases:
+          items:
+            $ref: '#/components/schemas/ProjectJourneyPhase'
+          type: array
+      type: object
+    UploadFileRequest:
+      properties:
+        file:
+          description: The file to upload.
+          format: binary
           type: string
       required:
-      - code
-      - message
+      - file
+      type: object
+    SetpointReferences:
+      properties:
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+        setpoints:
+          items:
+            $ref: '#/components/schemas/SetpointReference'
+          type: array
+      type: object
+    PlotViewResponse:
+      properties:
+        datapoints:
+          description: Datapoints of the plot view.
+          items:
+            type: string
+          type: array
+        end:
+          description: end timestamp of the datapoints
+          format: date-time
+          type: string
+        hidden_datapoints:
+          description: Hidden datapoints of the plot view.
+          items:
+            type: string
+          type: array
+        id:
+          description: id integer of the plot view.
+          format: uuid
+          type: string
+        samplerate:
+          description: sample rate of the datapoints.
+          type: string
+        start:
+          description: start timestamp of the datapoints.
+          format: date-time
+          type: string
+        zoom:
+          $ref: '#/components/schemas/PlotViewZoom'
+          description: Zoom period with start and end timestamps including timezone
+      required:
+      - id
+      - start
+      - end
+      - samplerate
       type: object
     ShortUser:
       properties:

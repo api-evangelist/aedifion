@@ -177,8 +177,18 @@ components:
         - fr
         type: string
   schemas:
-    EnumValue:
+    ComponentCategory:
       properties:
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
         key:
           type: string
         name:
@@ -190,6 +200,54 @@ components:
         nameEN:
           deprecated: true
           description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+      type: object
+    Pin:
+      properties:
+        alphanumeric_id:
+          type: string
+        description:
+          type: string
+        description_de:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        description_en:
+          deprecated: true
+          description: 'Deprecated: use the localized ''description'' field instead.'
+          type: string
+        id:
+          format: int64
+          type: integer
+        location:
+          type: string
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        pin_attributes:
+          items:
+            $ref: '#/components/schemas/PinAttribute'
+          type: array
+        unit_type:
+          type: string
+      type: object
+    PinAttribute:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        probability:
+          type: number
+        value:
           type: string
       type: object
     Error:
@@ -212,6 +270,28 @@ components:
           type: boolean
       required:
       - error
+      type: object
+    Component:
+      properties:
+        alphanumeric_id:
+          type: string
+        category:
+          $ref: '#/components/schemas/ComponentCategory'
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        nameDE:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        nameEN:
+          deprecated: true
+          description: 'Deprecated: use the localized ''name'' field instead.'
+          type: string
+        private:
+          type: boolean
       type: object
     ComponentAttributeDefinition:
       properties:
@@ -264,54 +344,8 @@ components:
         value_type:
           type: string
       type: object
-    Pin:
+    EnumValue:
       properties:
-        alphanumeric_id:
-          type: string
-        description:
-          type: string
-        description_de:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        description_en:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        id:
-          format: int64
-          type: integer
-        location:
-          type: string
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        pin_attributes:
-          items:
-            $ref: '#/components/schemas/PinAttribute'
-          type: array
-        unit_type:
-          type: string
-      type: object
-    ComponentCategory:
-      properties:
-        description:
-          type: string
-        description_de:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
-        description_en:
-          deprecated: true
-          description: 'Deprecated: use the localized ''description'' field instead.'
-          type: string
         key:
           type: string
         name:
@@ -324,40 +358,6 @@ components:
           deprecated: true
           description: 'Deprecated: use the localized ''name'' field instead.'
           type: string
-      type: object
-    PinAttribute:
-      properties:
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        probability:
-          type: number
-        value:
-          type: string
-      type: object
-    Component:
-      properties:
-        alphanumeric_id:
-          type: string
-        category:
-          $ref: '#/components/schemas/ComponentCategory'
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        nameDE:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        nameEN:
-          deprecated: true
-          description: 'Deprecated: use the localized ''name'' field instead.'
-          type: string
-        private:
-          type: boolean
       type: object
   securitySchemes:
     basicAuth:

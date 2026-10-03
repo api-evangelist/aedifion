@@ -210,15 +210,16 @@ paths:
       x-openapi-router-controller: app.controllers.ai_controller
 components:
   schemas:
-    ChatHistory:
+    Chat:
       properties:
-        chats:
-          description: The list of chats in a thread
-          items:
-            $ref: '#/components/schemas/Chat'
-          type: array
+        prompt:
+          $ref: '#/components/schemas/ChatPrompt'
+          description: The user's prompt
+        response:
+          $ref: '#/components/schemas/ChatResponse'
+          description: The AI's response to the prompt.
       required:
-      - chats
+      - prompt
       type: object
     PaginationMeta:
       properties:
@@ -235,18 +236,6 @@ components:
       - items_per_page
       - current_page
       - total_pages
-      type: object
-    Source:
-      properties:
-        name:
-          description: The name of the source.
-          type: string
-        parameters:
-          description: A set of named parameters.
-          type: object
-      required:
-      - name
-      - parameters
       type: object
     Error:
       properties:
@@ -269,14 +258,18 @@ components:
       required:
       - error
       type: object
-    AIConversationThreads:
+    AIConversationThread:
       properties:
-        items:
-          items:
-            $ref: '#/components/schemas/AIConversationThread'
-          type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
+        summary:
+          description: Summary of the first prompt.
+          type: string
+        thread_id:
+          description: Unique id of conversation thread.
+          type: string
+        updated_at:
+          description: The last updated date of the conversation thread.
+          format: date-time
+          type: string
       type: object
     ChatRequest:
       properties:
@@ -301,47 +294,14 @@ components:
       - message
       - metadata
       type: object
-    AIConversationThread:
+    AIConversationThreads:
       properties:
-        summary:
-          description: Summary of the first prompt.
-          type: string
-        thread_id:
-          description: Unique id of conversation thread.
-          type: string
-        updated_at:
-          description: The last updated date of the conversation thread.
-          format: date-time
-          type: string
-      type: object
-    ChatResponse:
-      properties:
-        message:
-          description: Response from the AI agent.
-          type: string
-        sources:
-          description: Sources used to create the response.
+        items:
           items:
-            $ref: '#/components/schemas/Source'
+            $ref: '#/components/schemas/AIConversationThread'
           type: array
-        timestamp:
-          description: Timestamp of the response.
-          format: date-time
-          type: string
-      required:
-      - message
-      - sources
-      type: object
-    Chat:
-      properties:
-        prompt:
-          $ref: '#/components/schemas/ChatPrompt'
-          description: The user's prompt
-        response:
-          $ref: '#/components/schemas/ChatResponse'
-          description: The AI's response to the prompt.
-      required:
-      - prompt
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
       type: object
     ChatPrompt:
       properties:
@@ -362,6 +322,46 @@ components:
           - 'null'
       required:
       - message
+      type: object
+    ChatHistory:
+      properties:
+        chats:
+          description: The list of chats in a thread
+          items:
+            $ref: '#/components/schemas/Chat'
+          type: array
+      required:
+      - chats
+      type: object
+    Source:
+      properties:
+        name:
+          description: The name of the source.
+          type: string
+        parameters:
+          description: A set of named parameters.
+          type: object
+      required:
+      - name
+      - parameters
+      type: object
+    ChatResponse:
+      properties:
+        message:
+          description: Response from the AI agent.
+          type: string
+        sources:
+          description: Sources used to create the response.
+          items:
+            $ref: '#/components/schemas/Source'
+          type: array
+        timestamp:
+          description: Timestamp of the response.
+          format: date-time
+          type: string
+      required:
+      - message
+      - sources
       type: object
   securitySchemes:
     basicAuth:
