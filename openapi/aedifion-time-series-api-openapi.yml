@@ -376,6 +376,50 @@ paths:
       x-openapi-router-controller: app.controllers.project_controller
 components:
   schemas:
+    Tag:
+      properties:
+        id:
+          format: int64
+          type: integer
+        key:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - key
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    Observation:
+      properties:
+        time:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - time
+      - value
     TimeseriesWithContext:
       properties:
         data:
@@ -399,50 +443,6 @@ components:
       items:
         $ref: '#/components/schemas/Observation'
       type: array
-    Observation:
-      properties:
-        time:
-          type: string
-        value:
-          format: float
-          type: number
-      required:
-      - time
-      - value
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    Tag:
-      properties:
-        id:
-          format: int64
-          type: integer
-        key:
-          type: string
-        value:
-          type: string
-      required:
-      - id
-      - key
-      type: object
     TagAssociation:
       allOf:
       - $ref: '#/components/schemas/Tag'

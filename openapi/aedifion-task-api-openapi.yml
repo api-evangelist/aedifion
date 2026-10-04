@@ -386,14 +386,98 @@ paths:
       x-openapi-router-controller: app.controllers.task_controller
 components:
   schemas:
-    TaskCommentList:
+    AnalysisResultShort:
       properties:
-        items:
+        function_id:
+          type: integer
+        id:
+          type: string
+        instance_id:
+          type: integer
+        interpretation:
+          type: string
+        signal_color:
+          enum:
+          - green
+          - grey
+          - yellow
+          - red
+          type: string
+      required:
+      - id
+      - instance_id
+      - function_id
+      type: object
+    PlotViewResponse:
+      properties:
+        datapoints:
+          description: Datapoints of the plot view.
           items:
-            $ref: '#/components/schemas/TaskComment'
+            type: string
           type: array
-        meta:
-          $ref: '#/components/schemas/PaginationMeta'
+        end:
+          description: end timestamp of the datapoints
+          format: date-time
+          type: string
+        hidden_datapoints:
+          description: Hidden datapoints of the plot view.
+          items:
+            type: string
+          type: array
+        id:
+          description: id integer of the plot view.
+          format: uuid
+          type: string
+        samplerate:
+          description: sample rate of the datapoints.
+          type: string
+        start:
+          description: start timestamp of the datapoints.
+          format: date-time
+          type: string
+        zoom:
+          $ref: '#/components/schemas/PlotViewZoom'
+          description: Zoom period with start and end timestamps including timezone
+      required:
+      - id
+      - start
+      - end
+      - samplerate
+      type: object
+    TaskComment:
+      properties:
+        author:
+          $ref: '#/components/schemas/ShortUser'
+          description: The author of the comment.
+        created:
+          description: 'Timestamp of the comment creation.
+
+            This information is set automatically and is not editable.
+
+            '
+          format: date-time
+          type: string
+        id:
+          description: The id of the comment.
+          format: uuid
+          type: string
+        task_id:
+          description: The id of the task the comment belongs to.
+          format: uuid
+          type: string
+        text:
+          description: The text of the comment.
+          type: string
+        updated:
+          description: 'Timestamp of the latest comment modification.
+
+            This information is set automatically and is not editable.
+
+            '
+          format: date-time
+          type: string
+      required:
+      - id
       type: object
     UpdateTask:
       properties:
@@ -465,135 +549,6 @@ components:
       - priority
       - reporter_user_id
       type: object
-    NewTaskComment:
-      properties:
-        text:
-          description: The text of the comment.
-          maxLength: 32767
-          type: string
-      required:
-      - text
-      type: object
-    TaskComment:
-      properties:
-        author:
-          $ref: '#/components/schemas/ShortUser'
-          description: The author of the comment.
-        created:
-          description: 'Timestamp of the comment creation.
-
-            This information is set automatically and is not editable.
-
-            '
-          format: date-time
-          type: string
-        id:
-          description: The id of the comment.
-          format: uuid
-          type: string
-        task_id:
-          description: The id of the task the comment belongs to.
-          format: uuid
-          type: string
-        text:
-          description: The text of the comment.
-          type: string
-        updated:
-          description: 'Timestamp of the latest comment modification.
-
-            This information is set automatically and is not editable.
-
-            '
-          format: date-time
-          type: string
-      required:
-      - id
-      type: object
-    PlotViewZoom:
-      description: Plot view zoom period with start and end timestamps including timezone
-      properties:
-        end:
-          description: end timestamp of the plot view zoom period including timezone
-          format: date-time
-          type:
-          - string
-          - 'null'
-        start:
-          description: start timestamp of the plot view zoom period including timezone
-          format: date-time
-          type:
-          - string
-          - 'null'
-      type: object
-    NewTask:
-      properties:
-        analytics_result:
-          description: List of references of analytics results related to the task.
-          items:
-            format: uuid
-            type: string
-          type: array
-        assignee_user_id:
-          description: The id of the user assigned to the task.
-          format: int64
-          type: integer
-        componentinproject:
-          description: List of ids of component instances related to the task.
-          items:
-            format: int64
-            type: integer
-          type: array
-        description:
-          default: ''
-          description: The description of the task.
-          maxLength: 32727
-          type: string
-        end:
-          description: The planned end time of the task.
-          format: date-time
-          type: string
-        plot_view_id:
-          description: id of the plot view related to the task
-          format: uuid
-          type: string
-        priority:
-          default: medium
-          description: The priority of the task.
-          enum:
-          - low
-          - medium
-          - high
-          type: string
-        reporter_user_id:
-          description: 'The id of the user who reported the task.
-
-            If not given, this will be set to the user who made the API call.
-
-            '
-          format: int64
-          type: integer
-        start:
-          description: The planned start time of the task.
-          format: date-time
-          type: string
-        status:
-          default: open
-          description: The status of the task.
-          enum:
-          - open
-          - doing
-          - review
-          - done
-          - rejected
-          - failed
-          type: string
-        title:
-          description: The short title of the task.
-          maxLength: 100
-          type: string
-      required:
-      - title
-      type: object
     UpdateTaskComment:
       properties:
         text:
@@ -602,22 +557,6 @@ components:
           type: string
       required:
       - text
-      type: object
-    PaginationMeta:
-      properties:
-        current_page:
-          type: integer
-        items_per_page:
-          type: integer
-        total_items:
-          type: integer
-        total_pages:
-          type: integer
-      required:
-      - total_items
-      - items_per_page
-      - current_page
-      - total_pages
       type: object
     Error:
       properties:
@@ -640,41 +579,31 @@ components:
       required:
       - error
       type: object
-    PlotViewResponse:
+    ShortUser:
       properties:
-        datapoints:
-          description: Datapoints of the plot view.
-          items:
-            type: string
-          type: array
-        end:
-          description: end timestamp of the datapoints
-          format: date-time
+        avatar_url:
+          description: The url to the user's avatar.
           type: string
-        hidden_datapoints:
-          description: Hidden datapoints of the plot view.
-          items:
-            type: string
-          type: array
+        company_id:
+          description: The id of the company the user belongs to.
+          type: integer
+        email:
+          description: The user's email address.
+          format: email
+          type: string
+        firstName:
+          description: The user's first name.
+          type: string
         id:
-          description: id integer of the plot view.
-          format: uuid
+          description: The user's id.
+          type: integer
+        lastName:
+          description: The user's last name.
           type: string
-        samplerate:
-          description: sample rate of the datapoints.
-          type: string
-        start:
-          description: start timestamp of the datapoints.
-          format: date-time
-          type: string
-        zoom:
-          $ref: '#/components/schemas/PlotViewZoom'
-          description: Zoom period with start and end timestamps including timezone
       required:
       - id
-      - start
-      - end
-      - samplerate
+      - email
+      - company_id
       type: object
     Task:
       properties:
@@ -752,27 +681,14 @@ components:
           format: date-time
           type: string
       type: object
-    AnalysisResultShort:
+    NewTaskComment:
       properties:
-        function_id:
-          type: integer
-        id:
-          type: string
-        instance_id:
-          type: integer
-        interpretation:
-          type: string
-        signal_color:
-          enum:
-          - green
-          - grey
-          - yellow
-          - red
+        text:
+          description: The text of the comment.
+          maxLength: 32767
           type: string
       required:
-      - id
-      - instance_id
-      - function_id
+      - text
       type: object
     ComponentInProject:
       properties:
@@ -798,6 +714,107 @@ components:
           format: int64
           type: integer
       type: object
+    NewTask:
+      properties:
+        analytics_result:
+          description: List of references of analytics results related to the task.
+          items:
+            format: uuid
+            type: string
+          type: array
+        assignee_user_id:
+          description: The id of the user assigned to the task.
+          format: int64
+          type: integer
+        componentinproject:
+          description: List of ids of component instances related to the task.
+          items:
+            format: int64
+            type: integer
+          type: array
+        description:
+          default: ''
+          description: The description of the task.
+          maxLength: 32727
+          type: string
+        end:
+          description: The planned end time of the task.
+          format: date-time
+          type: string
+        plot_view_id:
+          description: id of the plot view related to the task
+          format: uuid
+          type: string
+        priority:
+          default: medium
+          description: The priority of the task.
+          enum:
+          - low
+          - medium
+          - high
+          type: string
+        reporter_user_id:
+          description: 'The id of the user who reported the task.
+
+            If not given, this will be set to the user who made the API call.
+
+            '
+          format: int64
+          type: integer
+        start:
+          description: The planned start time of the task.
+          format: date-time
+          type: string
+        status:
+          default: open
+          description: The status of the task.
+          enum:
+          - open
+          - doing
+          - review
+          - done
+          - rejected
+          - failed
+          type: string
+        title:
+          description: The short title of the task.
+          maxLength: 100
+          type: string
+      required:
+      - title
+      type: object
+    PlotViewZoom:
+      description: Plot view zoom period with start and end timestamps including timezone
+      properties:
+        end:
+          description: end timestamp of the plot view zoom period including timezone
+          format: date-time
+          type:
+          - string
+          - 'null'
+        start:
+          description: start timestamp of the plot view zoom period including timezone
+          format: date-time
+          type:
+          - string
+          - 'null'
+      type: object
+    PaginationMeta:
+      properties:
+        current_page:
+          type: integer
+        items_per_page:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+      required:
+      - total_items
+      - items_per_page
+      - current_page
+      - total_pages
+      type: object
     KPIResult:
       properties:
         context:
@@ -814,31 +831,14 @@ components:
           format: float
           type: number
       type: object
-    ShortUser:
+    TaskCommentList:
       properties:
-        avatar_url:
-          description: The url to the user's avatar.
-          type: string
-        company_id:
-          description: The id of the company the user belongs to.
-          type: integer
-        email:
-          description: The user's email address.
-          format: email
-          type: string
-        firstName:
-          description: The user's first name.
-          type: string
-        id:
-          description: The user's id.
-          type: integer
-        lastName:
-          description: The user's last name.
-          type: string
-      required:
-      - id
-      - email
-      - company_id
+        items:
+          items:
+            $ref: '#/components/schemas/TaskComment'
+          type: array
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
       type: object
   parameters:
     LanguageQueryParam:

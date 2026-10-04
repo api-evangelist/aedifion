@@ -159,30 +159,35 @@ paths:
       - Meta
       x-openapi-router-controller: app.controllers.meta_controller
 components:
-  parameters:
-    LanguageQueryParam:
-      description: 'Choose language in which the response should be displayed.
-
-        - ''en'' for English
-
-        - ''de'' for German
-
-        - ''fr'' for French
-
-        '
-      in: query
-      name: language
-      schema:
-        enum:
-        - en
-        - de
-        - fr
-        type: string
   schemas:
-    ListOfEndpoints:
-      items:
-        $ref: '#/components/schemas/Endpoint'
-      type: array
+    Endpoint:
+      properties:
+        id:
+          format: int64
+          type: integer
+        path:
+          type: string
+        request_method:
+          type: string
+        summary:
+          type: string
+    LabelsSystems:
+      properties:
+        currency_systems:
+          items:
+            type: string
+          type: array
+        labels_checksum:
+          type: string
+        locales:
+          items:
+            type: string
+          type: array
+        units_systems:
+          items:
+            type: string
+          type: array
+      type: object
     Error:
       properties:
         details:
@@ -211,34 +216,29 @@ components:
         uptime:
           type: string
       type: object
-    LabelsSystems:
-      properties:
-        currency_systems:
-          items:
-            type: string
-          type: array
-        labels_checksum:
-          type: string
-        locales:
-          items:
-            type: string
-          type: array
-        units_systems:
-          items:
-            type: string
-          type: array
-      type: object
-    Endpoint:
-      properties:
-        id:
-          format: int64
-          type: integer
-        path:
-          type: string
-        request_method:
-          type: string
-        summary:
-          type: string
+    ListOfEndpoints:
+      items:
+        $ref: '#/components/schemas/Endpoint'
+      type: array
+  parameters:
+    LanguageQueryParam:
+      description: 'Choose language in which the response should be displayed.
+
+        - ''en'' for English
+
+        - ''de'' for German
+
+        - ''fr'' for French
+
+        '
+      in: query
+      name: language
+      schema:
+        enum:
+        - en
+        - de
+        - fr
+        type: string
   securitySchemes:
     basicAuth:
       scheme: basic
