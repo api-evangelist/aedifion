@@ -1,0 +1,27 @@
+slug: aedifion
+provider: Aedifion
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 1
+edges:
+- tag: Controls
+  spec_file: aedifion-controls-api-openapi.yml
+  capability_id: BC-700.20
+  capability_id_l1: BC-700
+  capability_name: Hard Facilities Management
+  confidence: 0.7
+  evidence: POST /v2/controls/app/{controls_app_id}/run 'Request to run or stop a controls app in the
+    project'; GET /v2/controls/algorithms_by_component; vendor 'autonomously controls HVAC and building
+    services'
+  reason: Operations deploy and run control algorithms against building components, i.e. automation of
+    building plant. Hard Facilities Management (HVAC/building systems) is the closest honest capability;
+    not a software release or IT ops capability.
