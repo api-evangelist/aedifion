@@ -1,0 +1,12 @@
+{
+ "url": "https://api.aedifion.io/openapi.json",
+ "requested_url": "https://api.aedifion.io/openapi.json",
+ "status": 200,
+ "content_type": "application/json",
+ "bytes": 426851,
+ "sha256": "d0f537e0c800856059bc526c28e49b27b8dcff4f8e65a1cb9990ef98ef1c76ff",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 0.945), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
