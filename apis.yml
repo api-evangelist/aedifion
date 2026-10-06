@@ -17,7 +17,7 @@ x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.20'
 created: '2026-09-09'
-modified: '2026-09-16'
+modified: '2026-10-06'
 tags:
 - Building Automation
 - Smart Buildings
@@ -378,6 +378,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- url: https://www.aedifion.com/blog/rss.xml
+  type: BlogRSS
 - type: CapabilityMap
   url: capabilities/aedifion-capability-edges.yml
   name: Aedifion Business Capability Map
