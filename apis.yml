@@ -378,6 +378,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Pricing
+  url: https://docs.aedifion.io/en/products/io/quota/
 - url: https://www.aedifion.com/blog/rss.xml
   type: BlogRSS
 - type: CapabilityMap
