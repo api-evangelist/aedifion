@@ -60,3 +60,28 @@ evidence:
   status: 404
 - url: https://docs.aedifion.io/en/products/io/quota/
   status: 200
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - metered
+  units: []
+  plans:
+  - name: Regular
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
+  - name: Medium
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
+  - name: Premium
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
