@@ -868,6 +868,52 @@ paths:
       x-openapi-router-controller: app.controllers.datapoint_controller
 components:
   schemas:
+    DataPointWithContext:
+      properties:
+        dataPointID:
+          type: string
+        favorite:
+          type: boolean
+        hash_id:
+          type: string
+        id:
+          type: integer
+        renamings:
+          items:
+            $ref: '#/components/schemas/Renaming'
+          type: array
+        setpoint_max_value:
+          type: number
+        setpoint_min_value:
+          type: number
+        tags:
+          items:
+            $ref: '#/components/schemas/TagAssociation'
+          type: array
+        writable:
+          type: boolean
+      type: object
+    Renaming:
+      properties:
+        datapointkey_id:
+          format: int64
+          type: integer
+        id:
+          format: int64
+          type: integer
+        renaming:
+          type: string
+      type: object
+    Observation:
+      properties:
+        time:
+          type: string
+        value:
+          format: float
+          type: number
+      required:
+      - time
+      - value
     Tag:
       properties:
         id:
@@ -881,17 +927,10 @@ components:
       - id
       - key
       type: object
-    Renaming:
-      properties:
-        datapointkey_id:
-          format: int64
-          type: integer
-        id:
-          format: int64
-          type: integer
-        renaming:
-          type: string
-      type: object
+    Timeseries:
+      items:
+        $ref: '#/components/schemas/Observation'
+      type: array
     Error:
       properties:
         details:
@@ -932,25 +971,6 @@ components:
           default: true
           type: boolean
       type: object
-    UpdateDatapoint:
-      properties:
-        setpoint_max_value:
-          type: number
-        setpoint_min_value:
-          type: number
-        writable:
-          type: boolean
-      type: object
-    Observation:
-      properties:
-        time:
-          type: string
-        value:
-          format: float
-          type: number
-      required:
-      - time
-      - value
     TimeseriesWithContext:
       properties:
         data:
@@ -970,55 +990,6 @@ components:
           type: array
         units:
           type: string
-    DataPointWithContext:
-      properties:
-        dataPointID:
-          type: string
-        favorite:
-          type: boolean
-        hash_id:
-          type: string
-        id:
-          type: integer
-        renamings:
-          items:
-            $ref: '#/components/schemas/Renaming'
-          type: array
-        setpoint_max_value:
-          type: number
-        setpoint_min_value:
-          type: number
-        tags:
-          items:
-            $ref: '#/components/schemas/TagAssociation'
-          type: array
-        writable:
-          type: boolean
-      type: object
-    SetpointAck:
-      properties:
-        dataPointID:
-          type: string
-        log:
-          type: string
-        priority:
-          type: integer
-        project_id:
-          format: int64
-          type: integer
-        reference:
-          type: string
-        state_before:
-          type: object
-        status:
-          type: string
-        value:
-          type: string
-      type: object
-    Timeseries:
-      items:
-        $ref: '#/components/schemas/Observation'
-      type: array
     TagAssociation:
       allOf:
       - $ref: '#/components/schemas/Tag'
@@ -1040,6 +1011,35 @@ components:
           - 'false'
           - unconfirmed
           type: string
+      type: object
+    SetpointAck:
+      properties:
+        dataPointID:
+          type: string
+        log:
+          type: string
+        priority:
+          type: integer
+        project_id:
+          format: int64
+          type: integer
+        reference:
+          type: string
+        state_before:
+          type: object
+        status:
+          type: string
+        value:
+          type: string
+      type: object
+    UpdateDatapoint:
+      properties:
+        setpoint_max_value:
+          type: number
+        setpoint_min_value:
+          type: number
+        writable:
+          type: boolean
       type: object
   securitySchemes:
     basicAuth:

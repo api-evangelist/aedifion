@@ -409,6 +409,291 @@ paths:
       x-openapi-router-controller: app.controllers.realm_controller
 components:
   schemas:
+    ProjectSetupTopic:
+      properties:
+        name:
+          description: The logical name of the topic.
+          type: string
+        topic:
+          description: The topic pattern.
+          type: string
+      required:
+      - name
+      - topic
+      type: object
+    ProjectSetupCredential:
+      properties:
+        password:
+          description: The generated password of the provisioned credential.
+          type: string
+        username:
+          description: The username of the provisioned credential.
+          type: string
+      required:
+      - username
+      - password
+      type: object
+    HiddenNativePage:
+      properties:
+        title:
+          description: Identifier of the native page to hide or unhide.
+          minLength: 1
+          type: string
+      required:
+      - title
+      type: object
+    CustomPage:
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        url:
+          type: string
+      type: object
+    Company:
+      properties:
+        address:
+          type: string
+        avatar_url:
+          type: string
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        roles:
+          items:
+            properties:
+              description:
+                type: string
+              id:
+                type: integer
+              name:
+                type: string
+            type: object
+          type: array
+        whitelabel:
+          type: boolean
+      required:
+      - name
+      type: object
+    Error:
+      properties:
+        details:
+          properties: {}
+          type: object
+        error:
+          type: string
+        operation:
+          enum:
+          - ''
+          - get
+          - create
+          - delete
+          - update
+          type: string
+        success:
+          default: false
+          type: boolean
+      required:
+      - error
+      type: object
+    TagAuth:
+      properties:
+        key:
+          type: string
+        read:
+          type: boolean
+        value:
+          type: string
+        write:
+          type: boolean
+      type: object
+    Project:
+      properties:
+        account_manager:
+          $ref: '#/components/schemas/ShortUser'
+          description: Account manager assigned to this project
+        address:
+          type: string
+        asset_manager:
+          $ref: '#/components/schemas/ShortUser'
+          description: Asset manager assigned to this project
+        avatar_url:
+          type: string
+        company_id:
+          format: int64
+          type: integer
+        currency_system:
+          type: string
+        custom_pages:
+          items:
+            $ref: '#/components/schemas/CustomPage'
+          type: array
+        description:
+          type: string
+        handle:
+          type: string
+        hidden_native_pages:
+          items:
+            $ref: '#/components/schemas/HiddenNativePage'
+          type: array
+        id:
+          type: integer
+        latitude:
+          type: string
+        links:
+          items:
+            $ref: '#/components/schemas/ProjectLink'
+          type: array
+        load_balancing_group:
+          type: string
+        longitude:
+          type: string
+        name:
+          type: string
+        project_engineer:
+          $ref: '#/components/schemas/ShortUser'
+          description: Project engineer assigned to this project
+        start:
+          format: date-time
+          type: string
+        status_report:
+          type: string
+        status_report_updated_at:
+          format: date-time
+          type: string
+        units_system:
+          type: string
+      required:
+      - company_id
+      - name
+      type: object
+    ProjectLink:
+      properties:
+        before:
+          type: string
+        icon:
+          type: string
+        parent:
+          type: string
+        title:
+          type: string
+        titleDE:
+          type: string
+        titleEN:
+          type: string
+        url:
+          type: string
+        urlDE:
+          type: string
+        urlEN:
+          type: string
+      required:
+      - title
+      - titleDE
+      - titleEN
+      - url
+      - urlDE
+      - urlEN
+      type: object
+    CompanyProjectResponse:
+      properties:
+        project:
+          $ref: '#/components/schemas/Project'
+        role:
+          $ref: '#/components/schemas/Role'
+      required:
+      - project
+      - role
+      type: object
+    ProjectSetupResource:
+      properties:
+        credentials:
+          description: The credentials created for this resource.
+          items:
+            $ref: '#/components/schemas/ProjectSetupCredential'
+          type: array
+        topics:
+          description: The topics created for this resource, if any.
+          items:
+            $ref: '#/components/schemas/ProjectSetupTopic'
+          type: array
+        type:
+          description: The resource type.
+          type: string
+      required:
+      - type
+      - credentials
+      type: object
+    NewProject:
+      properties:
+        account_manager_id:
+          description: ID of the account manager user
+          format: int64
+          type: integer
+        address:
+          type: string
+        asset_manager_id:
+          format: int64
+          type: integer
+        currency_system:
+          type: string
+        description:
+          type: string
+        latitude:
+          type: string
+        longitude:
+          type: string
+        name:
+          maxLength: 254
+          minLength: 1
+          type: string
+        project_engineer_id:
+          description: ID of the project engineer user
+          format: int64
+          type: integer
+        start:
+          format: date-time
+          type: string
+        status_report:
+          type: string
+        units_system:
+          type: string
+      required:
+      - name
+      type: object
+    ShortUser:
+      properties:
+        avatar_url:
+          description: The url to the user's avatar.
+          type: string
+        company_id:
+          description: The id of the company the user belongs to.
+          type: integer
+        email:
+          description: The user's email address.
+          format: email
+          type: string
+        firstName:
+          description: The user's first name.
+          type: string
+        id:
+          description: The user's id.
+          type: integer
+        lastName:
+          description: The user's last name.
+          type: string
+      required:
+      - id
+      - email
+      - company_id
+      type: object
     CompanyWithContext:
       properties:
         company:
@@ -487,43 +772,6 @@ components:
             type: object
           type: array
       type: object
-    ProjectSetupTopic:
-      properties:
-        name:
-          description: The logical name of the topic.
-          type: string
-        topic:
-          description: The topic pattern.
-          type: string
-      required:
-      - name
-      - topic
-      type: object
-    ProjectSetupCredential:
-      properties:
-        password:
-          description: The generated password of the provisioned credential.
-          type: string
-        username:
-          description: The username of the provisioned credential.
-          type: string
-      required:
-      - username
-      - password
-      type: object
-    ProjectSetupResponse:
-      properties:
-        project:
-          $ref: '#/components/schemas/Project'
-        resources:
-          description: The provisioned resources.
-          items:
-            $ref: '#/components/schemas/ProjectSetupResource'
-          type: array
-      required:
-      - project
-      - resources
-      type: object
     User:
       properties:
         address:
@@ -552,18 +800,18 @@ components:
         units_system:
           type: string
       type: object
-    RealmRole:
+    ProjectSetupResponse:
       properties:
-        endpoints:
+        project:
+          $ref: '#/components/schemas/Project'
+        resources:
+          description: The provisioned resources.
           items:
-            type: integer
+            $ref: '#/components/schemas/ProjectSetupResource'
           type: array
-        id:
-          description: id of the realm role.
-          type: integer
-        name:
-          description: name of the realm role.
-          type: string
+      required:
+      - project
+      - resources
       type: object
     Success:
       properties:
@@ -583,243 +831,6 @@ components:
         success:
           default: true
           type: boolean
-      type: object
-    ShortUser:
-      properties:
-        avatar_url:
-          description: The url to the user's avatar.
-          type: string
-        company_id:
-          description: The id of the company the user belongs to.
-          type: integer
-        email:
-          description: The user's email address.
-          format: email
-          type: string
-        firstName:
-          description: The user's first name.
-          type: string
-        id:
-          description: The user's id.
-          type: integer
-        lastName:
-          description: The user's last name.
-          type: string
-      required:
-      - id
-      - email
-      - company_id
-      type: object
-    ProjectJourneySyncResponse:
-      properties:
-        project_ids:
-          description: List of project IDs that were found and processed.
-          items:
-            format: int64
-            type: integer
-          type: array
-        project_ids_not_found:
-          description: List of project IDs that were not found.
-          items:
-            format: int64
-            type: integer
-          type: array
-      type: object
-    Project:
-      properties:
-        account_manager:
-          $ref: '#/components/schemas/ShortUser'
-          description: Account manager assigned to this project
-        address:
-          type: string
-        asset_manager:
-          $ref: '#/components/schemas/ShortUser'
-          description: Asset manager assigned to this project
-        avatar_url:
-          type: string
-        company_id:
-          format: int64
-          type: integer
-        currency_system:
-          type: string
-        custom_pages:
-          items:
-            $ref: '#/components/schemas/CustomPage'
-          type: array
-        description:
-          type: string
-        handle:
-          type: string
-        hidden_native_pages:
-          items:
-            $ref: '#/components/schemas/HiddenNativePage'
-          type: array
-        id:
-          type: integer
-        latitude:
-          type: string
-        links:
-          items:
-            $ref: '#/components/schemas/ProjectLink'
-          type: array
-        load_balancing_group:
-          type: string
-        longitude:
-          type: string
-        name:
-          type: string
-        project_engineer:
-          $ref: '#/components/schemas/ShortUser'
-          description: Project engineer assigned to this project
-        start:
-          format: date-time
-          type: string
-        status_report:
-          type: string
-        status_report_updated_at:
-          format: date-time
-          type: string
-        units_system:
-          type: string
-      required:
-      - company_id
-      - name
-      type: object
-    CustomPage:
-      properties:
-        id:
-          type: integer
-        title:
-          type: string
-        url:
-          type: string
-      type: object
-    ProjectSetupResource:
-      properties:
-        credentials:
-          description: The credentials created for this resource.
-          items:
-            $ref: '#/components/schemas/ProjectSetupCredential'
-          type: array
-        topics:
-          description: The topics created for this resource, if any.
-          items:
-            $ref: '#/components/schemas/ProjectSetupTopic'
-          type: array
-        type:
-          description: The resource type.
-          type: string
-      required:
-      - type
-      - credentials
-      type: object
-    NewProject:
-      properties:
-        account_manager_id:
-          description: ID of the account manager user
-          format: int64
-          type: integer
-        address:
-          type: string
-        asset_manager_id:
-          format: int64
-          type: integer
-        currency_system:
-          type: string
-        description:
-          type: string
-        latitude:
-          type: string
-        longitude:
-          type: string
-        name:
-          maxLength: 254
-          minLength: 1
-          type: string
-        project_engineer_id:
-          description: ID of the project engineer user
-          format: int64
-          type: integer
-        start:
-          format: date-time
-          type: string
-        status_report:
-          type: string
-        units_system:
-          type: string
-      required:
-      - name
-      type: object
-    HiddenNativePage:
-      properties:
-        title:
-          description: Identifier of the native page to hide or unhide.
-          minLength: 1
-          type: string
-      required:
-      - title
-      type: object
-    CompanyProjectResponse:
-      properties:
-        project:
-          $ref: '#/components/schemas/Project'
-        role:
-          $ref: '#/components/schemas/Role'
-      required:
-      - project
-      - role
-      type: object
-    Error:
-      properties:
-        details:
-          properties: {}
-          type: object
-        error:
-          type: string
-        operation:
-          enum:
-          - ''
-          - get
-          - create
-          - delete
-          - update
-          type: string
-        success:
-          default: false
-          type: boolean
-      required:
-      - error
-      type: object
-    Company:
-      properties:
-        address:
-          type: string
-        avatar_url:
-          type: string
-        description:
-          type: string
-        id:
-          format: int64
-          type: integer
-        name:
-          type: string
-        phone:
-          type: string
-        roles:
-          items:
-            properties:
-              description:
-                type: string
-              id:
-                type: integer
-              name:
-                type: string
-            type: object
-          type: array
-        whitelabel:
-          type: boolean
-      required:
-      - name
       type: object
     Role:
       properties:
@@ -843,44 +854,33 @@ components:
           format: int64
           type: integer
       type: object
-    TagAuth:
+    RealmRole:
       properties:
-        key:
+        endpoints:
+          items:
+            type: integer
+          type: array
+        id:
+          description: id of the realm role.
+          type: integer
+        name:
+          description: name of the realm role.
           type: string
-        read:
-          type: boolean
-        value:
-          type: string
-        write:
-          type: boolean
       type: object
-    ProjectLink:
+    ProjectJourneySyncResponse:
       properties:
-        before:
-          type: string
-        icon:
-          type: string
-        parent:
-          type: string
-        title:
-          type: string
-        titleDE:
-          type: string
-        titleEN:
-          type: string
-        url:
-          type: string
-        urlDE:
-          type: string
-        urlEN:
-          type: string
-      required:
-      - title
-      - titleDE
-      - titleEN
-      - url
-      - urlDE
-      - urlEN
+        project_ids:
+          description: List of project IDs that were found and processed.
+          items:
+            format: int64
+            type: integer
+          type: array
+        project_ids_not_found:
+          description: List of project IDs that were not found.
+          items:
+            format: int64
+            type: integer
+          type: array
       type: object
   securitySchemes:
     basicAuth:
