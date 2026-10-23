@@ -469,3 +469,9 @@ components:
             openid: Use OpenID Connect (required)
       type: oauth2
       x-tokenInfoFunc: app.controllers.auth.connexion_token_info
+x-provenance:
+  method: harvested
+  publisher: Aedifion
+  source: https://api.aedifion.io/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)

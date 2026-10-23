@@ -12,6 +12,9 @@ artifacts:
   authentication/aedifion-authentication.yml:
     method: searched
     evidence: declared in the artifact
+  capabilities/aedifion-capability-edges.yml:
+    method: unknown
+    evidence: no authorship recorded
   changelog/aedifion-changelog.yml:
     method: searched
     evidence: declared in the artifact
@@ -33,10 +36,7 @@ artifacts:
   front-door-ai/2026-09-17.yml:
     method: unknown
     evidence: no authorship recorded
-  kin/checks-2026-09-24T161608.yml:
-    method: generated
-    evidence: Kin Score snapshot written by score.rb
-  kin/score-2026-09-10T222408.yml:
+  kin/checks-2026-10-11T110117.yml:
     method: generated
     evidence: Kin Score snapshot written by score.rb
   kin/score-2026-09-12T062655.yml:
@@ -120,6 +120,21 @@ artifacts:
   kin/score-2026-09-24T161608.yml:
     method: generated
     evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-09-25T210408.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-09-25T232841.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-03T000835.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-03T024842.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
+  kin/score-2026-10-11T110117.yml:
+    method: generated
+    evidence: Kin Score snapshot written by score.rb
   lifecycle/aedifion-lifecycle.yml:
     method: searched
     evidence: declared in the artifact
@@ -131,12 +146,12 @@ artifacts:
     evidence: declared in the artifact
   openapi/_original/aedifion-openapi.json:
     method: harvested
-    evidence: found in openapi/_original/; the fetch URL and bytes were not recorded, so byte-identity
-      to the provider's source is unverified
+    evidence: the same operations as https://api.aedifion.io/openapi.json (sha256 d0f537e0c800, fetched
+      2026-10-04)
   openapi/_original/aedifion-openapi.yml:
     method: harvested
-    evidence: found in openapi/_original/; the fetch URL and bytes were not recorded, so byte-identity
-      to the provider's source is unverified
+    evidence: the same operations as https://api.aedifion.io/openapi.json (sha256 d0f537e0c800, fetched
+      2026-10-04)
   openapi/aedifion-ai-api-openapi.yml:
     method: derived
     evidence: paths are a subset of openapi/_original/ (split from the harvested spec)
@@ -177,8 +192,8 @@ artifacts:
     method: derived
     evidence: paths are a subset of openapi/_original/ (split from the harvested spec)
   overlays/aedifion-http-api-overlay.yaml:
-    method: generated
-    evidence: declared in the artifact
+    method: derived
+    evidence: an API Evangelist overlay (title) over the provider's contract
   packages/aedifion-packages.yml:
     method: searched
     evidence: declared in the artifact
