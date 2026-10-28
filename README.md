@@ -64,68 +64,158 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-aedifion GmbH is a Cologne-based PropTech founded in 2017 that operates a vendor-neutral,
-patented cloud platform for the optimized operation of non-residential buildings. It ingests
-real-time operating data from all building trades via plug-and-play edge devices, applies
-analytics and AI to detect faults, and autonomously controls HVAC plant based on weather
-forecasts, occupancy and electricity prices.
+aedifion GmbH is a Cologne-based PropTech founded in 2017 that operates a vendor-neutral, patented cloud platform for the optimized operation of non-residential buildings. The platform ingests real-time operating data from all building trades via plug-and-play edge devices, applies analytics and AI to detect faults and inefficiencies, and autonomously controls HVAC and building services based on weather forecasts, occupancy and electricity prices - cutting energy use, CO2 emissions and operating costs by up to 40% without structural retrofits. Products span aedifion.io (connectivity and monitoring), aedifion.analytics, aedifion.controls, aedifion.dynamics (demand-side management) and aedifion.smartkit. Developers get a documented HTTP API (OpenAPI 3.0, 208 operations across projects, datapoints, timeseries, analytics, controls, alerts and tasks), an MQTT broker and a Kafka interface for streaming building telemetry. The company serves owners, operators and asset managers of commercial real estate and supports decarbonization, ESG reporting and DGNB, ISO 50001 and GEG certification.
 
-- Website: https://www.aedifion.com/
-- Developer documentation: https://docs.aedifion.io/en/developers/
-- API console: https://api.aedifion.io/ui/
+**Areas:** Building Automation · Smart Buildings · Energy Management · IoT · Real Estate · HVAC · Sustainability · Time Series · Analytics · MQTT · Building Operations · ESG
 
-## API surface
+## Aedifion on APIs.io
 
-| Surface | Where | Notes |
-|---|---|---|
-| HTTP API | `https://api.aedifion.io` | OpenAPI 3.0.1, 147 paths, **208 operations**, 239 schemas. Live at `/openapi.json` and `/openapi.yaml`. |
-| MQTT API | `mqtt.aedifion.io:8883` / `:9001` | TLS-only broker, MQTT 3.1.1, InfluxDB line protocol. |
-| Kafka | not published | SASL/SCRAM-SHA-512, topics `mtw.aed.{project_handle}.*`. Bootstrap servers are not published. |
-| Alert notifications | via HTTP API | Outbound push to Microsoft Teams webhook URLs, Telegram, email, dashboard. |
+Everything profiled for Aedifion is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/aedifion/](https://apis.io/providers/aedifion/)** — or go straight to one of the APIs or properties below.
 
-Authentication is HTTP Basic (documented as legacy) or OpenID Connect bearer tokens from the
-aedifion Keycloak realm at `https://auth.aedifion.io/realms/aedifion`.
+### APIs (14)
 
-## What this profile found
+- [aedifion MQTT API](https://apis.io/apis/aedifion/aedifion-mqtt-api/) — MQTT 3.1.1 broker interface at mqtt.aedifion.io for streaming building telemetry into and out of the aedifion.io platform. TLS-only (ports 8883 for native…
+- [Aedifion AI API](https://apis.io/apis/aedifion/aedifion-ai-api/) — Creating, modifying, and accessing AI related resources.
+- [Aedifion Alert API](https://apis.io/apis/aedifion/aedifion-alert-api/) — Creating, modifying, and accessing alerts and related resources.
+- [Aedifion Analytics API](https://apis.io/apis/aedifion/aedifion-analytics-api/) — Creating, modifying, and accessing analytics and related resources.
+- [Aedifion Company API](https://apis.io/apis/aedifion/aedifion-company-api/) — Creating, modifying, and accessing companies and related resources.
+- [Aedifion Component API](https://apis.io/apis/aedifion/aedifion-component-api/) — Creating, modifying, and accessing components and related resources.
+- [Aedifion Controls API](https://apis.io/apis/aedifion/aedifion-controls-api/) — Creating, modifying, and accessing controls apps and related resources.
+- [Aedifion Datapoint API](https://apis.io/apis/aedifion/aedifion-datapoint-api/) — Creating, modifying, and accessing datapoints and related resources.
+- [Aedifion Meta API](https://apis.io/apis/aedifion/aedifion-meta-api/) — Meta management resources.
+- [Aedifion Project API](https://apis.io/apis/aedifion/aedifion-project-api/) — Creating, modifying, and accessing projects and related resources.
+- [Aedifion Realm API](https://apis.io/apis/aedifion/aedifion-realm-api/) — Accessing realm-level resources.
+- [Aedifion Task API](https://apis.io/apis/aedifion/aedifion-task-api/) — Creating, modifying, and accessing tasks and related resources.
+- [Aedifion User API](https://apis.io/apis/aedifion/aedifion-user-api/) — Creating, modifying, and accessing users and related resources.
+- [Aedifion Time Series API](https://apis.io/apis/aedifion/aedifion-time-series-api/) — The Time Series API from Aedifion — 2 operation(s) for time series.
 
-**Strengths.** The contract is unusually complete for this sector: every one of the 208
-operations carries an `operationId`, a summary, a description and tags. The platform is ISO
-27001 certified (since December 2023, certificate published) and hosted entirely in Germany.
-The semantic component/pin data model aligns with Project Haystack, and BACnet unit
-enumerations are mapped in the schema itself. A dated changelog is maintained and was updated
-five days before this profile was written. aedifion also publishes a genuine, hand-written
-`llms.txt`.
+### Published properties
 
-**Notable gaps.**
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-- The spec declares `servers: [{"url": ""}]` — an **empty string**. The Swagger UI works because
-  the browser resolves it relative to the page, but any client generated from the downloaded
-  document has no host to call. `info.title` is the generic "API Docs" and `info.version` is
-  empty. See `overlays/aedifion-http-api-overlay.yaml`.
-- **No client SDK exists in any package registry.** The only npm package, `aedifion-api`, was
-  unpublished six minutes after it was published in 2021. The GitHub organisation's five repos
-  were all last touched between 2018 and 2020, and the "open source Excel plugin" repository is
-  empty.
-- **No sandbox.** The interactive console calls production, where a setpoint write actuates real
-  building equipment and 43 DELETE operations have no undo.
-- No RFC 9457 problem details, no `Idempotency-Key`, no rate-limit headers, no ETags, no
-  request-id header. Throttling is signalled inconsistently as 423 on one operation and 429 on
-  another.
-- No published vulnerability disclosure policy, `security.txt` or bug bounty.
-- No MCP server. `mcp/aedifion-mcp.yml` holds a **candidate** tool set derived from real
-  operationIds — it is a proposal, not a live agent surface.
+#### AsyncAPI (2)
 
-**Where aedifion does better than most.** The highest-consequence operation on the API,
-`post_datapoint_setpoint`, ships a real `dryrun` parameter, returns the prior value in
-`SetpointAck.state_before`, and defines `value='null'` as a reset that hands the point back to
-the local building automation system. That is a rehearsal path, an audit trail and a reversal
-path on the one operation that moves physical plant.
+Event-driven and webhook contracts.
 
-## Artifacts
+- [Aedifion Event Surface](https://apis.io/asyncapis/aedifion/aedifion-event-surface/)
+- [aedifion MQTT API](https://apis.io/asyncapis/aedifion/aedifion-mqtt-asyncapi/)
 
-`openapi/` `asyncapi/` `authentication/` `scopes/` `conventions/` `errors/` `data-model/`
-`conformance/` `lifecycle/` `changelog/` `rate-limits/` `plans/` `packages/` `components/`
-`sandbox/` `security/` `well-known/` `llms/` `mcp/` `skills/` `overlays/`
+#### Event channels (3)
 
-Six packaged Agent Skills are in `skills/`; every `operationId` they reference was verified
-against the live spec.
+Individual events and webhooks the provider emits.
+
+- [CONTROLS/{loadBalancingGroup}/{projectHandle}](https://apis.io/channels/aedifion/controls-loadbalancinggroup-projecthandle/)
+- [{loadBalancingGroup}/{projectHandle}](https://apis.io/channels/aedifion/loadbalancinggroup-projecthandle/)
+- [META/{loadBalancingGroup}/{projectHandle}](https://apis.io/channels/aedifion/meta-loadbalancinggroup-projecthandle/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [aedifion](https://apis.io/servers/aedifion/aedifion/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Aedifion Http Api Overlay](https://apis.io/overlays/aedifion/aedifion-http-api-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Aedifion Authentication](https://apis.io/security/aedifion/aedifion-authentication/)
+- [Aedifion Domain Security](https://apis.io/security/aedifion/aedifion-domain-security/)
+- [Aedifion Trust Center](https://apis.io/security/aedifion/aedifion-trust-center/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Aedifion Scopes](https://apis.io/scopes/aedifion/aedifion-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Aedifion Plans Pricing](https://apis.io/plans/aedifion/aedifion-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Aedifion Rate Limits](https://apis.io/rate-limits/aedifion/aedifion-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.aedifion.com/)
+- [Documentation](https://docs.aedifion.io/en/)
+- [Getting started](https://docs.aedifion.io/en/developers/http-api/)
+- [API reference](https://api.aedifion.io/ui/)
+- [Pricing](https://docs.aedifion.io/en/products/io/quota/)
+- [Sign up](https://www.aedifion.io/login)
+- [Support](https://www.aedifion.com/kontakt)
+- [Changelog](https://docs.aedifion.io/en/changelog/)
+- [Blog](https://www.aedifion.com/blog)
+- [Compliance](https://www.aedifion.com/sicherheit)
+- [Terms of service](https://www.aedifion.com/agb)
+- [Privacy policy](https://www.aedifion.com/datenschutz)
+- [GitHub](https://github.com/aedifion)
+- [Status](https://status.aedifion.io/)
+
+## API Evangelist rating
+
+**Kin Score 64.6** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 54.8 |
+| Contract governance | 18.2 |
+| Operational transparency | 63.2 |
+| Developer ergonomics | 66.1 |
+| Access clarity | 78.9 |
+
+**Agent readiness 46.2** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | derived (partial credit) |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | yes |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | mostly |
+
+**Regulatory alignment 38.5** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/aedifion/](https://apis.io/providers/aedifion/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Aedifion: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/aedifion/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
