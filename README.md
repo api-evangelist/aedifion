@@ -120,6 +120,12 @@ OpenAPI overlays, including conversational phrasing for each operation.
 
 - [Aedifion Http Api Overlay](https://apis.io/overlays/aedifion/aedifion-http-api-overlay/)
 
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [Aedifion API Rules](https://apis.io/rules/aedifion/aedifion-rules/)
+
 #### Security (3)
 
 Authentication, trust centre, and vulnerability disclosure.
@@ -146,6 +152,12 @@ Published request limits.
 
 - [Aedifion Rate Limits](https://apis.io/rate-limits/aedifion/aedifion-rate-limits/)
 
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Aedifion Finops](https://apis.io/finops/aedifion/aedifion-finops/)
+
 ## Where to find this API
 
 Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
@@ -167,18 +179,18 @@ Links to the company's own pages. This repository publishes no copy of their spe
 
 ## API Evangelist rating
 
-**Kin Score 64.6** — strong · rubric 0.25.0 · scored 2026-10-23
+**Kin Score 60.3** — strong · rubric 0.28.1 · scored 2026-11-21
 
 | Facet | Score |
 |---|---|
 | Discoverability | 73.2 |
-| Contract quality | 54.8 |
-| Contract governance | 18.2 |
-| Operational transparency | 63.2 |
+| Contract quality | 59.2 |
+| Contract governance | 31.8 |
+| Operational transparency | 64.3 |
 | Developer ergonomics | 66.1 |
-| Access clarity | 78.9 |
+| Access clarity | 46.8 |
 
-**Agent readiness 46.2** — agent-ready (gated down from agent-native)
+**Agent readiness 45.3** — agent-ready (gated down from agent-native)
 
 | Agent-readiness dimension | Result |
 |---|---|
@@ -203,8 +215,12 @@ Links to the company's own pages. This repository publishes no copy of their spe
 | Agentic Commerce | — |
 | Pagination Ratio | — |
 | Operation Distinctiveness | mostly (partial credit) |
+| MCP Tool Quality | na |
+| Onboarding Descriptor | — |
+| Dns Aid Index | na |
+| Markdown Negotiation | na |
 
-**Regulatory alignment 38.5** — Energy & Utilities
+**Regulatory alignment 33.6** — Energy & Utilities
 
 The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/aedifion/](https://apis.io/providers/aedifion/).
 
